@@ -4,34 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ProTrack — Central Production Tracker</title>
-<!-- Firebase SDK -->
+<!-- Firebase SDK (correct, single import) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  // 🔁 REPLACE THIS OBJECT WITH YOUR FIREBASE CONFIG
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBmVe4COOYoXIFuHTBppL2cm8vY78aLaek",
-  authDomain: "protrack-e9960.firebaseapp.com",
-  projectId: "protrack-e9960",
-  storageBucket: "protrack-e9960.firebasestorage.app",
-  messagingSenderId: "796146110275",
-  appId: "1:796146110275:web:8f503e2a83adb94c5629f6",
-  measurementId: "G-P5KTX9G4WF"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+  // Your Firebase configuration (from your project)
+  const firebaseConfig = {
+    apiKey: "AIzaSyBmVe4COOYxIFuHTBppL2cm8vY78aLake",
+    authDomain: "protrack-e9960.firebaseapp.com",
+    projectId: "protrack-e9960",
+    storageBucket: "protrack-e9960.firebasestorage.app",
+    messagingSenderId: "796146110275",
+    appId: "1:796146110275:web:8f503e2a83adb94c5629f6",
+    measurementId: "G-P5KTX9G4WF"
+  };
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
@@ -41,7 +29,7 @@ const analytics = getAnalytics(app);
   // Anonymous sign-in
   signInAnonymously(auth).catch(error => console.error("Auth error", error));
 
-  // Make db and auth available globally
+  // Make db and auth available globally for the second script
   window.firebaseDb = db;
   window.firebaseAuth = auth;
 </script>
@@ -253,7 +241,7 @@ const analytics = getAnalytics(app);
           <div>
             <div class="card"><div class="card-header"><span class="card-title">📷 Production Entry</span></div><div class="card-body"><div class="scan-zone" onclick="doScan()"><span style="font-size:32px;">⬡</span><div style="margin-top:8px;">Click to Simulate Scan</div><div style="font-size:11px;color:var(--text-2);margin-top:4px;">Auto-fills part details</div></div><div class="form-grid form-2"><div class="form-group form-full"><label class="form-label">🔍 Search Part</label><div style="display:flex;gap:8px;"><input class="form-input" id="part-search-input" placeholder="Name / Part #"><button class="btn btn-primary btn-sm" onclick="searchPartAndFill()">Search</button></div></div><div class="form-group form-full"><label class="form-label">Select Part</label><select class="form-select" id="e-part-sel" onchange="onPartSelect()"><option value="">— Choose Part —</option></select></div><div class="form-group"><label class="form-label">Description</label><input class="form-input" id="e-desc" readonly></div><div class="form-group"><label class="form-label">ATA</label><input class="form-input" id="e-ata" readonly></div><div class="form-group"><label class="form-label">Part Number</label><input class="form-input" id="e-pnum" readonly></div><div class="form-group"><label class="form-label">Std Hours</label><input class="form-input" id="e-hours" readonly></div><div class="form-group"><label class="form-label">Serial *</label><input class="form-input" id="e-serial" placeholder="Enter serial number"></div><div class="form-group"><label class="form-label">Time</label><input class="form-input" id="e-time" type="datetime-local"></div></div><div style="margin-top:16px;display:flex;gap:10px;"><button class="btn btn-primary" onclick="submitEntry()">✓ Submit Entry</button><button class="btn btn-outline" onclick="clearEntry()">✕ Clear Form</button><button class="btn btn-outline" onclick="cancelEntry()">✖ Cancel</button></div></div></div>
           </div>
-          <div><div class="kpi-grid kpi-2"><div class="kpi-card"><div class="kpi-label">Today (Hours)</div><div class="kpi-val" id="e-today-hrs">0</div><div class="kpi-sub">daily target: <span id="e-daily-target">0</span> hrs</div></div><div class="kpi-card"><div class="kpi-label">This Week (Hours)</div><div class="kpi-val" id="e-week-hrs">0</div><div class="kpi-sub">weekly target: <span id="e-week-target">0</span> hrs</div></div></div><div class="card"><div class="card-header"><span class="card-title">Today's Submissions</span></div><div class="tbl-wrap" style="max-height:400px;overflow-y:auto;">   <table> <thead> <tr><th>Time</th><th>Part</th><th>Hrs</th><th>Serial</th></tr> </thead><tbody id="e-today-list"></tbody> </table> </div></div></div>
+          <div><div class="kpi-grid kpi-2"><div class="kpi-card"><div class="kpi-label">Today (Hours)</div><div class="kpi-val" id="e-today-hrs">0</div><div class="kpi-sub">daily target: <span id="e-daily-target">0</span> hrs</div></div><div class="kpi-card"><div class="kpi-label">This Week (Hours)</div><div class="kpi-val" id="e-week-hrs">0</div><div class="kpi-sub">weekly target: <span id="e-week-target">0</span> hrs</div></div></div><div class="card"><div class="card-header"><span class="card-title">Today's Submissions</span></div><div class="tbl-wrap" style="max-height:400px;overflow-y:auto;">    <table> <thead> <tr><th>Time</th><th>Part</th><th>Hrs</th><th>Serial</th></tr> </thead><tbody id="e-today-list"></tbody> </table></div></div></div>
         </div>
       </div>
       <!-- Technician Stats Page -->
@@ -264,7 +252,7 @@ const analytics = getAnalytics(app);
           <div class="kpi-card"><div class="kpi-label">Month Hours</div><div class="kpi-val" id="ms-month">0</div><div class="kpi-sub">target: <span id="ms-month-target">0</span></div></div>
           <div class="kpi-card"><div class="kpi-label">Monthly Progress</div><div class="kpi-val" id="ms-progress">0%</div><div class="kpi-sub">remaining: <span id="ms-remaining">0</span> hrs</div></div>
         </div>
-        <div class="card"><div class="card-header"><span class="card-title">Production History</span></div><div class="tbl-wrap"> <table> <thead> <tr><th>Date</th><th>Part</th><th>Std Hrs</th><th>Serial</th></tr> </thead><tbody id="ms-hist"></tbody> </table> </div></div>
+        <div class="card"><div class="card-header"><span class="card-title">Production History</span></div><div class="tbl-wrap"> <table> <thead> <tr><th>Date</th><th>Part</th><th>Std Hrs</th><th>Serial</th></tr> </thead><tbody id="ms-hist"></tbody> </table></div></div>
       </div>
       <!-- Leader Dashboard -->
       <div class="page" id="pg-dashboard">
@@ -278,12 +266,12 @@ const analytics = getAnalytics(app);
         <div class="card"><div class="card-header"><span class="card-title">🏆 Technician Monthly Performance</span><div class="search-box"><input type="text" id="lb-search" placeholder="Search technician..." oninput="renderLeaderboard()"></div></div><div id="lb-body"></div></div>
       </div>
       <!-- All Entries -->
-      <div class="page" id="pg-allentries"><div class="toolbar"><div class="search-box"><input type="text" id="ae-search" placeholder="Search entries..."></div><select class="form-select" id="ae-tech" style="width:150px;"><option value="">All Techs</option></select><select class="form-select" id="ae-date"><option value="today">Today</option><option value="week">This Week</option><option value="month">This Month</option><option value="all">All Time</option></select><button class="btn btn-outline" onclick="renderAllEntries()">Filter</button><button class="btn btn-outline btn-sm" onclick="exportAllEntries()">⬇ Export CSV</button></div><div class="card"><div class="tbl-wrap"> <table> <thead> <tr><th>Date</th><th>Tech</th><th>Part</th><th>Serial</th><th>Hours</th></tr> </thead><tbody id="ae-body"></tbody> </table> </div></div></div>
-      <div class="page" id="pg-reports"><div class="card"><div class="card-header">Monthly Hours Summary</div><div class="tbl-wrap"> <table> <thead> <tr><th>Tech</th><th>Monthly Target</th><th>Actual Month</th><th>Progress</th><th>Daily Avg</th><th>Status</th></tr> </thead><tbody id="rpt-weekly"></tbody> </table> </div></div></div>
+      <div class="page" id="pg-allentries"><div class="toolbar"><div class="search-box"><input type="text" id="ae-search" placeholder="Search entries..."></div><select class="form-select" id="ae-tech" style="width:150px;"><option value="">All Techs</option></select><select class="form-select" id="ae-date"><option value="today">Today</option><option value="week">This Week</option><option value="month">This Month</option><option value="all">All Time</option></select><button class="btn btn-outline" onclick="renderAllEntries()">Filter</button><button class="btn btn-outline btn-sm" onclick="exportAllEntries()">⬇ Export CSV</button></div><div class="card"><div class="tbl-wrap"> <table> <thead> <tr><th>Date</th><th>Tech</th><th>Part</th><th>Serial</th><th>Hours</th></tr> </thead><tbody id="ae-body"></tbody> </table></div></div></div>
+      <div class="page" id="pg-reports"><div class="card"><div class="card-header">Monthly Hours Summary</div><div class="tbl-wrap"> <table> <thead> <tr><th>Tech</th><th>Monthly Target</th><th>Actual Month</th><th>Progress</th><th>Daily Avg</th><th>Status</th></tr> </thead><tbody id="rpt-weekly"></tbody> </table></div></div></div>
       <!-- Developer Pages -->
-      <div class="page" id="pg-techs"><div class="toolbar"><button class="btn btn-primary" onclick="openAddTech()">+ Technician</button><button class="btn btn-outline" onclick="openImportTech()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"> <table> <thead> <tr><th>ID</th><th>Name</th><th>Monthly Target (hrs)</th><th>Daily Target</th><th>Status</th><th>Actions</th></tr> </thead><tbody id="at-body"></tbody> </table> </div></div></div>
-      <div class="page" id="pg-parts"><div class="toolbar"><button class="btn btn-primary" onclick="openAddPart()">+ Part</button><button class="btn btn-outline" onclick="openImportPart()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"> <table> <thead> <tr><th>Part Name</th><th>Part Number</th><th>Std Hours</th><th>ATA</th><th>Description</th><th>Actions</th></tr> </thead><tbody id="ap-body"></tbody> </table> </div></div></div>
-      <div class="page" id="pg-leaders"><div class="card"><div class="card-header">👥 Team Leaders Management</div><div class="card-body"><button class="btn btn-primary btn-sm" onclick="openAddLeader()">+ Add Team Leader</button><div class="tbl-wrap" style="margin-top:16px;"> <table> <thead> <tr><th>ID</th><th>Name</th><th>Email</th><th>Actions</th></tr> </thead><tbody id="leaders-body"></tbody> </table> </div></div></div></div>
+      <div class="page" id="pg-techs"><div class="toolbar"><button class="btn btn-primary" onclick="openAddTech()">+ Technician</button><button class="btn btn-outline" onclick="openImportTech()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"> <table> <thead> <tr><th>ID</th><th>Name</th><th>Monthly Target (hrs)</th><th>Daily Target</th><th>Status</th><th>Actions</th></tr> </thead><tbody id="at-body"></tbody> </table></div></div></div>
+      <div class="page" id="pg-parts"><div class="toolbar"><button class="btn btn-primary" onclick="openAddPart()">+ Part</button><button class="btn btn-outline" onclick="openImportPart()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"> <table> <thead> <tr><th>Part Name</th><th>Part Number</th><th>Std Hours</th><th>ATA</th><th>Description</th><th>Actions</th></tr> </thead><tbody id="ap-body"></tbody> </table></div></div></div>
+      <div class="page" id="pg-leaders"><div class="card"><div class="card-header">👥 Team Leaders Management</div><div class="card-body"><button class="btn btn-primary btn-sm" onclick="openAddLeader()">+ Add Team Leader</button><div class="tbl-wrap" style="margin-top:16px;"> <table> <thead> <tr><th>ID</th><th>Name</th><th>Email</th><th>Actions</th></tr> </thead><tbody id="leaders-body"></tbody> </table></div></div></div></div>
       <div class="page" id="pg-system"><div class="card"><div class="card-header">🔐 System Settings</div><div class="card-body"><div class="setting-row"><div><strong>Default Monthly Target (Hours)</strong><div style="font-size:12px;">Initial target for new technicians</div></div><input type="number" id="sys-default-month-target" style="width:120px;" class="form-input" value="160"><button class="btn btn-primary btn-sm" onclick="saveDefaultMonthlyTarget()">Set</button></div><div class="setting-row"><div><strong>Change Default Passwords</strong></div><button class="btn btn-outline btn-sm" onclick="openGlobalPwdModal()">Configure</button></div><div class="setting-row"><div><strong>Export Full Backup</strong></div><button class="btn btn-outline btn-sm" onclick="exportBackup()">⬇ Export JSON</button></div><div class="setting-row"><div><strong>Import Backup</strong></div><label class="btn btn-outline btn-sm" style="cursor:pointer;">⬆ Import JSON<input type="file" accept=".json" style="display:none" onchange="importBackup(this)"></label></div><div class="setting-row"><div><strong>Factory Reset</strong></div><button class="btn btn-danger btn-sm" onclick="factoryReset()">⚠️ Reset All</button></div></div></div></div>
     </div>
   </main>
