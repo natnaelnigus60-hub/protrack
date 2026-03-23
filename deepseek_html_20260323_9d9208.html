@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProTrack — Central Production Tracker</title>
+<!-- Firebase SDK (correct, single import) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  // Your Firebase configuration (from your project)
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBmVe4COOYoXIFuHTBppL2cm8vY78aLaek",
+  authDomain: "protrack-e9960.firebaseapp.com",
+  projectId: "protrack-e9960",
+  storageBucket: "protrack-e9960.firebasestorage.app",
+  messagingSenderId: "796146110275",
+  appId: "1:796146110275:web:d0b8775340b1b1245629f6",
+  measurementId: "G-RK0L1BP5TN"
+};
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  // Anonymous sign-in
+  signInAnonymously(auth).catch(error => console.error("Auth error", error));
+
+  // Make db and auth available globally for the second script
+  window.firebaseDb = db;
+  window.firebaseAuth = auth;
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  /* ========== STYLES (same as before) ========== */
+  :root {
+    --bg: #070c18;
+    --surface: #0c1220;
+    --card: #111827;
+    --card2: #162035;
+    --border: #1e2d47;
+    --border2: #263a57;
+    --blue: #3b82f6;
+    --blue-dim: rgba(59,130,246,.12);
+    --blue-dark: #1d4ed8;
+    --emerald: #10b981;
+    --emerald-dim: rgba(16,185,129,.12);
+    --amber: #f59e0b;
+    --amber-dim: rgba(245,158,11,.12);
+    --rose: #f43f5e;
+    --rose-dim: rgba(244,63,94,.12);
+    --violet: #8b5cf6;
+    --violet-dim: rgba(139,92,246,.12);
+    --text: #e2e8f0;
+    --text-2: #94a3b8;
+    --text-3: #475569;
+    --ui: 'Plus Jakarta Sans', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+    --sidebar-w: 240px;
+    --header-h: 60px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--ui);overflow-x:hidden;}
+  ::-webkit-scrollbar{width:5px;height:5px;}
+  ::-webkit-scrollbar-track{background:var(--surface);}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+  .screen{display:none;min-height:100vh;}
+  .screen.active{display:flex;}
+  #login{background:radial-gradient(ellipse 90% 70% at 50% -10%,rgba(59,130,246,.10) 0%,transparent 65%),var(--bg);align-items:center;justify-content:center;}
+  .login-wrap{width:440px;animation:slideUp .5s ease both;}
+  @keyframes slideUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+  .login-brand{display:flex;align-items:center;gap:10px;margin-bottom:40px;}
+  .brand-mark{width:38px;height:38px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:700;color:#fff;}
+  .brand-name{font-size:20px;font-weight:800;}
+  .brand-name em{font-style:normal;color:var(--blue);}
+  .login-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:36px;position:relative;}
+  .login-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);}
+  .login-h{font-size:22px;font-weight:700;margin-bottom:4px;}
+  .login-sub{color:var(--text-2);font-size:13.5px;margin-bottom:28px;}
+  .f-label{display:block;font-size:12px;font-weight:600;color:var(--text-2);letter-spacing:.5px;margin-bottom:6px;text-transform:uppercase;}
+  .f-input{width:100%;padding:11px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14.5px;outline:none;margin-bottom:18px;}
+  .f-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-dim);}
+  .role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px;}
+  .role-opt{border:1px solid var(--border);border-radius:8px;padding:12px 8px;cursor:pointer;text-align:center;background:var(--surface);transition:all .2s;}
+  .role-opt.sel{border-color:var(--blue);background:var(--blue-dim);}
+  .role-opt .r-icon{font-size:22px;display:block;margin-bottom:6px;}
+  .role-opt .r-label{font-size:10.5px;font-weight:700;color:var(--text-2);}
+  .btn-lg{width:100%;padding:13px;background:var(--blue);border:none;border-radius:8px;color:#fff;font-weight:700;cursor:pointer;transition:background .2s;}
+  .btn-lg:hover{background:var(--blue-dark);}
+  .quick-links{margin-top:16px;text-align:center;font-size:12.5px;color:var(--text-3);}
+  .quick-links a{color:var(--blue);cursor:pointer;text-decoration:none;}
+  .quick-links a:hover{text-decoration:underline;}
+  #app{flex-direction:row;}
+  .sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto;}
+  .sb-brand{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  .sb-section{padding:16px 12px 4px;font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;}
+  .sb-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;color:var(--text-2);font-size:13.5px;font-weight:500;margin:1px 0;transition:all .15s;}
+  .sb-link:hover{background:var(--card);color:var(--text);}
+  .sb-link.active{background:var(--blue-dim);color:var(--blue);font-weight:600;}
+  .sb-link .si{width:18px;text-align:center;font-size:16px;}
+  .sb-footer{margin-top:auto;padding:16px 12px;border-top:1px solid var(--border);}
+  .sb-user{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:var(--card);}
+  .sb-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+  .sb-uname{font-size:13px;font-weight:600;}
+  .sb-urole{font-size:10.5px;color:var(--text-3);}
+  .sb-logout{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:14px;padding:4px;}
+  .sb-logout:hover{color:var(--rose);}
+  .main{flex:1;display:flex;flex-direction:column;min-height:100vh;overflow-y:auto;}
+  .topbar{height:var(--header-h);border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:50;}
+  .topbar-left h1{font-size:18px;font-weight:700;}
+  .topbar-left p{font-size:12.5px;color:var(--text-2);margin-top:2px;}
+  .live-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;background:var(--emerald-dim);border:1px solid rgba(16,185,129,.2);border-radius:99px;font-size:11.5px;font-weight:600;color:var(--emerald);}
+  .live-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);animation:blink 2s infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+  .page-content{flex:1;padding:28px;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:20px;overflow:hidden;}
+  .card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  .card-title{font-size:14.5px;font-weight:700;}
+  .card-body{padding:20px;}
+  .btn{padding:8px 16px;border-radius:7px;border:none;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s;}
+  .btn-primary{background:var(--blue);color:#fff;}
+  .btn-primary:hover{background:var(--blue-dark);}
+  .btn-outline{background:transparent;color:var(--text-2);border:1px solid var(--border);}
+  .btn-outline:hover{border-color:var(--border2);color:var(--text);}
+  .btn-danger{background:transparent;color:var(--rose);border:1px solid rgba(244,63,94,.3);}
+  .btn-danger:hover{background:var(--rose-dim);}
+  .btn-sm{padding:5px 12px;font-size:12px;}
+  .form-grid{display:grid;gap:16px;}
+  .form-2{grid-template-columns:1fr 1fr;}
+  .form-group{display:flex;flex-direction:column;gap:5px;}
+  .form-label{font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;}
+  .form-input,.form-select{padding:10px 13px;background:var(--surface);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:14px;outline:none;width:100%;}
+  .form-input:focus,.form-select:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-dim);}
+  .badge{display:inline-flex;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;}
+  .badge-blue{background:var(--blue-dim);color:var(--blue);}
+  .badge-green{background:var(--emerald-dim);color:var(--emerald);}
+  .badge-amber{background:var(--amber-dim);color:var(--amber);}
+  .badge-red{background:var(--rose-dim);color:var(--rose);}
+  .tbl-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th{padding:11px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);background:rgba(0,0,0,.2);}
+  td{padding:12px 16px;font-size:13.5px;border-bottom:1px solid rgba(30,45,71,.5);}
+  .mono{font-family:var(--mono);font-size:12px;}
+  .kpi-grid{display:grid;gap:16px;margin-bottom:24px;}
+  .kpi-4{grid-template-columns:repeat(4,1fr);}
+  .kpi-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;position:relative;}
+  .kpi-label{font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;margin-bottom:8px;}
+  .kpi-val{font-size:32px;font-weight:800;line-height:1;}
+  .kpi-sub{font-size:12px;color:var(--text-2);margin-top:8px;}
+  .tech-row{display:flex;align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid rgba(30,45,71,.5);cursor:pointer;transition:background .15s;}
+  .tech-row:hover{background:rgba(255,255,255,.02);}
+  .t-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;}
+  .t-info{flex:1;}
+  .t-name{font-weight:600;}
+  .t-id{font-family:var(--mono);font-size:11px;color:var(--text-3);margin-top:2px;}
+  .t-hours{font-family:var(--mono);font-weight:700;font-size:16px;min-width:70px;text-align:right;}
+  .t-progress{width:140px;}
+  .progress-bg{height:6px;background:var(--card2);border-radius:99px;overflow:hidden;}
+  .progress-fill{height:100%;border-radius:99px;background:var(--blue);transition:width .3s;}
+  .toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+  .search-box{position:relative;}
+  .search-box input{padding:8px 12px 8px 34px;background:var(--card);border:1px solid var(--border);border-radius:7px;color:var(--text);width:240px;outline:none;}
+  .search-box input:focus{border-color:var(--blue);}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
+  .modal-bg.open{display:flex;}
+  .modal{background:var(--card);border:1px solid var(--border);border-radius:12px;width:100%;max-width:560px;max-height:90vh;overflow:hidden;}
+  .modal-head{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .modal-title{font-size:17px;font-weight:700;}
+  .modal-close-btn{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text-2);width:32px;height:32px;cursor:pointer;font-size:16px;transition:all .15s;}
+  .modal-close-btn:hover{border-color:var(--rose);color:var(--rose);}
+  .modal-body{padding:24px;overflow-y:auto;}
+  .modal-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+  .toast{position:fixed;bottom:24px;right:24px;z-index:999;padding:13px 18px;background:var(--card);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:12px;transform:translateX(120%);transition:transform .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 32px rgba(0,0,0,.4);}
+  .toast.show{transform:translateX(0);}
+  .toast-icon{font-size:18px;}
+  .toast-msg{font-size:13.5px;font-weight:500;}
+  .setting-row{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border);gap:16px;}
+  .setting-row:last-child{border-bottom:none;}
+  .scan-zone{border:2px dashed var(--border2);border-radius:12px;padding:24px;text-align:center;cursor:pointer;margin-bottom:16px;transition:all .2s;}
+  .scan-zone:hover{border-color:var(--blue);background:var(--blue-dim);}
+  .alert{padding:12px 16px;border-radius:8px;background:var(--blue-dim);margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;}
+  .empty{text-align:center;padding:48px 24px;color:var(--text-2);}
+</style>
+</head>
+<body>
+<div id="login" class="screen active">
+  <div class="login-wrap">
+    <div class="login-brand"><div class="brand-mark">PT</div><div class="brand-name">Pro<em>Track</em></div></div>
+    <div class="login-card">
+      <div class="login-h">Welcome back</div>
+      <div class="login-sub">Production Tracking — Central Database</div>
+      <label class="f-label">Employee ID</label>
+      <input class="f-input" id="li-id" value="T1001">
+      <label class="f-label">Password</label>
+      <input class="f-input" id="li-pw" type="password" value="demo">
+      <div class="f-label">Access Level</div>
+      <div class="role-grid">
+        <div class="role-opt sel" data-role="tech" onclick="pickRole(this)"><span class="r-icon">🔧</span><span class="r-label">TECHNICIAN</span></div>
+        <div class="role-opt" data-role="lead" onclick="pickRole(this)"><span class="r-icon">📊</span><span class="r-label">TEAM LEADER</span></div>
+        <div class="role-opt" data-role="dev" onclick="pickRole(this)"><span class="r-icon">⚙️</span><span class="r-label">DEVELOPER</span></div>
+      </div>
+      <button class="btn-lg" onclick="doLogin()">Sign In →</button>
+      <div class="quick-links">Demo: <a onclick="quickLogin('T1001','tech')">Technician (T1001)</a> · <a onclick="quickLogin('TL001','lead')">Team Leader (TL001)</a> · <a onclick="quickLogin('DEV001','dev')">Developer (DEV001)</a></div>
+      <div class="quick-links" style="margin-top:8px;">⚠️ Default password: <strong>demo</strong></div>
+    </div>
+  </div>
+</div>
+
+<div id="app" class="screen">
+  <aside class="sidebar">
+    <div class="sb-brand"><div class="brand-mark">PT</div><div class="brand-name">Pro<em>Track</em></div></div>
+    <div id="sb-nav"></div>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar" id="sb-avatar">JD</div>
+        <div class="sb-uinfo">
+          <div class="sb-uname" id="sb-uname"></div>
+          <div class="sb-urole" id="sb-urole"></div>
+        </div>
+        <button class="sb-logout" onclick="logout()" title="Sign Out">Sign Out</button>
+      </div>
+      <div style="font-size:10px; text-align:center; margin-top:12px; color:var(--text-3);">Developed by Natnael N.</div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-left"><h1 id="page-title"></h1><p id="page-desc"></p></div>
+      <div class="topbar-right"><div class="live-pill"><div class="live-dot"></div>LIVE</div><button class="btn btn-outline btn-sm" onclick="openChangePassword()" style="margin-left:8px;">🔐 Change Pwd</button></div>
+    </header>
+    <div class="page-content">
+      <!-- Technician Entry Page -->
+      <div class="page" id="pg-entry">
+        <div class="alert">📋 Each entry adds production hours toward your monthly target. Daily/weekly targets are calculated automatically.</div>
+        <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:20px;">
+          <div>
+            <div class="card"><div class="card-header"><span class="card-title">📷 Production Entry</span></div><div class="card-body"><div class="scan-zone" onclick="doScan()"><span style="font-size:32px;">⬡</span><div style="margin-top:8px;">Click to Simulate Scan</div><div style="font-size:11px;color:var(--text-2);margin-top:4px;">Auto-fills part details</div></div><div class="form-grid form-2"><div class="form-group form-full"><label class="form-label">🔍 Search Part</label><div style="display:flex;gap:8px;"><input class="form-input" id="part-search-input" placeholder="Name / Part #"><button class="btn btn-primary btn-sm" onclick="searchPartAndFill()">Search</button></div></div><div class="form-group form-full"><label class="form-label">Select Part</label><select class="form-select" id="e-part-sel" onchange="onPartSelect()"><option value="">— Choose Part —</option></select></div><div class="form-group"><label class="form-label">Description</label><input class="form-input" id="e-desc" readonly></div><div class="form-group"><label class="form-label">ATA</label><input class="form-input" id="e-ata" readonly></div><div class="form-group"><label class="form-label">Part Number</label><input class="form-input" id="e-pnum" readonly></div><div class="form-group"><label class="form-label">Std Hours</label><input class="form-input" id="e-hours" readonly></div><div class="form-group"><label class="form-label">Serial *</label><input class="form-input" id="e-serial" placeholder="Enter serial number"></div><div class="form-group"><label class="form-label">Time</label><input class="form-input" id="e-time" type="datetime-local"></div></div><div style="margin-top:16px;display:flex;gap:10px;"><button class="btn btn-primary" onclick="submitEntry()">✓ Submit Entry</button><button class="btn btn-outline" onclick="clearEntry()">✕ Clear Form</button><button class="btn btn-outline" onclick="cancelEntry()">✖ Cancel</button></div></div></div>
+          </div>
+          <div><div class="kpi-grid kpi-2"><div class="kpi-card"><div class="kpi-label">Today (Hours)</div><div class="kpi-val" id="e-today-hrs">0</div><div class="kpi-sub">daily target: <span id="e-daily-target">0</span> hrs</div></div><div class="kpi-card"><div class="kpi-label">This Week (Hours)</div><div class="kpi-val" id="e-week-hrs">0</div><div class="kpi-sub">weekly target: <span id="e-week-target">0</span> hrs</div></div></div><div class="card"><div class="card-header"><span class="card-title">Today's Submissions</span></div><div class="tbl-wrap" style="max-height:400px;overflow-y:auto;">    <table> <thead> <tr><th>Time</th><th>Part</th><th>Hrs</th><th>Serial</th></tr> </thead><tbody id="e-today-list"></tbody> </table></div></div></div>
+        </div>
+      </div>
+      <!-- Technician Stats Page -->
+      <div class="page" id="pg-mystats">
+        <div class="kpi-grid kpi-4">
+          <div class="kpi-card"><div class="kpi-label">Today Hours</div><div class="kpi-val" id="ms-today">0</div><div class="kpi-sub">target: <span id="ms-daily-target">0</span></div></div>
+          <div class="kpi-card"><div class="kpi-label">Week Hours</div><div class="kpi-val" id="ms-week">0</div><div class="kpi-sub">target: <span id="ms-week-target">0</span></div></div>
+          <div class="kpi-card"><div class="kpi-label">Month Hours</div><div class="kpi-val" id="ms-month">0</div><div class="kpi-sub">target: <span id="ms-month-target">0</span></div></div>
+          <div class="kpi-card"><div class="kpi-label">Monthly Progress</div><div class="kpi-val" id="ms-progress">0%</div><div class="kpi-sub">remaining: <span id="ms-remaining">0</span> hrs</div></div>
+        </div>
+        <div class="card"><div class="card-header"><span class="card-title">Production History</span></div><div class="tbl-wrap"> <table> <thead> <tr><th>Date</th><th>Part</th><th>Std Hrs</th><th>Serial</th></tr> </thead><tbody id="ms-hist"></tbody> </table></div></div>
+      </div>
+      <!-- Leader Dashboard -->
+      <div class="page" id="pg-dashboard">
+        <div class="kpi-grid kpi-4">
+          <div class="kpi-card"><div class="kpi-label">Active Techs</div><div class="kpi-val" id="d-active">0</div></div>
+          <div class="kpi-card"><div class="kpi-label">Shop Total (Month)</div><div class="kpi-val" id="d-shop-month">0</div><div class="kpi-sub">target: <span id="d-shop-target">0</span> hrs</div></div>
+          <div class="kpi-card"><div class="kpi-label">Avg Hrs/Tech (Month)</div><div class="kpi-val" id="d-avg-month">0</div></div>
+          <div class="kpi-card"><div class="kpi-label">Shop Progress</div><div class="kpi-val" id="d-shop-progress">0%</div></div>
+        </div>
+        <div class="card"><div class="card-header"><span class="card-title">⚙️ Monthly Target Settings (Leader/Dev only)</span><button class="btn btn-outline btn-sm" onclick="openMonthlyTargetModal()">Set Monthly Targets</button></div><div class="card-body"><div>Each technician's monthly target is set here. Daily target = monthly / 20, Weekly = daily × 5.</div></div></div>
+        <div class="card"><div class="card-header"><span class="card-title">🏆 Technician Monthly Performance</span><div class="search-box"><input type="text" id="lb-search" placeholder="Search technician..." oninput="renderLeaderboard()"></div></div><div id="lb-body"></div></div>
+      </div>
+      <!-- All Entries -->
+      <div class="page" id="pg-allentries"><div class="toolbar"><div class="search-box"><input type="text" id="ae-search" placeholder="Search entries..."></div><select class="form-select" id="ae-tech" style="width:150px;"><option value="">All Techs</option></select><select class="form-select" id="ae-date"><option value="today">Today</option><option value="week">This Week</option><option value="month">This Month</option><option value="all">All Time</option></select><button class="btn btn-outline" onclick="renderAllEntries()">Filter</button><button class="btn btn-outline btn-sm" onclick="exportAllEntries()">⬇ Export CSV</button></div><div class="card"><div class="tbl-wrap"> <table> <thead> <tr><th>Date</th><th>Tech</th><th>Part</th><th>Serial</th><th>Hours</th></tr> </thead><tbody id="ae-body"></tbody> </table></div></div></div>
+      <div class="page" id="pg-reports"><div class="card"><div class="card-header">Monthly Hours Summary</div><div class="tbl-wrap"> <table> <thead> <tr><th>Tech</th><th>Monthly Target</th><th>Actual Month</th><th>Progress</th><th>Daily Avg</th><th>Status</th></tr> </thead><tbody id="rpt-weekly"></tbody> </table></div></div></div>
+      <!-- Developer Pages -->
+      <div class="page" id="pg-techs"><div class="toolbar"><button class="btn btn-primary" onclick="openAddTech()">+ Technician</button><button class="btn btn-outline" onclick="openImportTech()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"> <table> <thead> <tr><th>ID</th><th>Name</th><th>Monthly Target (hrs)</th><th>Daily Target</th><th>Status</th><th>Actions</th></tr> </thead><tbody id="at-body"></tbody> </table></div></div></div>
+      <div class="page" id="pg-parts"><div class="toolbar"><button class="btn btn-primary" onclick="openAddPart()">+ Part</button><button class="btn btn-outline" onclick="openImportPart()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"> <table> <thead> <tr><th>Part Name</th><th>Part Number</th><th>Std Hours</th><th>ATA</th><th>Description</th><th>Actions</th></tr> </thead><tbody id="ap-body"></tbody> </table></div></div></div>
+      <div class="page" id="pg-leaders"><div class="card"><div class="card-header">👥 Team Leaders Management</div><div class="card-body"><button class="btn btn-primary btn-sm" onclick="openAddLeader()">+ Add Team Leader</button><div class="tbl-wrap" style="margin-top:16px;"> <table> <thead> <tr><th>ID</th><th>Name</th><th>Email</th><th>Actions</th></tr> </thead><tbody id="leaders-body"></tbody> </table></div></div></div></div>
+      <div class="page" id="pg-system"><div class="card"><div class="card-header">🔐 System Settings</div><div class="card-body"><div class="setting-row"><div><strong>Default Monthly Target (Hours)</strong><div style="font-size:12px;">Initial target for new technicians</div></div><input type="number" id="sys-default-month-target" style="width:120px;" class="form-input" value="160"><button class="btn btn-primary btn-sm" onclick="saveDefaultMonthlyTarget()">Set</button></div><div class="setting-row"><div><strong>Change Default Passwords</strong></div><button class="btn btn-outline btn-sm" onclick="openGlobalPwdModal()">Configure</button></div><div class="setting-row"><div><strong>Export Full Backup</strong></div><button class="btn btn-outline btn-sm" onclick="exportBackup()">⬇ Export JSON</button></div><div class="setting-row"><div><strong>Import Backup</strong></div><label class="btn btn-outline btn-sm" style="cursor:pointer;">⬆ Import JSON<input type="file" accept=".json" style="display:none" onchange="importBackup(this)"></label></div><div class="setting-row"><div><strong>Factory Reset</strong></div><button class="btn btn-danger btn-sm" onclick="factoryReset()">⚠️ Reset All</button></div></div></div></div>
+    </div>
+  </main>
+</div>
+
+<!-- Modals -->
+<div class="modal-bg" id="m-tech"><div class="modal"><div class="modal-head"><div class="modal-title">Technician</div><button class="modal-close-btn" onclick="closeModal('m-tech')">✕</button></div><div class="modal-body"><input class="form-input" id="mt-id" placeholder="ID (e.g., T1007)"><input class="form-input" id="mt-name" placeholder="Full Name"><input class="form-input" id="mt-month-target" type="number" step="1" placeholder="Monthly Target (hours)"><select id="mt-status" class="form-select"><option value="active">Active</option><option value="inactive">Inactive</option></select><input class="form-input" id="mt-pwd" type="password" placeholder="Password (default: demo)" value="demo"></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-tech')">Cancel</button><button class="btn btn-primary" onclick="saveTech()">Save</button></div></div></div>
+<div class="modal-bg" id="m-part"><div class="modal"><div class="modal-head"><div class="modal-title">Part</div><button class="modal-close-btn" onclick="closeModal('m-part')">✕</button></div><div class="modal-body"><input class="form-input" id="mp-name" placeholder="Part Name *"><input class="form-input" id="mp-num" placeholder="Part Number *"><input class="form-input" id="mp-hours" type="number" step="0.1" placeholder="Std Hours *"><input class="form-input" id="mp-ata" placeholder="ATA"><input class="form-input" id="mp-desc" placeholder="Description"></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-part')">Cancel</button><button class="btn btn-primary" onclick="savePart()">Save</button></div></div></div>
+<div class="modal-bg" id="m-password"><div class="modal"><div class="modal-head"><div class="modal-title">Change Password</div><button class="modal-close-btn" onclick="closeModal('m-password')">✕</button></div><div class="modal-body"><input class="form-input" id="pwd-old" type="password" placeholder="Current Password"><input class="form-input" id="pwd-new" type="password" placeholder="New Password"></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-password')">Cancel</button><button class="btn btn-primary" onclick="changeMyPassword()">Update</button></div></div></div>
+<div class="modal-bg" id="m-target-month"><div class="modal"><div class="modal-head"><div class="modal-title">Set Monthly Targets</div><button class="modal-close-btn" onclick="closeModal('m-target-month')">✕</button></div><div class="modal-body"><label class="form-label">Select Technician</label><select id="target-tech-select" class="form-select"></select><label class="form-label" style="margin-top:12px;">Monthly Target (hours)</label><input type="number" id="month-target-value" step="1" class="form-input"></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-target-month')">Cancel</button><button class="btn btn-primary" onclick="saveMonthlyTarget()">Save</button></div></div></div>
+<div class="modal-bg" id="m-leader"><div class="modal"><div class="modal-head"><div class="modal-title">Team Leader</div><button class="modal-close-btn" onclick="closeModal('m-leader')">✕</button></div><div class="modal-body"><input class="form-input" id="leader-id" placeholder="ID (e.g., TL002)"><input class="form-input" id="leader-name" placeholder="Name"><input class="form-input" id="leader-email" placeholder="Email"><input class="form-input" id="leader-pwd" type="password" placeholder="Password" value="demo"></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-leader')">Cancel</button><button class="btn btn-primary" onclick="saveLeader()">Save</button></div></div></div>
+<div class="modal-bg" id="m-globalpwd"><div class="modal"><div class="modal-head"><div class="modal-title">Default Passwords</div><button class="modal-close-btn" onclick="closeModal('m-globalpwd')">✕</button></div><div class="modal-body"><label class="form-label">Technician Default</label><input class="form-input" id="def-tech-pwd" placeholder="New default password"><label class="form-label" style="margin-top:12px;">Team Leader Default</label><input class="form-input" id="def-lead-pwd" placeholder="New default password"><label class="form-label" style="margin-top:12px;">Developer Default</label><input class="form-input" id="def-dev-pwd" placeholder="New default password"></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-globalpwd')">Cancel</button><button class="btn btn-primary" onclick="saveDefaultPasswords()">Save</button></div></div></div>
+<div class="modal-bg" id="m-import-tech"><div class="modal"><div class="modal-head"><div class="modal-title">Import Technicians</div><button class="modal-close-btn" onclick="closeModal('m-import-tech')">✕</button></div><div class="modal-body"><div style="border:2px dashed var(--border2);border-radius:8px;padding:24px;text-align:center;cursor:pointer;" onclick="document.getElementById('import-tech-file').click()">📂 Click to upload CSV/Excel<input type="file" id="import-tech-file" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleTechImport(this)"></div></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-import-tech')">Cancel</button></div></div></div>
+<div class="modal-bg" id="m-import-part"><div class="modal"><div class="modal-head"><div class="modal-title">Import Parts</div><button class="modal-close-btn" onclick="closeModal('m-import-part')">✕</button></div><div class="modal-body"><div style="border:2px dashed var(--border2);border-radius:8px;padding:24px;text-align:center;cursor:pointer;" onclick="document.getElementById('import-part-file').click()">📂 Click to upload CSV/Excel<input type="file" id="import-part-file" accept=".csv,.xlsx,.xls" style="display:none" onchange="handlePartImport(this)"></div></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-import-part')">Cancel</button></div></div></div>
+<div class="toast" id="toast"><span class="toast-icon">✅</span><span class="toast-msg"></span></div>
+
+<script type="module">
+  // Import Firebase modules (already imported at top, but we need to use the same instance)
+  import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const db = getFirestore();
+  const auth = getAuth();
+
+  let isFirebaseReady = false;
+  let currentUser = null;
+  let currentRole = null;
+  let editingTechId = null;
+  let editingPartId = null;
+
+  // Global data cache
+  let techs = [];
+  let parts = [];
+  let leaders = [];
+  let settings = {};
+  let entries = [];
+
+  // Helper functions
+  function toast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.querySelector('.toast-msg').textContent = msg;
+    t.querySelector('.toast-icon').textContent = type === 'error' ? '❌' : type === 'warn' ? '⚠️' : '✅';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  async function loadInitialData() {
+    try {
+      const techsSnap = await getDocs(collection(db, 'technicians'));
+      techs = techsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      const partsSnap = await getDocs(collection(db, 'parts'));
+      parts = partsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      const leadersSnap = await getDocs(collection(db, 'leaders'));
+      leaders = leadersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      const settingsSnap = await getDocs(collection(db, 'settings'));
+      if (!settingsSnap.empty) settings = settingsSnap.docs[0].data();
+      else settings = { defaultMonthlyTarget: 160, passwords: { tech: 'demo', lead: 'demo', dev: 'demo' } };
+      
+      const entriesSnap = await getDocs(collection(db, 'entries'));
+      entries = entriesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      // If no data, seed defaults
+      if (techs.length === 0) {
+        const defaultTechs = [
+          { id: 'T1001', name: 'John Smith', monthlyTarget: 160, status: 'active', password: 'demo', initials: 'JS', color: '#3b82f6' },
+          { id: 'T1002', name: 'Maria Garcia', monthlyTarget: 150, status: 'active', password: 'demo', initials: 'MG', color: '#10b981' },
+          { id: 'T1003', name: 'David Chen', monthlyTarget: 160, status: 'active', password: 'demo', initials: 'DC', color: '#f59e0b' }
+        ];
+        for (const t of defaultTechs) {
+          await setDoc(doc(db, 'technicians', t.id), t);
+          techs.push(t);
+        }
+      }
+      if (parts.length === 0) {
+        const defaultParts = [
+          { id: 'p1', name: 'Seat Back Assembly', num: 'TSFN-800-01', hours: 2.5, ata: '25-60-01', desc: 'Main seat back assembly' },
+          { id: 'p2', name: 'Seat Cushion', num: 'TSFN-900-02', hours: 1.8, ata: '25-60-02', desc: 'Comfort foam cushion' },
+          { id: 'p3', name: 'Armrest Assembly LH', num: 'TSFN-750-03', hours: 1.2, ata: '25-60-03', desc: 'Left-hand armrest' },
+          { id: 'p4', name: 'Headrest Unit', num: 'TSFN-820-04', hours: 0.8, ata: '25-60-04', desc: 'Adjustable headrest' }
+        ];
+        for (const p of defaultParts) {
+          await setDoc(doc(db, 'parts', p.id), p);
+          parts.push(p);
+        }
+      }
+      if (leaders.length === 0) {
+        await setDoc(doc(db, 'leaders', 'TL001'), { id: 'TL001', name: 'Sarah Mitchell', email: 'sarah@company.com', password: 'demo' });
+        leaders = [{ id: 'TL001', name: 'Sarah Mitchell', email: 'sarah@company.com', password: 'demo' }];
+      }
+      if (entries.length === 0) {
+        const monthRange = getCurrentMonthRange();
+        for (let i = 0; i < 20; i++) {
+          const tech = techs[i % techs.length];
+          const part = parts[i % parts.length];
+          const randomDay = new Date(Date.now() - Math.random() * 20 * 86400000);
+          if (randomDay.toISOString().slice(0,10) >= monthRange.start && randomDay.toISOString().slice(0,10) <= monthRange.end) {
+            const entry = {
+              techId: tech.id,
+              techName: tech.name,
+              pname: part.name,
+              pnum: part.num,
+              serial: 'SN' + Math.floor(10000 + Math.random() * 90000),
+              time: randomDay.toISOString(),
+              hours: part.hours,
+              desc: part.desc,
+              ata: part.ata
+            };
+            await addDoc(collection(db, 'entries'), entry);
+            entries.push(entry);
+          }
+        }
+      }
+      
+      // Show login screen and attach event handlers
+      document.getElementById('login').classList.add('active');
+      setupLoginHandlers();
+    } catch (err) {
+      console.error("Error loading data", err);
+      toast("Failed to connect to Firebase. Check your config.", "error");
+    }
+  }
+
+  function setupLoginHandlers() {
+    window.pickRole = (el) => {
+      selectedRole = el.dataset.role;
+      document.querySelectorAll('.role-opt').forEach(r => r.classList.remove('sel'));
+      el.classList.add('sel');
+    };
+    window.quickLogin = (id, role) => {
+      document.getElementById('li-id').value = id;
+      selectedRole = role;
+      document.querySelectorAll('.role-opt').forEach(r => r.classList.toggle('sel', r.dataset.role === role));
+      doLogin();
+    };
+    window.doLogin = () => {
+      const id = document.getElementById('li-id').value.trim();
+      const pwd = document.getElementById('li-pw').value;
+      let user = null;
+      if (selectedRole === 'tech') user = techs.find(t => t.id === id && t.password === pwd);
+      else if (selectedRole === 'lead') user = leaders.find(l => l.id === id && l.password === pwd);
+      else if (selectedRole === 'dev' && id === 'DEV001' && pwd === (settings.passwords?.dev || 'demo')) user = { id: 'DEV001', name: 'Developer Admin' };
+      if (!user) { toast('Invalid credentials. Use demo password: demo', 'error'); return; }
+      currentUser = user;
+      currentRole = selectedRole;
+      document.getElementById('sb-avatar').textContent = (user.initials || user.name.slice(0,2)).toUpperCase();
+      document.getElementById('sb-avatar').style.background = user.color || '#3b82f6';
+      document.getElementById('sb-uname').textContent = user.name;
+      document.getElementById('sb-urole').textContent = currentRole.toUpperCase();
+      buildNav();
+      document.getElementById('login').classList.remove('active');
+      document.getElementById('app').classList.add('active');
+      if (currentRole === 'tech') navigateTo('entry');
+      else if (currentRole === 'lead') navigateTo('dashboard');
+      else navigateTo('techs');
+      toast(`Welcome, ${user.name.split(' ')[0]}!`);
+    };
+    window.logout = () => {
+      currentUser = null;
+      currentRole = null;
+      document.getElementById('app').classList.remove('active');
+      document.getElementById('login').classList.add('active');
+    };
+  }
+
+  // Date helpers
+  function getCurrentMonthRange() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const start = new Date(year, month, 1).toISOString().slice(0,10);
+    const end = new Date(year, month + 1, 0).toISOString().slice(0,10);
+    return { start, end };
+  }
+  function getCurrentWeekRange() {
+    const now = new Date();
+    const day = now.getDay();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+    const friday = new Date(monday);
+    friday.setDate(monday.getDate() + 4);
+    return { start: monday.toISOString().slice(0,10), end: friday.toISOString().slice(0,10) };
+  }
+  function getDailyTarget(monthlyTarget) { return monthlyTarget / 20; }
+  function getWeeklyTarget(monthlyTarget) { return getDailyTarget(monthlyTarget) * 5; }
+
+  // Navigation
+  const navMap = { tech: ['entry', 'mystats'], lead: ['dashboard', 'allentries', 'reports'], dev: ['techs', 'parts', 'leaders', 'system'] };
+  const pageTitles = {
+    entry: { title: 'Production Entry', desc: 'Log production hours' },
+    mystats: { title: 'My Stats', desc: 'Monthly progress' },
+    dashboard: { title: 'Team Dashboard', desc: 'Monthly performance' },
+    allentries: { title: 'All Entries', desc: 'Complete log' },
+    reports: { title: 'Reports', desc: 'Monthly summary' },
+    techs: { title: 'Manage Technicians', desc: 'Set monthly targets' },
+    parts: { title: 'Parts', desc: 'Manage parts' },
+    leaders: { title: 'Team Leaders', desc: 'Manage leaders' },
+    system: { title: 'System', desc: 'Settings' }
+  };
+  function buildNav() {
+    const nav = document.getElementById('sb-nav');
+    const icons = { entry: '⊕', mystats: '📊', dashboard: '🖥', allentries: '📋', reports: '📈', techs: '👷', parts: '🔩', leaders: '👥', system: '⚙️' };
+    nav.innerHTML = '<div class="sb-section">Menu</div>' + (navMap[currentRole] || []).map(p => `<div class="sb-link" data-page="${p}" onclick="navigateTo('${p}')"><span class="si">${icons[p]}</span>${p.charAt(0).toUpperCase() + p.slice(1)}</div>`).join('');
+  }
+  window.navigateTo = (page) => {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('pg-' + page)?.classList.add('active');
+    document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
+    document.querySelector(`.sb-link[data-page="${page}"]`)?.classList.add('active');
+    const meta = pageTitles[page] || { title: page, desc: '' };
+    document.getElementById('page-title').textContent = meta.title;
+    document.getElementById('page-desc').textContent = meta.desc;
+    if (page === 'entry') renderEntry();
+    if (page === 'mystats') renderMyStats();
+    if (page === 'dashboard') { populateTechFilter(); renderDashboard(); }
+    if (page === 'allentries') { populateTechFilter(); renderAllEntries(); }
+    if (page === 'reports') renderReports();
+    if (page === 'techs') renderTechs();
+    if (page === 'parts') renderParts();
+    if (page === 'leaders') renderLeaders();
+    if (page === 'system') renderSystem();
+  };
+
+  // Render functions (using global data)
+  function renderEntry() {
+    const today = new Date().toISOString().slice(0,10);
+    const userEntries = entries.filter(e => e.techId === currentUser.id);
+    const todayHrs = userEntries.filter(e => e.time?.startsWith(today)).reduce((s,e) => s + (e.hours || 0), 0);
+    const weekRange = getCurrentWeekRange();
+    const weekHrs = userEntries.filter(e => e.time >= weekRange.start && e.time <= weekRange.end).reduce((s,e) => s + (e.hours || 0), 0);
+    const monthlyTarget = currentUser.monthlyTarget || 160;
+    const dailyTarget = getDailyTarget(monthlyTarget);
+    const weeklyTarget = getWeeklyTarget(monthlyTarget);
+    document.getElementById('e-today-hrs').textContent = todayHrs.toFixed(1);
+    document.getElementById('e-week-hrs').textContent = weekHrs.toFixed(1);
+    document.getElementById('e-daily-target').textContent = dailyTarget.toFixed(1);
+    document.getElementById('e-week-target').textContent = weeklyTarget.toFixed(1);
+    const sel = document.getElementById('e-part-sel');
+    sel.innerHTML = '<option value="">— Choose Part —</option>' + parts.map(p => `<option value="${p.id}">${p.name} (${p.hours}h)</option>`).join('');
+    document.getElementById('e-time').value = new Date().toISOString().slice(0,16);
+    const tbody = document.getElementById('e-today-list');
+    const todayEntries = userEntries.filter(e => e.time?.startsWith(today)).slice(0,15);
+    tbody.innerHTML = todayEntries.length ? todayEntries.map(e => `<tr><td class="mono">${new Date(e.time).toLocaleTimeString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">No entries today</td></tr>';
+  }
+  function onPartSelect() {
+    const partId = document.getElementById('e-part-sel').value;
+    if (!partId) return;
+    const part = parts.find(p => p.id === partId);
+    if (part) {
+      document.getElementById('e-desc').value = part.desc || '';
+      document.getElementById('e-ata').value = part.ata || '';
+      document.getElementById('e-pnum').value = part.num;
+      document.getElementById('e-hours').value = part.hours;
+    }
+  }
+  function searchPartAndFill() {
+    const term = document.getElementById('part-search-input').value.toLowerCase();
+    if (!term) return;
+    const found = parts.find(p => p.name.toLowerCase().includes(term) || p.num.toLowerCase().includes(term));
+    if (found) {
+      document.getElementById('e-part-sel').value = found.id;
+      onPartSelect();
+      toast(`Found: ${found.name}`);
+    } else toast('No matching part', 'warn');
+  }
+  async function submitEntry() {
+    const partId = document.getElementById('e-part-sel').value;
+    const serial = document.getElementById('e-serial').value.trim();
+    if (!partId) { toast('Select a part', 'error'); return; }
+    if (!serial) { toast('Enter serial number', 'error'); return; }
+    const part = parts.find(p => p.id === partId);
+    if (!part) return;
+    const entry = {
+      techId: currentUser.id,
+      techName: currentUser.name,
+      pname: part.name,
+      pnum: part.num,
+      serial,
+      time: document.getElementById('e-time').value || new Date().toISOString(),
+      hours: part.hours,
+      desc: part.desc,
+      ata: part.ata
+    };
+    try {
+      const docRef = await addDoc(collection(db, 'entries'), entry);
+      entry.id = docRef.id;
+      entries.unshift(entry);
+      clearEntry();
+      renderEntry();
+      toast(`✓ ${part.name} - ${part.hours}h logged`);
+    } catch (err) {
+      toast("Failed to save entry", "error");
+    }
+  }
+  function clearEntry() {
+    document.getElementById('e-part-sel').value = '';
+    document.getElementById('e-desc').value = '';
+    document.getElementById('e-ata').value = '';
+    document.getElementById('e-pnum').value = '';
+    document.getElementById('e-hours').value = '';
+    document.getElementById('e-serial').value = '';
+    document.getElementById('part-search-input').value = '';
+    document.getElementById('e-time').value = new Date().toISOString().slice(0,16);
+  }
+  function cancelEntry() { clearEntry(); toast('Entry cancelled'); }
+  function doScan() { if (!parts.length) { toast('No parts', 'error'); return; } const rand = parts[Math.floor(Math.random() * parts.length)]; document.getElementById('e-part-sel').value = rand.id; onPartSelect(); document.getElementById('e-serial').focus(); toast(`Scanned: ${rand.name}`); }
+
+  function renderMyStats() {
+    const userEntries = entries.filter(e => e.techId === currentUser.id);
+    const today = new Date().toISOString().slice(0,10);
+    const todayHrs = userEntries.filter(e => e.time?.startsWith(today)).reduce((s,e) => s + (e.hours || 0), 0);
+    const weekRange = getCurrentWeekRange();
+    const weekHrs = userEntries.filter(e => e.time >= weekRange.start && e.time <= weekRange.end).reduce((s,e) => s + (e.hours || 0), 0);
+    const monthRange = getCurrentMonthRange();
+    const monthHrs = userEntries.filter(e => e.time >= monthRange.start && e.time <= monthRange.end).reduce((s,e) => s + (e.hours || 0), 0);
+    const monthlyTarget = currentUser.monthlyTarget || 160;
+    const dailyTarget = getDailyTarget(monthlyTarget);
+    const weeklyTarget = getWeeklyTarget(monthlyTarget);
+    const progress = Math.min(100, Math.round(monthHrs / monthlyTarget * 100));
+    const remaining = Math.max(0, monthlyTarget - monthHrs);
+    document.getElementById('ms-today').textContent = todayHrs.toFixed(1);
+    document.getElementById('ms-daily-target').textContent = dailyTarget.toFixed(1);
+    document.getElementById('ms-week').textContent = weekHrs.toFixed(1);
+    document.getElementById('ms-week-target').textContent = weeklyTarget.toFixed(1);
+    document.getElementById('ms-month').textContent = monthHrs.toFixed(1);
+    document.getElementById('ms-month-target').textContent = monthlyTarget;
+    document.getElementById('ms-progress').textContent = progress + '%';
+    document.getElementById('ms-remaining').textContent = remaining.toFixed(1);
+    const tbody = document.getElementById('ms-hist');
+    tbody.innerHTML = userEntries.slice(0,30).map(e => `<tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">No history</td></tr>';
+  }
+
+  function renderDashboard() {
+    const monthRange = getCurrentMonthRange();
+    const monthEntries = entries.filter(e => e.time >= monthRange.start && e.time <= monthRange.end);
+    const activeTechs = new Set(monthEntries.map(e => e.techId)).size;
+    const totalMonthHrs = monthEntries.reduce((s,e) => s + (e.hours || 0), 0);
+    const totalMonthlyTarget = techs.filter(t => t.status === 'active').reduce((s,t) => s + (t.monthlyTarget || 160), 0);
+    const avgMonth = activeTechs ? totalMonthHrs / activeTechs : 0;
+    const progress = totalMonthlyTarget ? Math.min(100, Math.round(totalMonthHrs / totalMonthlyTarget * 100)) : 0;
+    document.getElementById('d-active').textContent = activeTechs;
+    document.getElementById('d-shop-month').textContent = totalMonthHrs.toFixed(1);
+    document.getElementById('d-shop-target').textContent = totalMonthlyTarget;
+    document.getElementById('d-avg-month').textContent = avgMonth.toFixed(1);
+    document.getElementById('d-shop-progress').textContent = progress + '%';
+    renderLeaderboard();
+  }
+  function renderLeaderboard() {
+    const monthRange = getCurrentMonthRange();
+    const monthEntries = entries.filter(e => e.time >= monthRange.start && e.time <= monthRange.end);
+    const search = document.getElementById('lb-search')?.value.toLowerCase() || '';
+    const activeTechs = techs.filter(t => t.status === 'active');
+    const stats = activeTechs.map(t => ({ ...t, monthHrs: monthEntries.filter(e => e.techId === t.id).reduce((s,e) => s + (e.hours || 0), 0) }))
+      .filter(t => !search || t.name.toLowerCase().includes(search))
+      .sort((a,b) => b.monthHrs - a.monthHrs);
+    const container = document.getElementById('lb-body');
+    if (!stats.length) { container.innerHTML = '<div class="empty">No technicians found</div>'; return; }
+    container.innerHTML = stats.map(t => {
+      const target = t.monthlyTarget || 160;
+      const pct = Math.min(100, Math.round(t.monthHrs / target * 100));
+      return `<div class="tech-row"><div class="t-avatar" style="background:${t.color || '#3b82f6'}">${(t.initials || t.name.slice(0,2)).toUpperCase()}</div><div class="t-info"><div class="t-name">${t.name}</div><div class="t-id">${t.id} | Monthly Target: ${target}h</div></div><div class="t-progress"><div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div></div><div class="t-hours" style="color:${pct >= 100 ? 'var(--emerald)' : pct >= 70 ? 'var(--amber)' : 'var(--rose)'}">${t.monthHrs.toFixed(1)}h / ${target}h</div></div>`;
+    }).join('');
+  }
+
+  function populateTechFilter() {
+    const sel = document.getElementById('ae-tech');
+    if (sel) sel.innerHTML = '<option value="">All Technicians</option>' + techs.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+  }
+  function renderAllEntries() {
+    const techFilter = document.getElementById('ae-tech').value;
+    const dateFilter = document.getElementById('ae-date').value;
+    const search = document.getElementById('ae-search').value.toLowerCase();
+    const today = new Date().toISOString().slice(0,10);
+    const weekRange = getCurrentWeekRange();
+    const monthRange = getCurrentMonthRange();
+    let filtered = entries;
+    if (techFilter) filtered = filtered.filter(e => e.techId === techFilter);
+    if (dateFilter === 'today') filtered = filtered.filter(e => e.time?.startsWith(today));
+    if (dateFilter === 'week') filtered = filtered.filter(e => e.time >= weekRange.start && e.time <= weekRange.end);
+    if (dateFilter === 'month') filtered = filtered.filter(e => e.time >= monthRange.start && e.time <= monthRange.end);
+    if (search) filtered = filtered.filter(e => (e.techName + e.pname + e.serial).toLowerCase().includes(search));
+    const tbody = document.getElementById('ae-body');
+    tbody.innerHTML = filtered.slice(0,200).map(e => `<tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.techName}</td><td>${e.pname}</td><td class="mono">${e.serial}</td><td>${e.hours}h</td></tr>`).join('') || '<tr><td colspan="5" class="empty">No entries</td></tr>';
+  }
+  function exportAllEntries() {
+    let csv = 'Date,Technician,Part,Serial,Hours\n';
+    entries.forEach(e => csv += `"${new Date(e.time).toLocaleString()}","${e.techName}","${e.pname}","${e.serial}",${e.hours}\n`);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    a.download = `production_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('CSV exported');
+  }
+  function renderReports() {
+    const monthRange = getCurrentMonthRange();
+    const monthEntries = entries.filter(e => e.time >= monthRange.start && e.time <= monthRange.end);
+    const activeTechs = techs.filter(t => t.status === 'active');
+    const tbody = document.getElementById('rpt-weekly');
+    tbody.innerHTML = activeTechs.map(t => {
+      const monthHrs = monthEntries.filter(e => e.techId === t.id).reduce((s,e) => s + (e.hours || 0), 0);
+      const target = t.monthlyTarget || 160;
+      const progress = Math.min(100, Math.round(monthHrs / target * 100));
+      const dailyAvg = monthHrs / 20;
+      const status = progress >= 100 ? '✅ Achieved' : progress >= 80 ? '⚠️ Near' : progress >= 60 ? '🟡 In Progress' : '🔴 Behind';
+      const statusClass = progress >= 100 ? 'badge-green' : progress >= 80 ? 'badge-amber' : progress >= 60 ? 'badge-blue' : 'badge-red';
+      return `<tr><td><strong>${t.name}</strong></td><td>${target}h</td><td>${monthHrs.toFixed(1)}h</td><td><span class="badge ${statusClass}">${progress}%</span></td><td>${dailyAvg.toFixed(1)}h</td><td>${status}</td></tr>`;
+    }).join('') || '<tr><td colspan="6" class="empty">No technicians</td></tr>';
+  }
+
+  // Admin functions (Firestore versions)
+  function renderTechs() {
+    const tbody = document.getElementById('at-body');
+    tbody.innerHTML = techs.map(t => `<tr><td class="mono">${t.id}</td><td>${t.name}</td><td><span class="badge badge-blue">${t.monthlyTarget || 160}h</span></td><td>${(t.monthlyTarget / 20).toFixed(1)}h</td><td><span class="badge ${t.status === 'active' ? 'badge-green' : 'badge-gray'}">${t.status}</span></td><td><button class="btn-outline btn-sm" onclick="openEditTech('${t.id}')">✏️</button> <button class="btn-outline btn-sm" onclick="deleteTech('${t.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No technicians</td></tr>';
+  }
+  window.openAddTech = () => { editingTechId = null; document.getElementById('mt-id').value = ''; document.getElementById('mt-name').value = ''; document.getElementById('mt-month-target').value = ''; document.getElementById('mt-status').value = 'active'; document.getElementById('mt-pwd').value = 'demo'; openModal('m-tech'); };
+  window.openEditTech = (id) => { const t = techs.find(t => t.id === id); if (t) { editingTechId = id; document.getElementById('mt-id').value = t.id; document.getElementById('mt-name').value = t.name; document.getElementById('mt-month-target').value = t.monthlyTarget || 160; document.getElementById('mt-status').value = t.status; document.getElementById('mt-pwd').value = t.password || 'demo'; openModal('m-tech'); } };
+  window.saveTech = async () => {
+    const id = document.getElementById('mt-id').value.trim();
+    const name = document.getElementById('mt-name').value.trim();
+    const monthlyTarget = parseFloat(document.getElementById('mt-month-target').value) || 160;
+    const status = document.getElementById('mt-status').value;
+    const pwd = document.getElementById('mt-pwd').value.trim() || 'demo';
+    if (!id || !name) { toast('ID and Name required', 'error'); return; }
+    const colors = ['#3b82f6','#10b981','#f59e0b','#f43f5e','#8b5cf6'];
+    if (editingTechId) {
+      const idx = techs.findIndex(t => t.id === editingTechId);
+      if (idx !== -1) {
+        const updated = { ...techs[idx], id, name, monthlyTarget, status, password: pwd };
+        await setDoc(doc(db, 'technicians', editingTechId), updated);
+        techs[idx] = updated;
+        if (currentUser && currentUser.id === editingTechId) currentUser = updated;
+        toast('Technician updated');
+      }
+    } else {
+      if (techs.find(t => t.id === id)) { toast('ID exists', 'error'); return; }
+      const newTech = { id, name, monthlyTarget, status, password: pwd, initials: name.slice(0,2).toUpperCase(), color: colors[techs.length % colors.length] };
+      await setDoc(doc(db, 'technicians', id), newTech);
+      techs.push(newTech);
+      toast('Technician added');
+    }
+    closeModal('m-tech');
+    renderTechs();
+    if (currentRole === 'lead') renderDashboard();
+  };
+  window.deleteTech = async (id) => {
+    if (!confirm('Delete technician?')) return;
+    await deleteDoc(doc(db, 'technicians', id));
+    techs = techs.filter(t => t.id !== id);
+    renderTechs();
+    if (currentRole === 'lead') renderDashboard();
+    toast('Technician removed');
+  };
+
+  function renderParts() {
+    const tbody = document.getElementById('ap-body');
+    tbody.innerHTML = parts.map(p => `<tr><td><strong>${p.name}</strong></td><td class="mono">${p.num}</td><td><span class="badge badge-blue">${p.hours}h</span></td><td>${p.ata || '—'}</td><td>${p.desc || '—'}</td><td><button class="btn-outline btn-sm" onclick="openEditPart('${p.id}')">✏️</button> <button class="btn-outline btn-sm" onclick="deletePart('${p.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No parts</td></tr>';
+  }
+  window.openAddPart = () => { editingPartId = null; document.getElementById('mp-name').value = ''; document.getElementById('mp-num').value = ''; document.getElementById('mp-hours').value = ''; document.getElementById('mp-ata').value = ''; document.getElementById('mp-desc').value = ''; openModal('m-part'); };
+  window.openEditPart = (id) => { const p = parts.find(p => p.id === id); if (p) { editingPartId = id; document.getElementById('mp-name').value = p.name; document.getElementById('mp-num').value = p.num; document.getElementById('mp-hours').value = p.hours; document.getElementById('mp-ata').value = p.ata || ''; document.getElementById('mp-desc').value = p.desc || ''; openModal('m-part'); } };
+  window.savePart = async () => {
+    const name = document.getElementById('mp-name').value.trim();
+    const num = document.getElementById('mp-num').value.trim();
+    const hours = parseFloat(document.getElementById('mp-hours').value);
+    if (!name || !num || !hours) { toast('Name, Number and Hours required', 'error'); return; }
+    const part = { name, num, hours, ata: document.getElementById('mp-ata').value, desc: document.getElementById('mp-desc').value };
+    if (editingPartId) {
+      await setDoc(doc(db, 'parts', editingPartId), { id: editingPartId, ...part });
+      const idx = parts.findIndex(p => p.id === editingPartId);
+      if (idx !== -1) parts[idx] = { id: editingPartId, ...part };
+      toast('Part updated');
+    } else {
+      const newId = Date.now().toString();
+      await setDoc(doc(db, 'parts', newId), { id: newId, ...part });
+      parts.push({ id: newId, ...part });
+      toast('Part added');
+    }
+    closeModal('m-part');
+    renderParts();
+  };
+  window.deletePart = async (id) => {
+    if (!confirm('Delete part?')) return;
+    await deleteDoc(doc(db, 'parts', id));
+    parts = parts.filter(p => p.id !== id);
+    renderParts();
+    toast('Part removed');
+  };
+
+  function renderLeaders() {
+    const tbody = document.getElementById('leaders-body');
+    tbody.innerHTML = leaders.map(l => `<tr><td class="mono">${l.id}</td><td>${l.name}</td><td>${l.email || '—'}</td><td><button class="btn-outline btn-sm" onclick="deleteLeader('${l.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="4" class="empty">No leaders</td></tr>';
+  }
+  window.openAddLeader = () => { document.getElementById('leader-id').value = ''; document.getElementById('leader-name').value = ''; document.getElementById('leader-email').value = ''; document.getElementById('leader-pwd').value = 'demo'; openModal('m-leader'); };
+  window.saveLeader = async () => {
+    const id = document.getElementById('leader-id').value.trim();
+    const name = document.getElementById('leader-name').value.trim();
+    if (!id || !name) { toast('ID and Name required', 'error'); return; }
+    if (leaders.find(l => l.id === id)) { toast('ID exists', 'error'); return; }
+    const newLeader = { id, name, email: document.getElementById('leader-email').value, password: document.getElementById('leader-pwd').value || 'demo' };
+    await setDoc(doc(db, 'leaders', id), newLeader);
+    leaders.push(newLeader);
+    closeModal('m-leader');
+    renderLeaders();
+    toast('Leader added');
+  };
+  window.deleteLeader = async (id) => {
+    if (!confirm('Delete leader?')) return;
+    await deleteDoc(doc(db, 'leaders', id));
+    leaders = leaders.filter(l => l.id !== id);
+    renderLeaders();
+    toast('Leader removed');
+  };
+
+  function renderSystem() {
+    document.getElementById('sys-default-month-target').value = settings.defaultMonthlyTarget || 160;
+  }
+  window.saveDefaultMonthlyTarget = async () => {
+    const val = parseFloat(document.getElementById('sys-default-month-target').value) || 160;
+    settings.defaultMonthlyTarget = val;
+    const settingsRef = collection(db, 'settings');
+    const snap = await getDocs(settingsRef);
+    if (!snap.empty) await setDoc(doc(db, 'settings', snap.docs[0].id), settings);
+    else await setDoc(doc(db, 'settings', 'global'), settings);
+    toast('Default monthly target set');
+  };
+  window.openMonthlyTargetModal = () => {
+    const select = document.getElementById('target-tech-select');
+    select.innerHTML = '<option value="">Select Technician</option>' + techs.filter(t => t.status === 'active').map(t => `<option value="${t.id}">${t.name} (current: ${t.monthlyTarget || 160}h)</option>`).join('');
+    document.getElementById('month-target-value').value = '';
+    openModal('m-target-month');
+  };
+  window.saveMonthlyTarget = async () => {
+    const techId = document.getElementById('target-tech-select').value;
+    const newTarget = parseFloat(document.getElementById('month-target-value').value);
+    if (!techId || isNaN(newTarget) || newTarget <= 0) { toast('Select technician and enter valid target', 'error'); return; }
+    const idx = techs.findIndex(t => t.id === techId);
+    if (idx !== -1) {
+      techs[idx].monthlyTarget = newTarget;
+      await setDoc(doc(db, 'technicians', techId), techs[idx]);
+      toast(`Monthly target for ${techs[idx].name} set to ${newTarget}h`);
+      if (currentRole === 'lead') renderDashboard();
+      else if (currentRole === 'dev') renderTechs();
+    }
+    closeModal('m-target-month');
+  };
+  window.openChangePassword = () => openModal('m-password');
+  window.changeMyPassword = async () => {
+    const old = document.getElementById('pwd-old').value;
+    const newPwd = document.getElementById('pwd-new').value;
+    if (!old || !newPwd) { toast('Enter both passwords', 'error'); return; }
+    if (currentRole === 'tech') {
+      const idx = techs.findIndex(t => t.id === currentUser.id);
+      if (techs[idx].password !== old) { toast('Wrong current password', 'error'); return; }
+      techs[idx].password = newPwd;
+      await setDoc(doc(db, 'technicians', currentUser.id), techs[idx]);
+      currentUser.password = newPwd;
+    } else if (currentRole === 'lead') {
+      const idx = leaders.findIndex(l => l.id === currentUser.id);
+      if (leaders[idx].password !== old) { toast('Wrong current password', 'error'); return; }
+      leaders[idx].password = newPwd;
+      await setDoc(doc(db, 'leaders', currentUser.id), leaders[idx]);
+    } else if (currentRole === 'dev') {
+      if ((settings.passwords?.dev || 'demo') !== old) { toast('Wrong current password', 'error'); return; }
+      settings.passwords = { ...settings.passwords, dev: newPwd };
+      const settingsRef = collection(db, 'settings');
+      const snap = await getDocs(settingsRef);
+      if (!snap.empty) await setDoc(doc(db, 'settings', snap.docs[0].id), settings);
+      else await setDoc(doc(db, 'settings', 'global'), settings);
+    }
+    closeModal('m-password');
+    toast('Password changed successfully');
+  };
+  window.openGlobalPwdModal = () => openModal('m-globalpwd');
+  window.saveDefaultPasswords = async () => {
+    const techPwd = document.getElementById('def-tech-pwd').value;
+    const leadPwd = document.getElementById('def-lead-pwd').value;
+    const devPwd = document.getElementById('def-dev-pwd').value;
+    if (techPwd) settings.passwords = { ...settings.passwords, tech: techPwd };
+    if (leadPwd) settings.passwords.lead = leadPwd;
+    if (devPwd) settings.passwords.dev = devPwd;
+    const settingsRef = collection(db, 'settings');
+    const snap = await getDocs(settingsRef);
+    if (!snap.empty) await setDoc(doc(db, 'settings', snap.docs[0].id), settings);
+    else await setDoc(doc(db, 'settings', 'global'), settings);
+    closeModal('m-globalpwd');
+    toast('Default passwords updated');
+  };
+  window.exportBackup = () => {
+    const backup = { techs, parts, leaders, settings, entries };
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(backup)], { type: 'application/json' }));
+    a.download = `protrack_backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    toast('Backup exported');
+  };
+  window.importBackup = (input) => {
+    const f = input.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = async (e) => {
+      try {
+        const d = JSON.parse(e.target.result);
+        // Clear existing collections
+        const collections = ['technicians', 'parts', 'leaders', 'entries'];
+        for (const coll of collections) {
+          const snap = await getDocs(collection(db, coll));
+          for (const docSnap of snap.docs) {
+            await deleteDoc(doc(db, coll, docSnap.id));
+          }
+        }
+        if (d.techs) for (const t of d.techs) await setDoc(doc(db, 'technicians', t.id), t);
+        if (d.parts) for (const p of d.parts) await setDoc(doc(db, 'parts', p.id), p);
+        if (d.leaders) for (const l of d.leaders) await setDoc(doc(db, 'leaders', l.id), l);
+        if (d.entries) for (const e of d.entries) await addDoc(collection(db, 'entries'), e);
+        if (d.settings) {
+          const snap = await getDocs(collection(db, 'settings'));
+          if (!snap.empty) await setDoc(doc(db, 'settings', snap.docs[0].id), d.settings);
+          else await setDoc(doc(db, 'settings', 'global'), d.settings);
+        }
+        toast('Restored successfully');
+        location.reload();
+      } catch (err) {
+        toast('Invalid backup file', 'error');
+      }
+    };
+    r.readAsText(f);
+  };
+  window.factoryReset = async () => {
+    if (!confirm('⚠️ FULL RESET: All data will be wiped. Continue?')) return;
+    const collections = ['technicians', 'parts', 'leaders', 'entries', 'settings'];
+    for (const coll of collections) {
+      const snap = await getDocs(collection(db, coll));
+      for (const docSnap of snap.docs) {
+        await deleteDoc(doc(db, coll, docSnap.id));
+      }
+    }
+    toast('Reset complete. Reloading...');
+    setTimeout(() => location.reload(), 1000);
+  };
+  function handleTechImport(input) {
+    const f = input.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = async (e) => {
+      try {
+        const wb = XLSX.read(e.target.result, { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws);
+        const colors = ['#3b82f6','#10b981','#f59e0b','#f43f5e','#8b5cf6'];
+        for (const row of rows) {
+          if (row.ID && row.Name) {
+            const id = row.ID.toString().trim();
+            if (!techs.find(t => t.id === id)) {
+              const name = row.Name.toString().trim();
+              const monthlyTarget = parseFloat(row.MonthlyTarget) || settings.defaultMonthlyTarget || 160;
+              const newTech = {
+                id, name, monthlyTarget, status: 'active',
+                password: settings.passwords?.tech || 'demo',
+                initials: name.slice(0,2).toUpperCase(),
+                color: colors[techs.length % colors.length]
+              };
+              await setDoc(doc(db, 'technicians', id), newTech);
+              techs.push(newTech);
+            }
+          }
+        }
+        renderTechs();
+        toast('Import complete');
+        closeModal('m-import-tech');
+      } catch (err) {
+        toast('Import failed', 'error');
+      }
+    };
+    r.readAsArrayBuffer(f);
+  }
+  function handlePartImport(input) {
+    const f = input.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = async (e) => {
+      try {
+        const wb = XLSX.read(e.target.result, { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws);
+        for (const row of rows) {
+          if (row.Name && row.Number) {
+            const newPart = {
+              id: Date.now().toString() + Math.random(),
+              name: row.Name.toString().trim(),
+              num: row.Number.toString().trim(),
+              hours: parseFloat(row.Hours) || 1,
+              ata: row.ATA || '',
+              desc: row.Description || ''
+            };
+            await setDoc(doc(db, 'parts', newPart.id), newPart);
+            parts.push(newPart);
+          }
+        }
+        renderParts();
+        toast('Import complete');
+        closeModal('m-import-part');
+      } catch (err) {
+        toast('Import failed', 'error');
+      }
+    };
+    r.readAsArrayBuffer(f);
+  }
+  function openImportTech() { openModal('m-import-tech'); }
+  function openImportPart() { openModal('m-import-part'); }
+  function openModal(id) { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  // Expose needed functions to global for inline onclick
+  window.onPartSelect = onPartSelect;
+  window.searchPartAndFill = searchPartAndFill;
+  window.submitEntry = submitEntry;
+  window.clearEntry = clearEntry;
+  window.cancelEntry = cancelEntry;
+  window.doScan = doScan;
+  window.renderLeaderboard = renderLeaderboard;
+  window.renderAllEntries = renderAllEntries;
+  window.exportAllEntries = exportAllEntries;
+  window.handleTechImport = handleTechImport;
+  window.handlePartImport = handlePartImport;
+  window.openImportTech = openImportTech;
+  window.openImportPart = openImportPart;
+  window.closeModal = closeModal;
+  window.openModal = openModal;
+
+  // Start
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log("Signed in anonymously");
+      loadInitialData();
+    } else {
+      signInAnonymously(auth).catch(console.error);
+    }
+  });
+</script>
+</body>
+</html>
+
+loadInitialData();
