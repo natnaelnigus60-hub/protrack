@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ProTrack — Central Production Tracker</title>
 
-  <!-- Firebase (working config) -->
+  <!-- Firebase (imports and exports to window) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -21,10 +21,20 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    window.firebaseDb = getFirestore(app);
-    window.firebaseAuth = getAuth(app);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-    signInAnonymously(window.firebaseAuth)
+    // Expose Firestore and Auth to the global scope for the non-module script
+    window.db = db;
+    window.auth = auth;
+    window.getDocs = getDocs;
+    window.collection = collection;
+    window.doc = doc;
+    window.setDoc = setDoc;
+    window.addDoc = addDoc;
+    window.deleteDoc = deleteDoc;
+
+    signInAnonymously(auth)
       .then(() => console.log("Firebase: Anonymous session active"))
       .catch(err => console.error("Firebase Error:", err));
   </script>
@@ -170,7 +180,6 @@
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
 <div id="login" class="screen active">
   <div class="login-wrap">
     <div class="login-brand"><div class="brand-mark">PT</div><div class="brand-name">Pro<em>Track</em></div></div>
@@ -194,7 +203,6 @@
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div id="app" class="screen">
   <aside class="sidebar">
     <div class="sb-brand"><div class="brand-mark">PT</div><div class="brand-name">Pro<em>Track</em></div></div>
@@ -224,7 +232,7 @@
           <div>
             <div class="card"><div class="card-header"><span class="card-title">📷 Production Entry</span></div><div class="card-body"><div class="scan-zone" onclick="doScan()"><span style="font-size:32px;">⬡</span><div style="margin-top:8px;">Click to Simulate Scan</div><div style="font-size:11px;color:var(--text-2);margin-top:4px;">Auto-fills part details</div></div><div class="form-grid form-2"><div class="form-group form-full"><label class="form-label">🔍 Search Part</label><div style="display:flex;gap:8px;"><input class="form-input" id="part-search-input" placeholder="Name / Part #"><button class="btn btn-primary btn-sm" onclick="searchPartAndFill()">Search</button></div></div><div class="form-group form-full"><label class="form-label">Select Part</label><select class="form-select" id="e-part-sel" onchange="onPartSelect()"><option value="">— Choose Part —</option></select></div><div class="form-group"><label class="form-label">Description</label><input class="form-input" id="e-desc" readonly></div><div class="form-group"><label class="form-label">ATA</label><input class="form-input" id="e-ata" readonly></div><div class="form-group"><label class="form-label">Part Number</label><input class="form-input" id="e-pnum" readonly></div><div class="form-group"><label class="form-label">Std Hours</label><input class="form-input" id="e-hours" readonly></div><div class="form-group"><label class="form-label">Serial *</label><input class="form-input" id="e-serial" placeholder="Enter serial number"></div><div class="form-group"><label class="form-label">Time</label><input class="form-input" id="e-time" type="datetime-local"></div></div><div style="margin-top:16px;display:flex;gap:10px;"><button class="btn btn-primary" onclick="submitEntry()">✓ Submit Entry</button><button class="btn btn-outline" onclick="clearEntry()">✕ Clear Form</button><button class="btn btn-outline" onclick="cancelEntry()">✖ Cancel</button></div></div></div>
           </div>
-          <div><div class="kpi-grid kpi-2"><div class="kpi-card"><div class="kpi-label">Today (Hours)</div><div class="kpi-val" id="e-today-hrs">0</div><div class="kpi-sub">daily target: <span id="e-daily-target">0</span> hrs</div></div><div class="kpi-card"><div class="kpi-label">This Week (Hours)</div><div class="kpi-val" id="e-week-hrs">0</div><div class="kpi-sub">weekly target: <span id="e-week-target">0</span> hrs</div></div></div><div class="card"><div class="card-header"><span class="card-title">Today's Submissions</span></div><div class="tbl-wrap" style="max-height:400px;overflow-y:auto;"><table><thead><tr><th>Time</th><th>Part</th><th>Hrs</th><th>Serial</th></tr></thead><tbody id="e-today-list"></tbody></table></div></div></div>
+          <div><div class="kpi-grid kpi-2"><div class="kpi-card"><div class="kpi-label">Today (Hours)</div><div class="kpi-val" id="e-today-hrs">0</div><div class="kpi-sub">daily target: <span id="e-daily-target">0</span> hrs</div></div><div class="kpi-card"><div class="kpi-label">This Week (Hours)</div><div class="kpi-val" id="e-week-hrs">0</div><div class="kpi-sub">weekly target: <span id="e-week-target">0</span> hrs</div></div></div><div class="card"><div class="card-header"><span class="card-title">Today's Submissions</span></div><div class="tbl-wrap" style="max-height:400px;overflow-y:auto;">   <thead>   <tr><th>Time</th><th>Part</th><th>Hrs</th><th>Serial</th></tr> </thead><tbody id="e-today-list"></tbody> </div></div></div>
         </div>
       </div>
       <!-- Technician Stats Page -->
@@ -235,7 +243,7 @@
           <div class="kpi-card"><div class="kpi-label">Month Hours</div><div class="kpi-val" id="ms-month">0</div><div class="kpi-sub">target: <span id="ms-month-target">0</span></div></div>
           <div class="kpi-card"><div class="kpi-label">Monthly Progress</div><div class="kpi-val" id="ms-progress">0%</div><div class="kpi-sub">remaining: <span id="ms-remaining">0</span> hrs</div></div>
         </div>
-        <div class="card"><div class="card-header"><span class="card-title">Production History</span></div><div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Part</th><th>Std Hrs</th><th>Serial</th></tr></thead><tbody id="ms-hist"></tbody></table></div></div>
+        <div class="card"><div class="card-header"><span class="card-title">Production History</span></div><div class="tbl-wrap"> <thead> <tr><th>Date</th><th>Part</th><th>Std Hrs</th><th>Serial</th></tr> </thead><tbody id="ms-hist"></tbody> </div></div>
       </div>
       <!-- Leader Dashboard -->
       <div class="page" id="pg-dashboard">
@@ -249,18 +257,18 @@
         <div class="card"><div class="card-header"><span class="card-title">🏆 Technician Monthly Performance</span><div class="search-box"><input type="text" id="lb-search" placeholder="Search technician..." oninput="renderLeaderboard()"></div></div><div id="lb-body"></div></div>
       </div>
       <!-- All Entries -->
-      <div class="page" id="pg-allentries"><div class="toolbar"><div class="search-box"><input type="text" id="ae-search" placeholder="Search entries..."></div><select class="form-select" id="ae-tech" style="width:150px;"><option value="">All Techs</option></select><select class="form-select" id="ae-date"><option value="today">Today</option><option value="week">This Week</option><option value="month">This Month</option><option value="all">All Time</option></select><button class="btn btn-outline" onclick="renderAllEntries()">Filter</button><button class="btn btn-outline btn-sm" onclick="exportAllEntries()">⬇ Export CSV</button></div><div class="card"><div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Tech</th><th>Part</th><th>Serial</th><th>Hours</th></tr></thead><tbody id="ae-body"></tbody></table></div></div></div>
-      <div class="page" id="pg-reports"><div class="card"><div class="card-header">Monthly Hours Summary</div><div class="tbl-wrap"><table><thead><tr><th>Tech</th><th>Monthly Target</th><th>Actual Month</th><th>Progress</th><th>Daily Avg</th><th>Status</th></tr></thead><tbody id="rpt-weekly"></tbody></table></div></div></div>
+      <div class="page" id="pg-allentries"><div class="toolbar"><div class="search-box"><input type="text" id="ae-search" placeholder="Search entries..."></div><select class="form-select" id="ae-tech" style="width:150px;"><option value="">All Techs</option></select><select class="form-select" id="ae-date"><option value="today">Today</option><option value="week">This Week</option><option value="month">This Month</option><option value="all">All Time</option></select><button class="btn btn-outline" onclick="renderAllEntries()">Filter</button><button class="btn btn-outline btn-sm" onclick="exportAllEntries()">⬇ Export CSV</button></div><div class="card"><div class="tbl-wrap"> <thead> <tr><th>Date</th><th>Tech</th><th>Part</th><th>Serial</th><th>Hours</th></tr> </thead><tbody id="ae-body"></tbody> </div></div></div>
+      <div class="page" id="pg-reports"><div class="card"><div class="card-header">Monthly Hours Summary</div><div class="tbl-wrap"> <thead> <tr><th>Tech</th><th>Monthly Target</th><th>Actual Month</th><th>Progress</th><th>Daily Avg</th><th>Status</th></tr> </thead><tbody id="rpt-weekly"></tbody> </div></div></div>
       <!-- Developer Pages -->
-      <div class="page" id="pg-techs"><div class="toolbar"><button class="btn btn-primary" onclick="openAddTech()">+ Technician</button><button class="btn btn-outline" onclick="openImportTech()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Monthly Target (hrs)</th><th>Daily Target</th><th>Status</th><th>Actions</th></tr></thead><tbody id="at-body"></tbody></table></div></div></div>
-      <div class="page" id="pg-parts"><div class="toolbar"><button class="btn btn-primary" onclick="openAddPart()">+ Part</button><button class="btn btn-outline" onclick="openImportPart()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"><table><thead><tr><th>Part Name</th><th>Part Number</th><th>Std Hours</th><th>ATA</th><th>Description</th><th>Actions</th></tr></thead><tbody id="ap-body"></tbody></table></div></div></div>
-      <div class="page" id="pg-leaders"><div class="card"><div class="card-header">👥 Team Leaders Management</div><div class="card-body"><button class="btn btn-primary btn-sm" onclick="openAddLeader()">+ Add Team Leader</button><div class="tbl-wrap" style="margin-top:16px;"><table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Actions</th></tr></thead><tbody id="leaders-body"></tbody></table></div></div></div></div>
+      <div class="page" id="pg-techs"><div class="toolbar"><button class="btn btn-primary" onclick="openAddTech()">+ Technician</button><button class="btn btn-outline" onclick="openImportTech()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"> <thead> <tr><th>ID</th><th>Name</th><th>Monthly Target (hrs)</th><th>Daily Target</th><th>Status</th><th>Actions</th></tr> </thead><tbody id="at-body"></tbody> </div></div></div>
+      <div class="page" id="pg-parts"><div class="toolbar"><button class="btn btn-primary" onclick="openAddPart()">+ Part</button><button class="btn btn-outline" onclick="openImportPart()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"> <thead> <tr><th>Part Name</th><th>Part Number</th><th>Std Hours</th><th>ATA</th><th>Description</th><th>Actions</th></tr> </thead><tbody id="ap-body"></tbody> </div></div></div>
+      <div class="page" id="pg-leaders"><div class="card"><div class="card-header">👥 Team Leaders Management</div><div class="card-body"><button class="btn btn-primary btn-sm" onclick="openAddLeader()">+ Add Team Leader</button><div class="tbl-wrap" style="margin-top:16px;"> <thead> <tr><th>ID</th><th>Name</th><th>Email</th><th>Actions</th></tr> </thead><tbody id="leaders-body"></tbody> </div></div></div></div>
       <div class="page" id="pg-system"><div class="card"><div class="card-header">🔐 System Settings</div><div class="card-body"><div class="setting-row"><div><strong>Default Monthly Target (Hours)</strong><div style="font-size:12px;">Initial target for new technicians</div></div><input type="number" id="sys-default-month-target" style="width:120px;" class="form-input" value="160"><button class="btn btn-primary btn-sm" onclick="saveDefaultMonthlyTarget()">Set</button></div><div class="setting-row"><div><strong>Change Default Passwords</strong></div><button class="btn btn-outline btn-sm" onclick="openGlobalPwdModal()">Configure</button></div><div class="setting-row"><div><strong>Export Full Backup</strong></div><button class="btn btn-outline btn-sm" onclick="exportBackup()">⬇ Export JSON</button></div><div class="setting-row"><div><strong>Import Backup</strong></div><label class="btn btn-outline btn-sm" style="cursor:pointer;">⬆ Import JSON<input type="file" accept=".json" style="display:none" onchange="importBackup(this)"></label></div><div class="setting-row"><div><strong>Factory Reset</strong></div><button class="btn btn-danger btn-sm" onclick="factoryReset()">⚠️ Reset All</button></div></div></div></div>
     </div>
   </main>
 </div>
 
-<!-- All Modals -->
+<!-- Modals -->
 <div class="modal-bg" id="m-tech"><div class="modal"><div class="modal-head"><div class="modal-title">Technician</div><button class="modal-close-btn" onclick="closeModal('m-tech')">✕</button></div><div class="modal-body"><input class="form-input" id="mt-id" placeholder="ID (e.g., T1007)"><input class="form-input" id="mt-name" placeholder="Full Name"><input class="form-input" id="mt-month-target" type="number" step="1" placeholder="Monthly Target (hours)"><select id="mt-status" class="form-select"><option value="active">Active</option><option value="inactive">Inactive</option></select><input class="form-input" id="mt-pwd" type="password" placeholder="Password (default: demo)" value="demo"></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-tech')">Cancel</button><button class="btn btn-primary" onclick="saveTech()">Save</button></div></div></div>
 <div class="modal-bg" id="m-part"><div class="modal"><div class="modal-head"><div class="modal-title">Part</div><button class="modal-close-btn" onclick="closeModal('m-part')">✕</button></div><div class="modal-body"><input class="form-input" id="mp-name" placeholder="Part Name *"><input class="form-input" id="mp-num" placeholder="Part Number *"><input class="form-input" id="mp-hours" type="number" step="0.1" placeholder="Std Hours *"><input class="form-input" id="mp-ata" placeholder="ATA"><input class="form-input" id="mp-desc" placeholder="Description"></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-part')">Cancel</button><button class="btn btn-primary" onclick="savePart()">Save</button></div></div></div>
 <div class="modal-bg" id="m-password"><div class="modal"><div class="modal-head"><div class="modal-title">Change Password</div><button class="modal-close-btn" onclick="closeModal('m-password')">✕</button></div><div class="modal-body"><input class="form-input" id="pwd-old" type="password" placeholder="Current Password"><input class="form-input" id="pwd-new" type="password" placeholder="New Password"></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-password')">Cancel</button><button class="btn btn-primary" onclick="changeMyPassword()">Update</button></div></div></div>
@@ -285,7 +293,14 @@ let leaders = [];
 let settings = { defaultMonthlyTarget: 160, passwords: { tech: 'demo', lead: 'demo', dev: 'demo' } };
 let entries = [];
 
-const db = window.firebaseDb;
+// Use global Firebase objects set by the module
+const db = window.db;
+const getDocs = window.getDocs;
+const collection = window.collection;
+const doc = window.doc;
+const setDoc = window.setDoc;
+const addDoc = window.addDoc;
+const deleteDoc = window.deleteDoc;
 
 function toast(msg, type = 'success') {
   const t = document.getElementById('toast');
@@ -422,7 +437,8 @@ async function submitEntry() {
     renderEntry();
     toast(`✓ ${part.name} - ${part.hours}h logged`);
   } catch (err) {
-    toast("Failed to save entry", "error");
+    console.error("Firestore error:", err);
+    toast("Failed to save entry: " + err.message, "error");
   }
 }
 function clearEntry() {
