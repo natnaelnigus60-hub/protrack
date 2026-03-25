@@ -24,7 +24,7 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // Expose Firestore and Auth to the global scope for the non-module script
+    // Expose Firestore and Auth to the global scope
     window.db = db;
     window.auth = auth;
     window.getDocs = getDocs;
@@ -43,6 +43,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
+    /* ========== STYLES (same as before) ========== */
     :root {
       --bg: #070c18; --surface: #0c1220; --card: #111827; --card2: #162035;
       --border: #1e2d47; --border2: #263a57; --blue: #3b82f6; --blue-dim: rgba(59,130,246,.12);
@@ -180,6 +181,7 @@
 </head>
 <body>
 
+<!-- LOGIN SCREEN -->
 <div id="login" class="screen active">
   <div class="login-wrap">
     <div class="login-brand"><div class="brand-mark">PT</div><div class="brand-name">Pro<em>Track</em></div></div>
@@ -293,14 +295,14 @@ let leaders = [];
 let settings = { defaultMonthlyTarget: 160, passwords: { tech: 'demo', lead: 'demo', dev: 'demo' } };
 let entries = [];
 
-// Use global Firebase objects set by the module
-const db = window.db;
-const getDocs = window.getDocs;
-const collection = window.collection;
-const doc = window.doc;
-const setDoc = window.setDoc;
-const addDoc = window.addDoc;
-const deleteDoc = window.deleteDoc;
+// Use global Firebase objects set by the module (window)
+const firestoreDb = window.db;
+const firestoreGetDocs = window.getDocs;
+const firestoreCollection = window.collection;
+const firestoreDoc = window.doc;
+const firestoreSetDoc = window.setDoc;
+const firestoreAddDoc = window.addDoc;
+const firestoreDeleteDoc = window.deleteDoc;
 
 function toast(msg, type = 'success') {
   const t = document.getElementById('toast');
@@ -388,7 +390,7 @@ function renderEntry() {
   document.getElementById('e-time').value = new Date().toISOString().slice(0,16);
   const tbody = document.getElementById('e-today-list');
   const todayEntries = userEntries.filter(e => e.time?.startsWith(today)).slice(0,15);
-  tbody.innerHTML = todayEntries.length ? todayEntries.map(e => `<tr><td class="mono">${new Date(e.time).toLocaleTimeString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">No entries today</td></tr>';
+  tbody.innerHTML = todayEntries.length ? todayEntries.map(e => `   <tr><td class="mono">${new Date(e.time).toLocaleTimeString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">No entries today</td></tr>';
 }
 function onPartSelect() {
   const partId = document.getElementById('e-part-sel').value;
@@ -430,7 +432,7 @@ async function submitEntry() {
     ata: part.ata
   };
   try {
-    const docRef = await addDoc(collection(db, 'entries'), entry);
+    const docRef = await firestoreAddDoc(firestoreCollection(firestoreDb, 'entries'), entry);
     entry.id = docRef.id;
     entries.unshift(entry);
     clearEntry();
@@ -476,7 +478,7 @@ function renderMyStats() {
   document.getElementById('ms-progress').textContent = progress + '%';
   document.getElementById('ms-remaining').textContent = remaining.toFixed(1);
   const tbody = document.getElementById('ms-hist');
-  tbody.innerHTML = userEntries.slice(0,30).map(e => `<tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">No history</td></tr>';
+  tbody.innerHTML = userEntries.slice(0,30).map(e => `   <tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">No history</td></tr>';
 }
 
 function renderDashboard() {
@@ -529,7 +531,7 @@ function renderAllEntries() {
   if (dateFilter === 'month') filtered = filtered.filter(e => e.time >= monthRange.start && e.time <= monthRange.end);
   if (search) filtered = filtered.filter(e => (e.techName + e.pname + e.serial).toLowerCase().includes(search));
   const tbody = document.getElementById('ae-body');
-  tbody.innerHTML = filtered.slice(0,200).map(e => `<tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.techName}</td><td>${e.pname}</td><td class="mono">${e.serial}</td><td>${e.hours}h</td></tr>`).join('') || '<tr><td colspan="5" class="empty">No entries</td></tr>';
+  tbody.innerHTML = filtered.slice(0,200).map(e => `   <tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.techName}</td><td>${e.pname}</td><td class="mono">${e.serial}</td><td>${e.hours}h</td></tr>`).join('') || '<tr><td colspan="5" class="empty">No entries</td></tr>';
 }
 function exportAllEntries() {
   let csv = 'Date,Technician,Part,Serial,Hours\n';
@@ -553,14 +555,14 @@ function renderReports() {
     const dailyAvg = monthHrs / 20;
     const status = progress >= 100 ? '✅ Achieved' : progress >= 80 ? '⚠️ Near' : progress >= 60 ? '🟡 In Progress' : '🔴 Behind';
     const statusClass = progress >= 100 ? 'badge-green' : progress >= 80 ? 'badge-amber' : progress >= 60 ? 'badge-blue' : 'badge-red';
-    return `<tr><td><strong>${t.name}</strong></td><td>${target}h</td><td>${monthHrs.toFixed(1)}h</td><td><span class="badge ${statusClass}">${progress}%</span></td><td>${dailyAvg.toFixed(1)}h</td><td>${status}</td></tr>`;
+    return `   <tr><td><strong>${t.name}</strong></td><td>${target}h</td><td>${monthHrs.toFixed(1)}h</td><td><span class="badge ${statusClass}">${progress}%</span></td><td>${dailyAvg.toFixed(1)}h</td><td>${status}</td></tr>`;
   }).join('') || '<tr><td colspan="6" class="empty">No technicians</td></tr>';
 }
 
-// ADMIN FUNCTIONS
+// ADMIN FUNCTIONS (simplified for brevity, but they use the same renamed Firebase functions)
 function renderTechs() {
   const tbody = document.getElementById('at-body');
-  tbody.innerHTML = techs.map(t => `<tr><td class="mono">${t.id}</td><td>${t.name}</td><td><span class="badge badge-blue">${t.monthlyTarget || 160}h</span></td><td>${(t.monthlyTarget / 20).toFixed(1)}h</td><td><span class="badge ${t.status === 'active' ? 'badge-green' : 'badge-gray'}">${t.status}</span></td><td><button class="btn-outline btn-sm" onclick="openEditTech('${t.id}')">✏️</button> <button class="btn-outline btn-sm" onclick="deleteTech('${t.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No technicians</td></tr>';
+  tbody.innerHTML = techs.map(t => `   <tr><td class="mono">${t.id}</td><td>${t.name}</td><td><span class="badge badge-blue">${t.monthlyTarget || 160}h</span></td><td>${(t.monthlyTarget / 20).toFixed(1)}h</td><td><span class="badge ${t.status === 'active' ? 'badge-green' : 'badge-gray'}">${t.status}</span></td><td><button class="btn-outline btn-sm" onclick="openEditTech('${t.id}')">✏️</button> <button class="btn-outline btn-sm" onclick="deleteTech('${t.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No technicians</td></tr>';
 }
 window.openAddTech = () => { editingTechId = null; document.getElementById('mt-id').value = ''; document.getElementById('mt-name').value = ''; document.getElementById('mt-month-target').value = ''; document.getElementById('mt-status').value = 'active'; document.getElementById('mt-pwd').value = 'demo'; openModal('m-tech'); };
 window.openEditTech = (id) => { const t = techs.find(t => t.id === id); if (t) { editingTechId = id; document.getElementById('mt-id').value = t.id; document.getElementById('mt-name').value = t.name; document.getElementById('mt-month-target').value = t.monthlyTarget || 160; document.getElementById('mt-status').value = t.status; document.getElementById('mt-pwd').value = t.password || 'demo'; openModal('m-tech'); } };
@@ -576,7 +578,7 @@ window.saveTech = async () => {
     const idx = techs.findIndex(t => t.id === editingTechId);
     if (idx !== -1) {
       const updated = { ...techs[idx], id, name, monthlyTarget, status, password: pwd };
-      await setDoc(doc(db, 'technicians', editingTechId), updated);
+      await firestoreSetDoc(firestoreDoc(firestoreDb, 'technicians', editingTechId), updated);
       techs[idx] = updated;
       if (currentUser && currentUser.id === editingTechId) currentUser = updated;
       toast('Technician updated');
@@ -584,7 +586,7 @@ window.saveTech = async () => {
   } else {
     if (techs.find(t => t.id === id)) { toast('ID exists', 'error'); return; }
     const newTech = { id, name, monthlyTarget, status, password: pwd, initials: name.slice(0,2).toUpperCase(), color: colors[techs.length % colors.length] };
-    await setDoc(doc(db, 'technicians', id), newTech);
+    await firestoreSetDoc(firestoreDoc(firestoreDb, 'technicians', id), newTech);
     techs.push(newTech);
     toast('Technician added');
   }
@@ -594,7 +596,7 @@ window.saveTech = async () => {
 };
 window.deleteTech = async (id) => {
   if (!confirm('Delete technician?')) return;
-  await deleteDoc(doc(db, 'technicians', id));
+  await firestoreDeleteDoc(firestoreDoc(firestoreDb, 'technicians', id));
   techs = techs.filter(t => t.id !== id);
   renderTechs();
   if (currentRole === 'lead') renderDashboard();
@@ -603,7 +605,7 @@ window.deleteTech = async (id) => {
 
 function renderParts() {
   const tbody = document.getElementById('ap-body');
-  tbody.innerHTML = parts.map(p => `<tr><td><strong>${p.name}</strong></td><td class="mono">${p.num}</td><td><span class="badge badge-blue">${p.hours}h</span></td><td>${p.ata || '—'}</td><td>${p.desc || '—'}</td><td><button class="btn-outline btn-sm" onclick="openEditPart('${p.id}')">✏️</button> <button class="btn-outline btn-sm" onclick="deletePart('${p.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No parts</td></tr>';
+  tbody.innerHTML = parts.map(p => `   <tr><td><strong>${p.name}</strong></td><td class="mono">${p.num}</td><td><span class="badge badge-blue">${p.hours}h</span></td><td>${p.ata || '—'}</td><td>${p.desc || '—'}</td><td><button class="btn-outline btn-sm" onclick="openEditPart('${p.id}')">✏️</button> <button class="btn-outline btn-sm" onclick="deletePart('${p.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No parts</td></tr>';
 }
 window.openAddPart = () => { editingPartId = null; document.getElementById('mp-name').value = ''; document.getElementById('mp-num').value = ''; document.getElementById('mp-hours').value = ''; document.getElementById('mp-ata').value = ''; document.getElementById('mp-desc').value = ''; openModal('m-part'); };
 window.openEditPart = (id) => { const p = parts.find(p => p.id === id); if (p) { editingPartId = id; document.getElementById('mp-name').value = p.name; document.getElementById('mp-num').value = p.num; document.getElementById('mp-hours').value = p.hours; document.getElementById('mp-ata').value = p.ata || ''; document.getElementById('mp-desc').value = p.desc || ''; openModal('m-part'); } };
@@ -614,13 +616,13 @@ window.savePart = async () => {
   if (!name || !num || !hours) { toast('Name, Number and Hours required', 'error'); return; }
   const part = { name, num, hours, ata: document.getElementById('mp-ata').value, desc: document.getElementById('mp-desc').value };
   if (editingPartId) {
-    await setDoc(doc(db, 'parts', editingPartId), { id: editingPartId, ...part });
+    await firestoreSetDoc(firestoreDoc(firestoreDb, 'parts', editingPartId), { id: editingPartId, ...part });
     const idx = parts.findIndex(p => p.id === editingPartId);
     if (idx !== -1) parts[idx] = { id: editingPartId, ...part };
     toast('Part updated');
   } else {
     const newId = Date.now().toString();
-    await setDoc(doc(db, 'parts', newId), { id: newId, ...part });
+    await firestoreSetDoc(firestoreDoc(firestoreDb, 'parts', newId), { id: newId, ...part });
     parts.push({ id: newId, ...part });
     toast('Part added');
   }
@@ -629,7 +631,7 @@ window.savePart = async () => {
 };
 window.deletePart = async (id) => {
   if (!confirm('Delete part?')) return;
-  await deleteDoc(doc(db, 'parts', id));
+  await firestoreDeleteDoc(firestoreDoc(firestoreDb, 'parts', id));
   parts = parts.filter(p => p.id !== id);
   renderParts();
   toast('Part removed');
@@ -637,7 +639,7 @@ window.deletePart = async (id) => {
 
 function renderLeaders() {
   const tbody = document.getElementById('leaders-body');
-  tbody.innerHTML = leaders.map(l => `<tr><td class="mono">${l.id}</td><td>${l.name}</td><td>${l.email || '—'}</td><td><button class="btn-outline btn-sm" onclick="deleteLeader('${l.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="4" class="empty">No leaders</td></tr>';
+  tbody.innerHTML = leaders.map(l => `   <tr><td class="mono">${l.id}</td><td>${l.name}</td><td>${l.email || '—'}</td><td><button class="btn-outline btn-sm" onclick="deleteLeader('${l.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="4" class="empty">No leaders</td></tr>';
 }
 window.openAddLeader = () => { document.getElementById('leader-id').value = ''; document.getElementById('leader-name').value = ''; document.getElementById('leader-email').value = ''; document.getElementById('leader-pwd').value = 'demo'; openModal('m-leader'); };
 window.saveLeader = async () => {
@@ -646,7 +648,7 @@ window.saveLeader = async () => {
   if (!id || !name) { toast('ID and Name required', 'error'); return; }
   if (leaders.find(l => l.id === id)) { toast('ID exists', 'error'); return; }
   const newLeader = { id, name, email: document.getElementById('leader-email').value, password: document.getElementById('leader-pwd').value || 'demo' };
-  await setDoc(doc(db, 'leaders', id), newLeader);
+  await firestoreSetDoc(firestoreDoc(firestoreDb, 'leaders', id), newLeader);
   leaders.push(newLeader);
   closeModal('m-leader');
   renderLeaders();
@@ -654,7 +656,7 @@ window.saveLeader = async () => {
 };
 window.deleteLeader = async (id) => {
   if (!confirm('Delete leader?')) return;
-  await deleteDoc(doc(db, 'leaders', id));
+  await firestoreDeleteDoc(firestoreDoc(firestoreDb, 'leaders', id));
   leaders = leaders.filter(l => l.id !== id);
   renderLeaders();
   toast('Leader removed');
@@ -666,10 +668,10 @@ function renderSystem() {
 window.saveDefaultMonthlyTarget = async () => {
   const val = parseFloat(document.getElementById('sys-default-month-target').value) || 160;
   settings.defaultMonthlyTarget = val;
-  const settingsRef = collection(db, 'settings');
-  const snap = await getDocs(settingsRef);
-  if (!snap.empty) await setDoc(doc(db, 'settings', snap.docs[0].id), settings);
-  else await setDoc(doc(db, 'settings', 'global'), settings);
+  const settingsRef = firestoreCollection(firestoreDb, 'settings');
+  const snap = await firestoreGetDocs(settingsRef);
+  if (!snap.empty) await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', snap.docs[0].id), settings);
+  else await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', 'global'), settings);
   toast('Default monthly target set');
 };
 window.openMonthlyTargetModal = () => {
@@ -685,7 +687,7 @@ window.saveMonthlyTarget = async () => {
   const idx = techs.findIndex(t => t.id === techId);
   if (idx !== -1) {
     techs[idx].monthlyTarget = newTarget;
-    await setDoc(doc(db, 'technicians', techId), techs[idx]);
+    await firestoreSetDoc(firestoreDoc(firestoreDb, 'technicians', techId), techs[idx]);
     toast(`Monthly target for ${techs[idx].name} set to ${newTarget}h`);
     if (currentRole === 'lead') renderDashboard();
     else if (currentRole === 'dev') renderTechs();
@@ -701,20 +703,20 @@ window.changeMyPassword = async () => {
     const idx = techs.findIndex(t => t.id === currentUser.id);
     if (techs[idx].password !== old) { toast('Wrong current password', 'error'); return; }
     techs[idx].password = newPwd;
-    await setDoc(doc(db, 'technicians', currentUser.id), techs[idx]);
+    await firestoreSetDoc(firestoreDoc(firestoreDb, 'technicians', currentUser.id), techs[idx]);
     currentUser.password = newPwd;
   } else if (currentRole === 'lead') {
     const idx = leaders.findIndex(l => l.id === currentUser.id);
     if (leaders[idx].password !== old) { toast('Wrong current password', 'error'); return; }
     leaders[idx].password = newPwd;
-    await setDoc(doc(db, 'leaders', currentUser.id), leaders[idx]);
+    await firestoreSetDoc(firestoreDoc(firestoreDb, 'leaders', currentUser.id), leaders[idx]);
   } else if (currentRole === 'dev') {
     if ((settings.passwords?.dev || 'demo') !== old) { toast('Wrong current password', 'error'); return; }
     settings.passwords = { ...settings.passwords, dev: newPwd };
-    const settingsRef = collection(db, 'settings');
-    const snap = await getDocs(settingsRef);
-    if (!snap.empty) await setDoc(doc(db, 'settings', snap.docs[0].id), settings);
-    else await setDoc(doc(db, 'settings', 'global'), settings);
+    const settingsRef = firestoreCollection(firestoreDb, 'settings');
+    const snap = await firestoreGetDocs(settingsRef);
+    if (!snap.empty) await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', snap.docs[0].id), settings);
+    else await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', 'global'), settings);
   }
   closeModal('m-password');
   toast('Password changed successfully');
@@ -727,10 +729,10 @@ window.saveDefaultPasswords = async () => {
   if (techPwd) settings.passwords = { ...settings.passwords, tech: techPwd };
   if (leadPwd) settings.passwords.lead = leadPwd;
   if (devPwd) settings.passwords.dev = devPwd;
-  const settingsRef = collection(db, 'settings');
-  const snap = await getDocs(settingsRef);
-  if (!snap.empty) await setDoc(doc(db, 'settings', snap.docs[0].id), settings);
-  else await setDoc(doc(db, 'settings', 'global'), settings);
+  const settingsRef = firestoreCollection(firestoreDb, 'settings');
+  const snap = await firestoreGetDocs(settingsRef);
+  if (!snap.empty) await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', snap.docs[0].id), settings);
+  else await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', 'global'), settings);
   closeModal('m-globalpwd');
   toast('Default passwords updated');
 };
@@ -751,17 +753,17 @@ window.importBackup = (input) => {
       const d = JSON.parse(e.target.result);
       const collections = ['technicians', 'parts', 'leaders', 'entries'];
       for (const coll of collections) {
-        const snap = await getDocs(collection(db, coll));
-        for (const docSnap of snap.docs) await deleteDoc(doc(db, coll, docSnap.id));
+        const snap = await firestoreGetDocs(firestoreCollection(firestoreDb, coll));
+        for (const docSnap of snap.docs) await firestoreDeleteDoc(firestoreDoc(firestoreDb, coll, docSnap.id));
       }
-      if (d.techs) for (const t of d.techs) await setDoc(doc(db, 'technicians', t.id), t);
-      if (d.parts) for (const p of d.parts) await setDoc(doc(db, 'parts', p.id), p);
-      if (d.leaders) for (const l of d.leaders) await setDoc(doc(db, 'leaders', l.id), l);
-      if (d.entries) for (const e of d.entries) await addDoc(collection(db, 'entries'), e);
+      if (d.techs) for (const t of d.techs) await firestoreSetDoc(firestoreDoc(firestoreDb, 'technicians', t.id), t);
+      if (d.parts) for (const p of d.parts) await firestoreSetDoc(firestoreDoc(firestoreDb, 'parts', p.id), p);
+      if (d.leaders) for (const l of d.leaders) await firestoreSetDoc(firestoreDoc(firestoreDb, 'leaders', l.id), l);
+      if (d.entries) for (const e of d.entries) await firestoreAddDoc(firestoreCollection(firestoreDb, 'entries'), e);
       if (d.settings) {
-        const snap = await getDocs(collection(db, 'settings'));
-        if (!snap.empty) await setDoc(doc(db, 'settings', snap.docs[0].id), d.settings);
-        else await setDoc(doc(db, 'settings', 'global'), d.settings);
+        const snap = await firestoreGetDocs(firestoreCollection(firestoreDb, 'settings'));
+        if (!snap.empty) await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', snap.docs[0].id), d.settings);
+        else await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', 'global'), d.settings);
       }
       toast('Restored successfully');
       location.reload();
@@ -773,8 +775,8 @@ window.factoryReset = async () => {
   if (!confirm('⚠️ FULL RESET: All data will be wiped. Continue?')) return;
   const collections = ['technicians', 'parts', 'leaders', 'entries', 'settings'];
   for (const coll of collections) {
-    const snap = await getDocs(collection(db, coll));
-    for (const docSnap of snap.docs) await deleteDoc(doc(db, coll, docSnap.id));
+    const snap = await firestoreGetDocs(firestoreCollection(firestoreDb, coll));
+    for (const docSnap of snap.docs) await firestoreDeleteDoc(firestoreDoc(firestoreDb, coll, docSnap.id));
   }
   toast('Reset complete. Reloading...');
   setTimeout(() => location.reload(), 1000);
@@ -801,7 +803,7 @@ function handleTechImport(input) {
               initials: name.slice(0,2).toUpperCase(),
               color: colors[techs.length % colors.length]
             };
-            await setDoc(doc(db, 'technicians', id), newTech);
+            await firestoreSetDoc(firestoreDoc(firestoreDb, 'technicians', id), newTech);
             techs.push(newTech);
           }
         }
@@ -832,7 +834,7 @@ function handlePartImport(input) {
             ata: row.ATA || '',
             desc: row.Description || ''
           };
-          await setDoc(doc(db, 'parts', newPart.id), newPart);
+          await firestoreSetDoc(firestoreDoc(firestoreDb, 'parts', newPart.id), newPart);
           parts.push(newPart);
         }
       }
@@ -866,15 +868,15 @@ window.doLogin = async function() {
 
   // Load fresh data from Firestore
   try {
-    const techSnap = await getDocs(collection(db, 'technicians'));
+    const techSnap = await firestoreGetDocs(firestoreCollection(firestoreDb, 'technicians'));
     techs = techSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const leadSnap = await getDocs(collection(db, 'leaders'));
+    const leadSnap = await firestoreGetDocs(firestoreCollection(firestoreDb, 'leaders'));
     leaders = leadSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const partSnap = await getDocs(collection(db, 'parts'));
+    const partSnap = await firestoreGetDocs(firestoreCollection(firestoreDb, 'parts'));
     parts = partSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const entrySnap = await getDocs(collection(db, 'entries'));
+    const entrySnap = await firestoreGetDocs(firestoreCollection(firestoreDb, 'entries'));
     entries = entrySnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const settingsSnap = await getDocs(collection(db, 'settings'));
+    const settingsSnap = await firestoreGetDocs(firestoreCollection(firestoreDb, 'settings'));
     if (!settingsSnap.empty) settings = settingsSnap.docs[0].data();
     else settings = { defaultMonthlyTarget: 160, passwords: { tech: 'demo', lead: 'demo', dev: 'demo' } };
   } catch (e) { console.warn("Using fallback data", e); }
