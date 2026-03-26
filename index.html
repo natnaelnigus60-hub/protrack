@@ -8,35 +8,45 @@
   <!-- Firebase (imports and exports to window) -->
  <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { 
+      getFirestore, collection, addDoc, getDocs, doc, setDoc, deleteDoc, query, where, serverTimestamp 
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBmVe4COOYoXIFuHTBppL2cm8vY78aLaek",
     authDomain: "protrack-e9960.firebaseapp.com",
     projectId: "protrack-e9960",
-    storageBucket: "protrack-e9960.firebasestorage.app",
-    messagingSenderId: "796146110275",
-    appId: "1:796146110275:web:d0b8775340b1b1245629f6"
+    storageBucket: "protrack-e9960.appspot.com",
+    messagingSenderId: "338575084922",
+    appId: "1:338575084922:web:68c1704e67303f27622878"
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
 
-  // IMPORTANT: attach everything to window so the main script can use them
+  // --- THE CRITICAL FIX ---
+  // We attach these to 'window' so your Submit button can find them!
   window.db = db;
-  window.auth = auth;
-  window.getDocs = getDocs;
   window.collection = collection;
+  window.addDoc = addDoc;
+  window.getDocs = getDocs;
   window.doc = doc;
   window.setDoc = setDoc;
-  window.addDoc = addDoc;
   window.deleteDoc = deleteDoc;
+  window.query = query;
+  window.where = where;
+  window.serverTimestamp = serverTimestamp;
 
-  signInAnonymously(auth)
-    .then(() => console.log("Firebase: Anonymous session active"))
-    .catch(err => console.error("Firebase Error:", err));
+  console.log("Firebase Global Tools Initialized");
+
+  // Sign in automatically
+  signInAnonymously(auth).then(() => {
+      console.log("Firebase: Anonymous session active");
+  }).catch((error) => {
+      console.error("Auth Error:", error);
+  });
 </script>
 
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
