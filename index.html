@@ -242,7 +242,7 @@
           <div>
             <div class="card"><div class="card-header"><span class="card-title">📷 Production Entry</span></div><div class="card-body"><div class="scan-zone" onclick="doScan()"><span style="font-size:32px;">⬡</span><div style="margin-top:8px;">Click to Simulate Scan</div><div style="font-size:11px;color:var(--text-2);margin-top:4px;">Auto-fills part details</div></div><div class="form-grid form-2"><div class="form-group form-full"><label class="form-label">🔍 Search Part</label><div style="display:flex;gap:8px;"><input class="form-input" id="part-search-input" placeholder="Name / Part #"><button class="btn btn-primary btn-sm" onclick="searchPartAndFill()">Search</button></div></div><div class="form-group form-full"><label class="form-label">Select Part</label><select class="form-select" id="e-part-sel" onchange="onPartSelect()"><option value="">— Choose Part —</option></select></div><div class="form-group"><label class="form-label">Description</label><input class="form-input" id="e-desc" readonly></div><div class="form-group"><label class="form-label">ATA</label><input class="form-input" id="e-ata" readonly></div><div class="form-group"><label class="form-label">Part Number</label><input class="form-input" id="e-pnum" readonly></div><div class="form-group"><label class="form-label">Std Hours</label><input class="form-input" id="e-hours" readonly></div><div class="form-group"><label class="form-label">Serial *</label><input class="form-input" id="e-serial" placeholder="Enter serial number"></div><div class="form-group"><label class="form-label">Time</label><input class="form-input" id="e-time" type="datetime-local"></div></div><div style="margin-top:16px;display:flex;gap:10px;"><button class="btn btn-primary" onclick="submitEntry()">✓ Submit Entry</button><button class="btn btn-outline" onclick="clearEntry()">✕ Clear Form</button><button class="btn btn-outline" onclick="cancelEntry()">✖ Cancel</button></div></div></div>
           </div>
-          <div><div class="kpi-grid kpi-2"><div class="kpi-card"><div class="kpi-label">Today (Hours)</div><div class="kpi-val" id="e-today-hrs">0</div><div class="kpi-sub">daily target: <span id="e-daily-target">0</span> hrs</div></div><div class="kpi-card"><div class="kpi-label">This Week (Hours)</div><div class="kpi-val" id="e-week-hrs">0</div><div class="kpi-sub">weekly target: <span id="e-week-target">0</span> hrs</div></div></div><div class="card"><div class="card-header"><span class="card-title">Today's Submissions</span></div><div class="tbl-wrap" style="max-height:400px;overflow-y:auto;">   <thead>    <tr><th>Time</th><th>Part</th><th>Hrs</th><th>Serial</th></tr> </thead><tbody id="e-today-list"></tbody> </div></div></div>
+          <div><div class="kpi-grid kpi-2"><div class="kpi-card"><div class="kpi-label">Today (Hours)</div><div class="kpi-val" id="e-today-hrs">0</div><div class="kpi-sub">daily target: <span id="e-daily-target">0</span> hrs</div></div><div class="kpi-card"><div class="kpi-label">This Week (Hours)</div><div class="kpi-val" id="e-week-hrs">0</div><div class="kpi-sub">weekly target: <span id="e-week-target">0</span> hrs</div></div></div><div class="card"><div class="card-header"><span class="card-title">Today's Submissions</span></div><div class="tbl-wrap" style="max-height:400px;overflow-y:auto;"><table style="width:100%;"><thead><tr><th>Time</th><th>Part</th><th>Hrs</th><th>Serial</th></tr></thead><tbody id="e-today-list"></tbody></table></div></div></div>
         </div>
       </div>
       <!-- Technician Stats Page -->
@@ -253,7 +253,7 @@
           <div class="kpi-card"><div class="kpi-label">Month Hours</div><div class="kpi-val" id="ms-month">0</div><div class="kpi-sub">target: <span id="ms-month-target">0</span></div></div>
           <div class="kpi-card"><div class="kpi-label">Monthly Progress</div><div class="kpi-val" id="ms-progress">0%</div><div class="kpi-sub">remaining: <span id="ms-remaining">0</span> hrs</div></div>
         </div>
-        <div class="card"><div class="card-header"><span class="card-title">Production History</span></div><div class="tbl-wrap"> <thead> <tr><th>Date</th><th>Part</th><th>Std Hrs</th><th>Serial</th></tr> </thead><tbody id="ms-hist"></tbody> </div></div>
+        <div class="card"><div class="card-header"><span class="card-title">Production History</span></div><div class="tbl-wrap"><table style="width:100%;"><thead><tr><th>Date</th><th>Part</th><th>Std Hrs</th><th>Serial</th></tr></thead><tbody id="ms-hist"></tbody></table></div></div>
       </div>
       <!-- Leader Dashboard -->
       <div class="page" id="pg-dashboard">
@@ -267,12 +267,12 @@
         <div class="card"><div class="card-header"><span class="card-title">🏆 Technician Monthly Performance</span><div class="search-box"><input type="text" id="lb-search" placeholder="Search technician..." oninput="renderLeaderboard()"></div></div><div id="lb-body"></div></div>
       </div>
       <!-- All Entries -->
-      <div class="page" id="pg-allentries"><div class="toolbar"><div class="search-box"><input type="text" id="ae-search" placeholder="Search entries..."></div><select class="form-select" id="ae-tech" style="width:150px;"><option value="">All Techs</option></select><select class="form-select" id="ae-date"><option value="today">Today</option><option value="week">This Week</option><option value="month">This Month</option><option value="all">All Time</option></select><button class="btn btn-outline" onclick="renderAllEntries()">Filter</button><button class="btn btn-outline btn-sm" onclick="exportAllEntries()">⬇ Export CSV</button></div><div class="card"><div class="tbl-wrap"> <thead> <tr><th>Date</th><th>Tech</th><th>Part</th><th>Serial</th><th>Hours</th></tr> </thead><tbody id="ae-body"></tbody> </div></div></div>
-      <div class="page" id="pg-reports"><div class="card"><div class="card-header">Monthly Hours Summary</div><div class="tbl-wrap"> <thead> <tr><th>Tech</th><th>Monthly Target</th><th>Actual Month</th><th>Progress</th><th>Daily Avg</th><th>Status</th></tr> </thead><tbody id="rpt-weekly"></tbody> </div></div></div>
+      <div class="page" id="pg-allentries"><div class="toolbar"><div class="search-box"><input type="text" id="ae-search" placeholder="Search entries..."></div><select class="form-select" id="ae-tech" style="width:150px;"><option value="">All Techs</option></select><select class="form-select" id="ae-date"><option value="today">Today</option><option value="week">This Week</option><option value="month">This Month</option><option value="all">All Time</option></select><button class="btn btn-outline" onclick="renderAllEntries()">Filter</button><button class="btn btn-outline btn-sm" onclick="exportAllEntries()">⬇ Export CSV</button></div><div class="card"><div class="tbl-wrap"><table style="width:100%;"><thead><tr><th>Date</th><th>Tech</th><th>Part</th><th>Serial</th><th>Hours</th></tr></thead><tbody id="ae-body"></tbody></table></div></div></div>
+      <div class="page" id="pg-reports"><div class="card"><div class="card-header">Monthly Hours Summary</div><div class="tbl-wrap"><table style="width:100%;"><thead><tr><th>Tech</th><th>Monthly Target</th><th>Actual Month</th><th>Progress</th><th>Daily Avg</th><th>Status</th></tr></thead><tbody id="rpt-weekly"></tbody></table></div></div></div>
       <!-- Developer Pages -->
-      <div class="page" id="pg-techs"><div class="toolbar"><button class="btn btn-primary" onclick="openAddTech()">+ Technician</button><button class="btn btn-outline" onclick="openImportTech()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"> <thead> <tr><th>ID</th><th>Name</th><th>Monthly Target (hrs)</th><th>Daily Target</th><th>Status</th><th>Actions</th></tr> </thead><tbody id="at-body"></tbody> </div></div></div>
-      <div class="page" id="pg-parts"><div class="toolbar"><button class="btn btn-primary" onclick="openAddPart()">+ Part</button><button class="btn btn-outline" onclick="openImportPart()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"> <thead> <tr><th>Part Name</th><th>Part Number</th><th>Std Hours</th><th>ATA</th><th>Description</th><th>Actions</th></tr> </thead><tbody id="ap-body"></tbody> </div></div></div>
-      <div class="page" id="pg-leaders"><div class="card"><div class="card-header">👥 Team Leaders Management</div><div class="card-body"><button class="btn btn-primary btn-sm" onclick="openAddLeader()">+ Add Team Leader</button><div class="tbl-wrap" style="margin-top:16px;"> <thead> <tr><th>ID</th><th>Name</th><th>Email</th><th>Actions</th></tr> </thead><tbody id="leaders-body"></tbody> </div></div></div></div>
+      <div class="page" id="pg-techs"><div class="toolbar"><button class="btn btn-primary" onclick="openAddTech()">+ Technician</button><button class="btn btn-outline" onclick="openImportTech()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"><table style="width:100%;"><thead><tr><th>ID</th><th>Name</th><th>Monthly Target (hrs)</th><th>Daily Target</th><th>Status</th><th>Actions</th></tr></thead><tbody id="at-body"></tbody></table></div></div></div>
+      <div class="page" id="pg-parts"><div class="toolbar"><button class="btn btn-primary" onclick="openAddPart()">+ Part</button><button class="btn btn-outline" onclick="openImportPart()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"><table style="width:100%;"><thead><tr><th>Part Name</th><th>Part Number</th><th>Std Hours</th><th>ATA</th><th>Description</th><th>Actions</th></tr></thead><tbody id="ap-body"></tbody></table></div></div></div>
+      <div class="page" id="pg-leaders"><div class="card"><div class="card-header">👥 Team Leaders Management</div><div class="card-body"><button class="btn btn-primary btn-sm" onclick="openAddLeader()">+ Add Team Leader</button><div class="tbl-wrap" style="margin-top:16px;"><table style="width:100%;"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Actions</th></tr></thead><tbody id="leaders-body"></tbody></table></div></div></div></div>
       <div class="page" id="pg-system"><div class="card"><div class="card-header">🔐 System Settings</div><div class="card-body"><div class="setting-row"><div><strong>Default Monthly Target (Hours)</strong><div style="font-size:12px;">Initial target for new technicians</div></div><input type="number" id="sys-default-month-target" style="width:120px;" class="form-input" value="160"><button class="btn btn-primary btn-sm" onclick="saveDefaultMonthlyTarget()">Set</button></div><div class="setting-row"><div><strong>Change Default Passwords</strong></div><button class="btn btn-outline btn-sm" onclick="openGlobalPwdModal()">Configure</button></div><div class="setting-row"><div><strong>Export Full Backup</strong></div><button class="btn btn-outline btn-sm" onclick="exportBackup()">⬇ Export JSON</button></div><div class="setting-row"><div><strong>Import Backup</strong></div><label class="btn btn-outline btn-sm" style="cursor:pointer;">⬆ Import JSON<input type="file" accept=".json" style="display:none" onchange="importBackup(this)"></label></div><div class="setting-row"><div><strong>Factory Reset</strong></div><button class="btn btn-danger btn-sm" onclick="factoryReset()">⚠️ Reset All</button></div></div></div></div>
     </div>
   </main>
@@ -303,10 +303,9 @@ let leaders = [];
 let settings = { defaultMonthlyTarget: 160, passwords: { tech: 'demo', lead: 'demo', dev: 'demo' } };
 let entries = [];
 
-// --- NO LOCAL ALIASES! We'll use window.collection, window.db, etc. directly. ---
-
 function toast(msg, type = 'success') {
   const t = document.getElementById('toast');
+  if (!t) return;
   t.querySelector('.toast-msg').textContent = msg;
   t.querySelector('.toast-icon').textContent = type === 'error' ? '❌' : '✅';
   t.classList.add('show');
@@ -350,17 +349,22 @@ const pageTitles = {
 
 function buildNav() {
   const nav = document.getElementById('sb-nav');
+  if (!nav) return;
   const icons = { entry: '⊕', mystats: '📊', dashboard: '🖥', allentries: '📋', reports: '📈', techs: '👷', parts: '🔩', leaders: '👥', system: '⚙️' };
   nav.innerHTML = '<div class="sb-section">Menu</div>' + (navMap[currentRole] || []).map(p => `<div class="sb-link" data-page="${p}" onclick="navigateTo('${p}')"><span class="si">${icons[p]}</span>${p.charAt(0).toUpperCase() + p.slice(1)}</div>`).join('');
 }
 window.navigateTo = function(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('pg-' + page)?.classList.add('active');
+  const target = document.getElementById('pg-' + page);
+  if (target) target.classList.add('active');
   document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
-  document.querySelector(`.sb-link[data-page="${page}"]`)?.classList.add('active');
+  const activeLink = document.querySelector(`.sb-link[data-page="${page}"]`);
+  if (activeLink) activeLink.classList.add('active');
   const meta = pageTitles[page] || { title: page, desc: '' };
-  document.getElementById('page-title').textContent = meta.title;
-  document.getElementById('page-desc').textContent = meta.desc;
+  const titleEl = document.getElementById('page-title');
+  const descEl = document.getElementById('page-desc');
+  if (titleEl) titleEl.textContent = meta.title;
+  if (descEl) descEl.textContent = meta.desc;
   if (page === 'entry') renderEntry();
   if (page === 'mystats') renderMyStats();
   if (page === 'dashboard') { populateTechFilter(); renderDashboard(); }
@@ -372,7 +376,7 @@ window.navigateTo = function(page) {
   if (page === 'system') renderSystem();
 };
 
-// RENDER FUNCTIONS (using window.db, window.collection etc.)
+// RENDER FUNCTIONS (with null checks)
 function renderEntry() {
   const today = new Date().toISOString().slice(0,10);
   const userEntries = entries.filter(e => e.techId === currentUser.id);
@@ -382,41 +386,58 @@ function renderEntry() {
   const monthlyTarget = currentUser.monthlyTarget || 160;
   const dailyTarget = getDailyTarget(monthlyTarget);
   const weeklyTarget = getWeeklyTarget(monthlyTarget);
-  document.getElementById('e-today-hrs').textContent = todayHrs.toFixed(1);
-  document.getElementById('e-week-hrs').textContent = weekHrs.toFixed(1);
-  document.getElementById('e-daily-target').textContent = dailyTarget.toFixed(1);
-  document.getElementById('e-week-target').textContent = weeklyTarget.toFixed(1);
+  
+  const elTodayHrs = document.getElementById('e-today-hrs');
+  const elWeekHrs = document.getElementById('e-week-hrs');
+  const elDailyTarget = document.getElementById('e-daily-target');
+  const elWeeklyTarget = document.getElementById('e-week-target');
+  if (elTodayHrs) elTodayHrs.textContent = todayHrs.toFixed(1);
+  if (elWeekHrs) elWeekHrs.textContent = weekHrs.toFixed(1);
+  if (elDailyTarget) elDailyTarget.textContent = dailyTarget.toFixed(1);
+  if (elWeeklyTarget) elWeeklyTarget.textContent = weeklyTarget.toFixed(1);
+  
   const sel = document.getElementById('e-part-sel');
-  sel.innerHTML = '<option value="">— Choose Part —</option>' + parts.map(p => `<option value="${p.id}">${p.name} (${p.hours}h)</option>`).join('');
-  document.getElementById('e-time').value = new Date().toISOString().slice(0,16);
+  if (sel) {
+    sel.innerHTML = '<option value="">— Choose Part —</option>' + parts.map(p => `<option value="${p.id}">${p.name} (${p.hours}h)</option>`).join('');
+  }
+  const timeInput = document.getElementById('e-time');
+  if (timeInput && !timeInput.value) timeInput.value = new Date().toISOString().slice(0,16);
+  
   const tbody = document.getElementById('e-today-list');
-  const todayEntries = userEntries.filter(e => e.time?.startsWith(today)).slice(0,15);
-  tbody.innerHTML = todayEntries.length ? todayEntries.map(e => `<tr><td class="mono">${new Date(e.time).toLocaleTimeString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">No entries today</td></tr>';
+  if (tbody) {
+    const todayEntries = userEntries.filter(e => e.time?.startsWith(today)).slice(0,15);
+    tbody.innerHTML = todayEntries.length ? todayEntries.map(e => `   <tr><td class="mono">${new Date(e.time).toLocaleTimeString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">No entries today</td></tr>';
+  }
 }
 function onPartSelect() {
-  const partId = document.getElementById('e-part-sel').value;
+  const partId = document.getElementById('e-part-sel')?.value;
   if (!partId) return;
   const part = parts.find(p => p.id === partId);
   if (part) {
-    document.getElementById('e-desc').value = part.desc || '';
-    document.getElementById('e-ata').value = part.ata || '';
-    document.getElementById('e-pnum').value = part.num;
-    document.getElementById('e-hours').value = part.hours;
+    const descEl = document.getElementById('e-desc');
+    const ataEl = document.getElementById('e-ata');
+    const pnumEl = document.getElementById('e-pnum');
+    const hoursEl = document.getElementById('e-hours');
+    if (descEl) descEl.value = part.desc || '';
+    if (ataEl) ataEl.value = part.ata || '';
+    if (pnumEl) pnumEl.value = part.num;
+    if (hoursEl) hoursEl.value = part.hours;
   }
 }
 function searchPartAndFill() {
-  const term = document.getElementById('part-search-input').value.toLowerCase();
+  const term = document.getElementById('part-search-input')?.value.toLowerCase();
   if (!term) return;
   const found = parts.find(p => p.name.toLowerCase().includes(term) || p.num.toLowerCase().includes(term));
   if (found) {
-    document.getElementById('e-part-sel').value = found.id;
+    const sel = document.getElementById('e-part-sel');
+    if (sel) sel.value = found.id;
     onPartSelect();
     toast(`Found: ${found.name}`);
   } else toast('No matching part', 'warn');
 }
 async function submitEntry() {
-  const partId = document.getElementById('e-part-sel').value;
-  const serial = document.getElementById('e-serial').value.trim();
+  const partId = document.getElementById('e-part-sel')?.value;
+  const serial = document.getElementById('e-serial')?.value.trim();
   if (!partId) { toast('Select a part', 'error'); return; }
   if (!serial) { toast('Enter serial number', 'error'); return; }
   const part = parts.find(p => p.id === partId);
@@ -427,13 +448,12 @@ async function submitEntry() {
     pname: part.name,
     pnum: part.num,
     serial,
-    time: document.getElementById('e-time').value || new Date().toISOString(),
+    time: document.getElementById('e-time')?.value || new Date().toISOString(),
     hours: part.hours,
     desc: part.desc,
     ata: part.ata
   };
   try {
-    // Use window.addDoc and window.collection directly
     const docRef = await window.addDoc(window.collection(window.db, 'entries'), entry);
     entry.id = docRef.id;
     entries.unshift(entry);
@@ -446,17 +466,16 @@ async function submitEntry() {
   }
 }
 function clearEntry() {
-  document.getElementById('e-part-sel').value = '';
-  document.getElementById('e-desc').value = '';
-  document.getElementById('e-ata').value = '';
-  document.getElementById('e-pnum').value = '';
-  document.getElementById('e-hours').value = '';
-  document.getElementById('e-serial').value = '';
-  document.getElementById('part-search-input').value = '';
-  document.getElementById('e-time').value = new Date().toISOString().slice(0,16);
+  const ids = ['e-part-sel', 'e-desc', 'e-ata', 'e-pnum', 'e-hours', 'e-serial', 'part-search-input'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const timeEl = document.getElementById('e-time');
+  if (timeEl) timeEl.value = new Date().toISOString().slice(0,16);
 }
 function cancelEntry() { clearEntry(); toast('Entry cancelled'); }
-function doScan() { if (!parts.length) { toast('No parts', 'error'); return; } const rand = parts[Math.floor(Math.random() * parts.length)]; document.getElementById('e-part-sel').value = rand.id; onPartSelect(); document.getElementById('e-serial').focus(); toast(`Scanned: ${rand.name}`); }
+function doScan() { if (!parts.length) { toast('No parts', 'error'); return; } const rand = parts[Math.floor(Math.random() * parts.length)]; const sel = document.getElementById('e-part-sel'); if (sel) sel.value = rand.id; onPartSelect(); const serialEl = document.getElementById('e-serial'); if (serialEl) serialEl.focus(); toast(`Scanned: ${rand.name}`); }
 
 function renderMyStats() {
   const userEntries = entries.filter(e => e.techId === currentUser.id);
@@ -471,16 +490,28 @@ function renderMyStats() {
   const weeklyTarget = getWeeklyTarget(monthlyTarget);
   const progress = Math.min(100, Math.round(monthHrs / monthlyTarget * 100));
   const remaining = Math.max(0, monthlyTarget - monthHrs);
-  document.getElementById('ms-today').textContent = todayHrs.toFixed(1);
-  document.getElementById('ms-daily-target').textContent = dailyTarget.toFixed(1);
-  document.getElementById('ms-week').textContent = weekHrs.toFixed(1);
-  document.getElementById('ms-week-target').textContent = weeklyTarget.toFixed(1);
-  document.getElementById('ms-month').textContent = monthHrs.toFixed(1);
-  document.getElementById('ms-month-target').textContent = monthlyTarget;
-  document.getElementById('ms-progress').textContent = progress + '%';
-  document.getElementById('ms-remaining').textContent = remaining.toFixed(1);
+  
+  const elToday = document.getElementById('ms-today');
+  const elDailyTarget = document.getElementById('ms-daily-target');
+  const elWeek = document.getElementById('ms-week');
+  const elWeekTarget = document.getElementById('ms-week-target');
+  const elMonth = document.getElementById('ms-month');
+  const elMonthTarget = document.getElementById('ms-month-target');
+  const elProgress = document.getElementById('ms-progress');
+  const elRemaining = document.getElementById('ms-remaining');
+  if (elToday) elToday.textContent = todayHrs.toFixed(1);
+  if (elDailyTarget) elDailyTarget.textContent = dailyTarget.toFixed(1);
+  if (elWeek) elWeek.textContent = weekHrs.toFixed(1);
+  if (elWeekTarget) elWeekTarget.textContent = weeklyTarget.toFixed(1);
+  if (elMonth) elMonth.textContent = monthHrs.toFixed(1);
+  if (elMonthTarget) elMonthTarget.textContent = monthlyTarget;
+  if (elProgress) elProgress.textContent = progress + '%';
+  if (elRemaining) elRemaining.textContent = remaining.toFixed(1);
+  
   const tbody = document.getElementById('ms-hist');
-  tbody.innerHTML = userEntries.slice(0,30).map(e => `<tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">No history</td></tr>';
+  if (tbody) {
+    tbody.innerHTML = userEntries.slice(0,30).map(e => `   <tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">No history</td></tr>';
+  }
 }
 
 function renderDashboard() {
@@ -491,11 +522,17 @@ function renderDashboard() {
   const totalMonthlyTarget = techs.filter(t => t.status === 'active').reduce((s,t) => s + (t.monthlyTarget || 160), 0);
   const avgMonth = activeTechs ? totalMonthHrs / activeTechs : 0;
   const progress = totalMonthlyTarget ? Math.min(100, Math.round(totalMonthHrs / totalMonthlyTarget * 100)) : 0;
-  document.getElementById('d-active').textContent = activeTechs;
-  document.getElementById('d-shop-month').textContent = totalMonthHrs.toFixed(1);
-  document.getElementById('d-shop-target').textContent = totalMonthlyTarget;
-  document.getElementById('d-avg-month').textContent = avgMonth.toFixed(1);
-  document.getElementById('d-shop-progress').textContent = progress + '%';
+  
+  const elActive = document.getElementById('d-active');
+  const elShopMonth = document.getElementById('d-shop-month');
+  const elShopTarget = document.getElementById('d-shop-target');
+  const elAvgMonth = document.getElementById('d-avg-month');
+  const elShopProgress = document.getElementById('d-shop-progress');
+  if (elActive) elActive.textContent = activeTechs;
+  if (elShopMonth) elShopMonth.textContent = totalMonthHrs.toFixed(1);
+  if (elShopTarget) elShopTarget.textContent = totalMonthlyTarget;
+  if (elAvgMonth) elAvgMonth.textContent = avgMonth.toFixed(1);
+  if (elShopProgress) elShopProgress.textContent = progress + '%';
   renderLeaderboard();
 }
 function renderLeaderboard() {
@@ -507,6 +544,7 @@ function renderLeaderboard() {
     .filter(t => !search || t.name.toLowerCase().includes(search))
     .sort((a,b) => b.monthHrs - a.monthHrs);
   const container = document.getElementById('lb-body');
+  if (!container) return;
   if (!stats.length) { container.innerHTML = '<div class="empty">No technicians found</div>'; return; }
   container.innerHTML = stats.map(t => {
     const target = t.monthlyTarget || 160;
@@ -520,9 +558,9 @@ function populateTechFilter() {
   if (sel) sel.innerHTML = '<option value="">All Technicians</option>' + techs.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
 }
 function renderAllEntries() {
-  const techFilter = document.getElementById('ae-tech').value;
-  const dateFilter = document.getElementById('ae-date').value;
-  const search = document.getElementById('ae-search').value.toLowerCase();
+  const techFilter = document.getElementById('ae-tech')?.value;
+  const dateFilter = document.getElementById('ae-date')?.value;
+  const search = document.getElementById('ae-search')?.value.toLowerCase() || '';
   const today = new Date().toISOString().slice(0,10);
   const weekRange = getCurrentWeekRange();
   const monthRange = getCurrentMonthRange();
@@ -533,7 +571,9 @@ function renderAllEntries() {
   if (dateFilter === 'month') filtered = filtered.filter(e => e.time >= monthRange.start && e.time <= monthRange.end);
   if (search) filtered = filtered.filter(e => (e.techName + e.pname + e.serial).toLowerCase().includes(search));
   const tbody = document.getElementById('ae-body');
-  tbody.innerHTML = filtered.slice(0,200).map(e => `<tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.techName}</td><td>${e.pname}</td><td class="mono">${e.serial}</td><td>${e.hours}h</td></tr>`).join('') || '<tr><td colspan="5" class="empty">No entries</td></tr>';
+  if (tbody) {
+    tbody.innerHTML = filtered.slice(0,200).map(e => `   <tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.techName}</td><td>${e.pname}</td><td class="mono">${e.serial}</td><td>${e.hours}h</td></tr>`).join('') || '<tr><td colspan="5" class="empty">No entries</td></tr>';
+  }
 }
 function exportAllEntries() {
   let csv = 'Date,Technician,Part,Serial,Hours\n';
@@ -550,6 +590,7 @@ function renderReports() {
   const monthEntries = entries.filter(e => e.time >= monthRange.start && e.time <= monthRange.end);
   const activeTechs = techs.filter(t => t.status === 'active');
   const tbody = document.getElementById('rpt-weekly');
+  if (!tbody) return;
   tbody.innerHTML = activeTechs.map(t => {
     const monthHrs = monthEntries.filter(e => e.techId === t.id).reduce((s,e) => s + (e.hours || 0), 0);
     const target = t.monthlyTarget || 160;
@@ -557,23 +598,24 @@ function renderReports() {
     const dailyAvg = monthHrs / 20;
     const status = progress >= 100 ? '✅ Achieved' : progress >= 80 ? '⚠️ Near' : progress >= 60 ? '🟡 In Progress' : '🔴 Behind';
     const statusClass = progress >= 100 ? 'badge-green' : progress >= 80 ? 'badge-amber' : progress >= 60 ? 'badge-blue' : 'badge-red';
-    return `<tr><td><strong>${t.name}</strong></td><td>${target}h</td><td>${monthHrs.toFixed(1)}h</td><td><span class="badge ${statusClass}">${progress}%</span></td><td>${dailyAvg.toFixed(1)}h</td><td>${status}</td></tr>`;
+    return `   <tr><td><strong>${t.name}</strong></td><td>${target}h</td><td>${monthHrs.toFixed(1)}h</td><td><span class="badge ${statusClass}">${progress}%</span></td><td>${dailyAvg.toFixed(1)}h</td><td>${status}</td></tr>`;
   }).join('') || '<tr><td colspan="6" class="empty">No technicians</td></tr>';
 }
 
 // ADMIN FUNCTIONS (using window versions)
 function renderTechs() {
   const tbody = document.getElementById('at-body');
-  tbody.innerHTML = techs.map(t => `<tr><td class="mono">${t.id}</td><td>${t.name}</td><td><span class="badge badge-blue">${t.monthlyTarget || 160}h</span></td><td>${(t.monthlyTarget / 20).toFixed(1)}h</td><td><span class="badge ${t.status === 'active' ? 'badge-green' : 'badge-gray'}">${t.status}</span></td><td><button class="btn-outline btn-sm" onclick="openEditTech('${t.id}')">✏️</button> <button class="btn-outline btn-sm" onclick="deleteTech('${t.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No technicians</td></tr>';
+  if (!tbody) return;
+  tbody.innerHTML = techs.map(t => `   <tr><td class="mono">${t.id}</td><td>${t.name}</td><td><span class="badge badge-blue">${t.monthlyTarget || 160}h</span></td><td>${(t.monthlyTarget / 20).toFixed(1)}h</td><td><span class="badge ${t.status === 'active' ? 'badge-green' : 'badge-gray'}">${t.status}</span></td><td><button class="btn-outline btn-sm" onclick="openEditTech('${t.id}')">✏️</button> <button class="btn-outline btn-sm" onclick="deleteTech('${t.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No technicians</td></tr>';
 }
 window.openAddTech = () => { editingTechId = null; document.getElementById('mt-id').value = ''; document.getElementById('mt-name').value = ''; document.getElementById('mt-month-target').value = ''; document.getElementById('mt-status').value = 'active'; document.getElementById('mt-pwd').value = 'demo'; openModal('m-tech'); };
 window.openEditTech = (id) => { const t = techs.find(t => t.id === id); if (t) { editingTechId = id; document.getElementById('mt-id').value = t.id; document.getElementById('mt-name').value = t.name; document.getElementById('mt-month-target').value = t.monthlyTarget || 160; document.getElementById('mt-status').value = t.status; document.getElementById('mt-pwd').value = t.password || 'demo'; openModal('m-tech'); } };
 window.saveTech = async () => {
-  const id = document.getElementById('mt-id').value.trim();
-  const name = document.getElementById('mt-name').value.trim();
-  const monthlyTarget = parseFloat(document.getElementById('mt-month-target').value) || 160;
-  const status = document.getElementById('mt-status').value;
-  const pwd = document.getElementById('mt-pwd').value.trim() || 'demo';
+  const id = document.getElementById('mt-id')?.value.trim();
+  const name = document.getElementById('mt-name')?.value.trim();
+  const monthlyTarget = parseFloat(document.getElementById('mt-month-target')?.value) || 160;
+  const status = document.getElementById('mt-status')?.value;
+  const pwd = document.getElementById('mt-pwd')?.value.trim() || 'demo';
   if (!id || !name) { toast('ID and Name required', 'error'); return; }
   const colors = ['#3b82f6','#10b981','#f59e0b','#f43f5e','#8b5cf6'];
   if (editingTechId) {
@@ -607,16 +649,17 @@ window.deleteTech = async (id) => {
 
 function renderParts() {
   const tbody = document.getElementById('ap-body');
-  tbody.innerHTML = parts.map(p => `<tr><td><strong>${p.name}</strong></td><td class="mono">${p.num}</td><td><span class="badge badge-blue">${p.hours}h</span></td><td>${p.ata || '—'}</td><td>${p.desc || '—'}</td><td><button class="btn-outline btn-sm" onclick="openEditPart('${p.id}')">✏️</button> <button class="btn-outline btn-sm" onclick="deletePart('${p.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No parts</td></tr>';
+  if (!tbody) return;
+  tbody.innerHTML = parts.map(p => `   <tr><td><strong>${p.name}</strong></td><td class="mono">${p.num}</td><td><span class="badge badge-blue">${p.hours}h</span></td><td>${p.ata || '—'}</td><td>${p.desc || '—'}</td><td><button class="btn-outline btn-sm" onclick="openEditPart('${p.id}')">✏️</button> <button class="btn-outline btn-sm" onclick="deletePart('${p.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No parts</td></tr>';
 }
 window.openAddPart = () => { editingPartId = null; document.getElementById('mp-name').value = ''; document.getElementById('mp-num').value = ''; document.getElementById('mp-hours').value = ''; document.getElementById('mp-ata').value = ''; document.getElementById('mp-desc').value = ''; openModal('m-part'); };
 window.openEditPart = (id) => { const p = parts.find(p => p.id === id); if (p) { editingPartId = id; document.getElementById('mp-name').value = p.name; document.getElementById('mp-num').value = p.num; document.getElementById('mp-hours').value = p.hours; document.getElementById('mp-ata').value = p.ata || ''; document.getElementById('mp-desc').value = p.desc || ''; openModal('m-part'); } };
 window.savePart = async () => {
-  const name = document.getElementById('mp-name').value.trim();
-  const num = document.getElementById('mp-num').value.trim();
-  const hours = parseFloat(document.getElementById('mp-hours').value);
+  const name = document.getElementById('mp-name')?.value.trim();
+  const num = document.getElementById('mp-num')?.value.trim();
+  const hours = parseFloat(document.getElementById('mp-hours')?.value);
   if (!name || !num || !hours) { toast('Name, Number and Hours required', 'error'); return; }
-  const part = { name, num, hours, ata: document.getElementById('mp-ata').value, desc: document.getElementById('mp-desc').value };
+  const part = { name, num, hours, ata: document.getElementById('mp-ata')?.value, desc: document.getElementById('mp-desc')?.value };
   if (editingPartId) {
     await window.setDoc(window.doc(window.db, 'parts', editingPartId), { id: editingPartId, ...part });
     const idx = parts.findIndex(p => p.id === editingPartId);
@@ -641,15 +684,16 @@ window.deletePart = async (id) => {
 
 function renderLeaders() {
   const tbody = document.getElementById('leaders-body');
-  tbody.innerHTML = leaders.map(l => `<tr><td class="mono">${l.id}</td><td>${l.name}</td><td>${l.email || '—'}</td><td><button class="btn-outline btn-sm" onclick="deleteLeader('${l.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="4" class="empty">No leaders</td></tr>';
+  if (!tbody) return;
+  tbody.innerHTML = leaders.map(l => `   <tr><td class="mono">${l.id}</td><td>${l.name}</td><td>${l.email || '—'}</td><td><button class="btn-outline btn-sm" onclick="deleteLeader('${l.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="4" class="empty">No leaders</td></tr>';
 }
 window.openAddLeader = () => { document.getElementById('leader-id').value = ''; document.getElementById('leader-name').value = ''; document.getElementById('leader-email').value = ''; document.getElementById('leader-pwd').value = 'demo'; openModal('m-leader'); };
 window.saveLeader = async () => {
-  const id = document.getElementById('leader-id').value.trim();
-  const name = document.getElementById('leader-name').value.trim();
+  const id = document.getElementById('leader-id')?.value.trim();
+  const name = document.getElementById('leader-name')?.value.trim();
   if (!id || !name) { toast('ID and Name required', 'error'); return; }
   if (leaders.find(l => l.id === id)) { toast('ID exists', 'error'); return; }
-  const newLeader = { id, name, email: document.getElementById('leader-email').value, password: document.getElementById('leader-pwd').value || 'demo' };
+  const newLeader = { id, name, email: document.getElementById('leader-email')?.value, password: document.getElementById('leader-pwd')?.value || 'demo' };
   await window.setDoc(window.doc(window.db, 'leaders', id), newLeader);
   leaders.push(newLeader);
   closeModal('m-leader');
@@ -665,10 +709,11 @@ window.deleteLeader = async (id) => {
 };
 
 function renderSystem() {
-  document.getElementById('sys-default-month-target').value = settings.defaultMonthlyTarget || 160;
+  const targetInput = document.getElementById('sys-default-month-target');
+  if (targetInput) targetInput.value = settings.defaultMonthlyTarget || 160;
 }
 window.saveDefaultMonthlyTarget = async () => {
-  const val = parseFloat(document.getElementById('sys-default-month-target').value) || 160;
+  const val = parseFloat(document.getElementById('sys-default-month-target')?.value) || 160;
   settings.defaultMonthlyTarget = val;
   const settingsRef = window.collection(window.db, 'settings');
   const snap = await window.getDocs(settingsRef);
@@ -678,13 +723,14 @@ window.saveDefaultMonthlyTarget = async () => {
 };
 window.openMonthlyTargetModal = () => {
   const select = document.getElementById('target-tech-select');
+  if (!select) return;
   select.innerHTML = '<option value="">Select Technician</option>' + techs.filter(t => t.status === 'active').map(t => `<option value="${t.id}">${t.name} (current: ${t.monthlyTarget || 160}h)</option>`).join('');
   document.getElementById('month-target-value').value = '';
   openModal('m-target-month');
 };
 window.saveMonthlyTarget = async () => {
-  const techId = document.getElementById('target-tech-select').value;
-  const newTarget = parseFloat(document.getElementById('month-target-value').value);
+  const techId = document.getElementById('target-tech-select')?.value;
+  const newTarget = parseFloat(document.getElementById('month-target-value')?.value);
   if (!techId || isNaN(newTarget) || newTarget <= 0) { toast('Select technician and enter valid target', 'error'); return; }
   const idx = techs.findIndex(t => t.id === techId);
   if (idx !== -1) {
@@ -698,8 +744,8 @@ window.saveMonthlyTarget = async () => {
 };
 window.openChangePassword = () => openModal('m-password');
 window.changeMyPassword = async () => {
-  const old = document.getElementById('pwd-old').value;
-  const newPwd = document.getElementById('pwd-new').value;
+  const old = document.getElementById('pwd-old')?.value;
+  const newPwd = document.getElementById('pwd-new')?.value;
   if (!old || !newPwd) { toast('Enter both passwords', 'error'); return; }
   if (currentRole === 'tech') {
     const idx = techs.findIndex(t => t.id === currentUser.id);
@@ -725,9 +771,9 @@ window.changeMyPassword = async () => {
 };
 window.openGlobalPwdModal = () => openModal('m-globalpwd');
 window.saveDefaultPasswords = async () => {
-  const techPwd = document.getElementById('def-tech-pwd').value;
-  const leadPwd = document.getElementById('def-lead-pwd').value;
-  const devPwd = document.getElementById('def-dev-pwd').value;
+  const techPwd = document.getElementById('def-tech-pwd')?.value;
+  const leadPwd = document.getElementById('def-lead-pwd')?.value;
+  const devPwd = document.getElementById('def-dev-pwd')?.value;
   if (techPwd) settings.passwords = { ...settings.passwords, tech: techPwd };
   if (leadPwd) settings.passwords.lead = leadPwd;
   if (devPwd) settings.passwords.dev = devPwd;
@@ -849,8 +895,8 @@ function handlePartImport(input) {
 }
 function openImportTech() { openModal('m-import-tech'); }
 function openImportPart() { openModal('m-import-part'); }
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openModal(id) { const el = document.getElementById(id); if (el) el.classList.add('open'); }
+function closeModal(id) { const el = document.getElementById(id); if (el) el.classList.remove('open'); }
 
 // LOGIN functions
 window.pickRole = function(el) {
@@ -865,8 +911,9 @@ window.quickLogin = function(id, role) {
   doLogin();
 };
 window.doLogin = async function() {
-  const id = document.getElementById('li-id').value.trim();
-  const pwd = document.getElementById('li-pw').value;
+  const id = document.getElementById('li-id')?.value.trim();
+  const pwd = document.getElementById('li-pw')?.value;
+  if (!id || !pwd) return;
 
   // Load fresh data from Firestore using window functions
   try {
@@ -914,10 +961,13 @@ window.doLogin = async function() {
   currentUser = user;
   currentRole = selectedRole;
 
-  document.getElementById('sb-avatar').textContent = (user.initials || user.name.slice(0,2)).toUpperCase();
-  document.getElementById('sb-avatar').style.background = user.color || '#3b82f6';
-  document.getElementById('sb-uname').textContent = user.name;
-  document.getElementById('sb-urole').textContent = currentRole.toUpperCase();
+  const avatarEl = document.getElementById('sb-avatar');
+  const unameEl = document.getElementById('sb-uname');
+  const uroleEl = document.getElementById('sb-urole');
+  if (avatarEl) avatarEl.textContent = (user.initials || user.name.slice(0,2)).toUpperCase();
+  if (avatarEl) avatarEl.style.background = user.color || '#3b82f6';
+  if (unameEl) unameEl.textContent = user.name;
+  if (uroleEl) uroleEl.textContent = currentRole.toUpperCase();
 
   buildNav();
   document.getElementById('login').classList.remove('active');
@@ -938,7 +988,8 @@ window.logout = function() {
 
 // Attach listeners
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('sign-in-btn').addEventListener('click', doLogin);
+  const signInBtn = document.getElementById('sign-in-btn');
+  if (signInBtn) signInBtn.addEventListener('click', doLogin);
 });
 
 // Expose all necessary functions to global scope for inline onclick handlers
