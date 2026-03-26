@@ -298,7 +298,7 @@ let entries = [];
 // Use global Firebase objects set by the module (window)
 const firestoreDb = window.db;
 const firestoreGetDocs = window.getDocs;
-const firestoreCollection = window.collection;
+const collection = window.collection;
 const firestoreDoc = window.doc;
 const firestoreSetDoc = window.setDoc;
 const firestoreAddDoc = window.addDoc;
@@ -432,7 +432,7 @@ async function submitEntry() {
     ata: part.ata
   };
   try {
-    const docRef = await firestoreAddDoc(firestoreCollection(firestoreDb, 'entries'), entry);
+    const docRef = await firestoreAddDoc(collection(firestoreDb, 'entries'), entry);
     entry.id = docRef.id;
     entries.unshift(entry);
     clearEntry();
@@ -668,7 +668,7 @@ function renderSystem() {
 window.saveDefaultMonthlyTarget = async () => {
   const val = parseFloat(document.getElementById('sys-default-month-target').value) || 160;
   settings.defaultMonthlyTarget = val;
-  const settingsRef = firestoreCollection(firestoreDb, 'settings');
+  const settingsRef = collection(firestoreDb, 'settings');
   const snap = await firestoreGetDocs(settingsRef);
   if (!snap.empty) await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', snap.docs[0].id), settings);
   else await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', 'global'), settings);
@@ -713,7 +713,7 @@ window.changeMyPassword = async () => {
   } else if (currentRole === 'dev') {
     if ((settings.passwords?.dev || 'demo') !== old) { toast('Wrong current password', 'error'); return; }
     settings.passwords = { ...settings.passwords, dev: newPwd };
-    const settingsRef = firestoreCollection(firestoreDb, 'settings');
+    const settingsRef = collection(firestoreDb, 'settings');
     const snap = await firestoreGetDocs(settingsRef);
     if (!snap.empty) await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', snap.docs[0].id), settings);
     else await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', 'global'), settings);
@@ -729,7 +729,7 @@ window.saveDefaultPasswords = async () => {
   if (techPwd) settings.passwords = { ...settings.passwords, tech: techPwd };
   if (leadPwd) settings.passwords.lead = leadPwd;
   if (devPwd) settings.passwords.dev = devPwd;
-  const settingsRef = firestoreCollection(firestoreDb, 'settings');
+  const settingsRef = collection(firestoreDb, 'settings');
   const snap = await firestoreGetDocs(settingsRef);
   if (!snap.empty) await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', snap.docs[0].id), settings);
   else await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', 'global'), settings);
@@ -753,15 +753,15 @@ window.importBackup = (input) => {
       const d = JSON.parse(e.target.result);
       const collections = ['technicians', 'parts', 'leaders', 'entries'];
       for (const coll of collections) {
-        const snap = await firestoreGetDocs(firestoreCollection(firestoreDb, coll));
+        const snap = await firestoreGetDocs(collection(firestoreDb, coll));
         for (const docSnap of snap.docs) await firestoreDeleteDoc(firestoreDoc(firestoreDb, coll, docSnap.id));
       }
       if (d.techs) for (const t of d.techs) await firestoreSetDoc(firestoreDoc(firestoreDb, 'technicians', t.id), t);
       if (d.parts) for (const p of d.parts) await firestoreSetDoc(firestoreDoc(firestoreDb, 'parts', p.id), p);
       if (d.leaders) for (const l of d.leaders) await firestoreSetDoc(firestoreDoc(firestoreDb, 'leaders', l.id), l);
-      if (d.entries) for (const e of d.entries) await firestoreAddDoc(firestoreCollection(firestoreDb, 'entries'), e);
+      if (d.entries) for (const e of d.entries) await firestoreAddDoc(collection(firestoreDb, 'entries'), e);
       if (d.settings) {
-        const snap = await firestoreGetDocs(firestoreCollection(firestoreDb, 'settings'));
+        const snap = await firestoreGetDocs(collection(firestoreDb, 'settings'));
         if (!snap.empty) await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', snap.docs[0].id), d.settings);
         else await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', 'global'), d.settings);
       }
@@ -775,7 +775,7 @@ window.factoryReset = async () => {
   if (!confirm('⚠️ FULL RESET: All data will be wiped. Continue?')) return;
   const collections = ['technicians', 'parts', 'leaders', 'entries', 'settings'];
   for (const coll of collections) {
-    const snap = await firestoreGetDocs(firestoreCollection(firestoreDb, coll));
+    const snap = await firestoreGetDocs(collection(firestoreDb, coll));
     for (const docSnap of snap.docs) await firestoreDeleteDoc(firestoreDoc(firestoreDb, coll, docSnap.id));
   }
   toast('Reset complete. Reloading...');
@@ -868,15 +868,15 @@ window.doLogin = async function() {
 
   // Load fresh data from Firestore
   try {
-    const techSnap = await firestoreGetDocs(firestoreCollection(firestoreDb, 'technicians'));
+    const techSnap = await firestoreGetDocs(collection(firestoreDb, 'technicians'));
     techs = techSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const leadSnap = await firestoreGetDocs(firestoreCollection(firestoreDb, 'leaders'));
+    const leadSnap = await firestoreGetDocs(collection(firestoreDb, 'leaders'));
     leaders = leadSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const partSnap = await firestoreGetDocs(firestoreCollection(firestoreDb, 'parts'));
+    const partSnap = await firestoreGetDocs(collection(firestoreDb, 'parts'));
     parts = partSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const entrySnap = await firestoreGetDocs(firestoreCollection(firestoreDb, 'entries'));
+    const entrySnap = await firestoreGetDocs(collection(firestoreDb, 'entries'));
     entries = entrySnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const settingsSnap = await firestoreGetDocs(firestoreCollection(firestoreDb, 'settings'));
+    const settingsSnap = await firestoreGetDocs(collection(firestoreDb, 'settings'));
     if (!settingsSnap.empty) settings = settingsSnap.docs[0].data();
     else settings = { defaultMonthlyTarget: 160, passwords: { tech: 'demo', lead: 'demo', dev: 'demo' } };
   } catch (e) { console.warn("Using fallback data", e); }
