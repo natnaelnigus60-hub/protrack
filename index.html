@@ -223,6 +223,27 @@
     .tc-search input:focus{border-color:var(--blue);}
     .tc-search::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;pointer-events:none;}
     .count-pill{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:700;color:#fff;}
+
+  /* ── RATIO SETTINGS ── */
+  .ratio-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;}
+  .ratio-card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  .ratio-slider-wrap{display:flex;align-items:center;gap:10px;}
+  .ratio-slider{-webkit-appearance:none;appearance:none;flex:1;height:6px;border-radius:99px;outline:none;cursor:pointer;background:var(--card2);}
+  .ratio-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;cursor:pointer;border:2px solid var(--bg);}
+  .rs-tech::-webkit-slider-thumb{background:var(--blue);}
+  .rs-sup::-webkit-slider-thumb{background:var(--emerald);}
+  .rs-insp::-webkit-slider-thumb{background:var(--violet);}
+  .ratio-input{width:72px;padding:7px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;text-align:center;outline:none;transition:border-color .15s;}
+  .ratio-input:focus{border-color:var(--blue);}
+  .ratio-total{font-family:var(--mono);font-weight:700;font-size:16px;}
+  .ratio-total.ok{color:var(--emerald);}
+  .ratio-total.bad{color:var(--rose);}
+  .ratio-visual{display:flex;height:8px;border-radius:99px;overflow:hidden;flex:1;max-width:320px;gap:2px;}
+  .rv-seg{height:100%;border-radius:2px;transition:flex .3s;}
+  .alloc-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:700;font-family:var(--mono);}
+  .ab-blue{background:var(--blue-dim);color:var(--blue);}
+  .ab-green{background:var(--emerald-dim);color:var(--emerald);}
+  .ab-violet{background:var(--violet-dim);color:var(--violet);}
   </style>
 </head>
 <body>
@@ -322,6 +343,108 @@
       <div class="page" id="pg-parts"><div class="toolbar"><button class="btn btn-primary" onclick="openAddPart()">+ Part</button><button class="btn btn-outline" onclick="openImportPart()">⬆ Import CSV/Excel</button></div><div class="card"><div class="tbl-wrap"><table style="width:100%;"><thead><tr><th>Part Name</th><th>Part Number</th><th>Std Hours</th><th>ATA</th><th>Description</th><th>Actions</th></tr></thead><tbody id="ap-body"></tbody></table></div></div></div>
       <div class="page" id="pg-leaders"><div class="card"><div class="card-header">👥 Team Leaders Management</div><div class="card-body"><button class="btn btn-primary btn-sm" onclick="openAddLeader()">+ Add Team Leader</button><div class="tbl-wrap" style="margin-top:16px;"><table style="width:100%;"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Actions</th></tr></thead><tbody id="leaders-body"></tbody></table></div></div></div></div>
       <div class="page" id="pg-system"><div class="card"><div class="card-header">🔐 System Settings</div><div class="card-body"><div class="setting-row"><div><strong>Default Monthly Target (Hours)</strong><div style="font-size:12px;">Initial target for new technicians</div></div><input type="number" id="sys-default-month-target" style="width:120px;" class="form-input" value="160"><button class="btn btn-primary btn-sm" onclick="saveDefaultMonthlyTarget()">Set</button></div><div class="setting-row"><div><strong>Change Default Passwords</strong></div><button class="btn btn-outline btn-sm" onclick="openGlobalPwdModal()">Configure</button></div><div class="setting-row"><div><strong>Export Full Backup</strong></div><button class="btn btn-outline btn-sm" onclick="exportBackup()">⬇ Export JSON</button></div><div class="setting-row"><div><strong>Import Backup</strong></div><label class="btn btn-outline btn-sm" style="cursor:pointer;">⬆ Import JSON<input type="file" accept=".json" style="display:none" onchange="importBackup(this)"></label></div><div class="setting-row"><div><strong>Factory Reset</strong></div><button class="btn btn-danger btn-sm" onclick="factoryReset()">⚠️ Reset All</button></div></div></div></div>
+      <!-- Hour Ratio Settings Page — Team Leader + Developer -->
+      <div class="page" id="pg-ratios">
+        <div class="alert" style="margin-bottom:18px;">
+          ⚖️ Set the <strong>percentage of Std Hours</strong> allocated to each job role per task code. These ratios are set by Team Leaders and Developers. The allocated hours per person are displayed in Task Code Groups.
+        </div>
+        <!-- Default Global Ratios -->
+        <div class="ratio-card">
+          <div class="ratio-card-head">
+            <div>
+              <div style="font-size:14.5px;font-weight:700;">🌐 Default Global Ratios</div>
+              <div style="font-size:12px;color:var(--text-2);margin-top:3px;">Applied to all task codes unless overridden below</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="saveDefaultRatios()">💾 Save Default Ratios</button>
+          </div>
+          <div style="padding:20px;">
+            <!-- Technician -->
+            <div style="margin-bottom:18px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:16px;">🔧</span>
+                  <span style="font-weight:700;color:var(--blue);">Technician</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <input class="ratio-input" id="r-tech" type="number" min="0" max="100" value="25" oninput="onRatioInput('default')">
+                  <span style="color:var(--text-2);font-size:13px;">%</span>
+                </div>
+              </div>
+              <div class="ratio-slider-wrap">
+                <input type="range" class="ratio-slider rs-tech" id="rs-tech" min="0" max="100" value="25" oninput="syncSlider('tech','default')">
+              </div>
+            </div>
+            <!-- Under Supervision -->
+            <div style="margin-bottom:18px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:16px;">👁</span>
+                  <span style="font-weight:700;color:var(--emerald);">Under Supervision</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <input class="ratio-input" id="r-sup" type="number" min="0" max="100" value="65" oninput="onRatioInput('default')">
+                  <span style="color:var(--text-2);font-size:13px;">%</span>
+                </div>
+              </div>
+              <div class="ratio-slider-wrap">
+                <input type="range" class="ratio-slider rs-sup" id="rs-sup" min="0" max="100" value="65" oninput="syncSlider('sup','default')">
+              </div>
+            </div>
+            <!-- Inspector -->
+            <div style="margin-bottom:20px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:16px;">🔍</span>
+                  <span style="font-weight:700;color:var(--violet);">Inspector</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <input class="ratio-input" id="r-insp" type="number" min="0" max="100" value="10" oninput="onRatioInput('default')">
+                  <span style="color:var(--text-2);font-size:13px;">%</span>
+                </div>
+              </div>
+              <div class="ratio-slider-wrap">
+                <input type="range" class="ratio-slider rs-insp" id="rs-insp" min="0" max="100" value="10" oninput="syncSlider('insp','default')">
+              </div>
+            </div>
+            <!-- Visual bar + total -->
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-top:14px;border-top:1px solid var(--border);">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;">
+                <span style="font-size:12px;color:var(--text-2);">Distribution:</span>
+                <div class="ratio-visual" id="rv-default">
+                  <div class="rv-seg" style="background:var(--blue);flex:25;"></div>
+                  <div class="rv-seg" style="background:var(--emerald);flex:65;"></div>
+                  <div class="rv-seg" style="background:var(--violet);flex:10;"></div>
+                </div>
+                <span style="font-size:11px;color:var(--blue);">Tech</span>
+                <span style="font-size:11px;color:var(--emerald);">Sup</span>
+                <span style="font-size:11px;color:var(--violet);">Insp</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:13px;color:var(--text-2);">Total:</span>
+                <span class="ratio-total ok" id="rt-default">100%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Per Task Code Overrides -->
+        <div class="ratio-card">
+          <div class="ratio-card-head">
+            <div>
+              <div style="font-size:14.5px;font-weight:700;">🏷 Per-Task-Code Overrides</div>
+              <div style="font-size:12px;color:var(--text-2);margin-top:3px;">Override ratios for specific task codes. Leave empty to use default.</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openAddRatioOverride()">+ Add Override</button>
+          </div>
+          <div id="ratio-overrides-body">
+            <div style="display:grid;grid-template-columns:180px 90px 90px 90px 60px 1fr auto;align-items:center;gap:10px;padding:9px 20px;background:rgba(0,0,0,.12);font-size:10px;font-weight:700;letter-spacing:.6px;color:var(--text-3);text-transform:uppercase;">
+              <div>Task Code</div><div>Tech %</div><div>Supervision %</div><div>Inspector %</div><div>Total</div><div>Note</div><div></div>
+            </div>
+            <div id="ratio-overrides-list"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- Task Code Groups Page — visible to ALL roles -->
       <div class="page" id="pg-taskgroups">
         <div class="alert" style="margin-bottom:18px;">🗂 Entries are grouped by <strong>Task Code (JIC)</strong>. Each group shows all personnel organized by their job role: Technician, Under Supervision, and Inspector.</div>
@@ -352,6 +475,53 @@
 <div class="modal-bg" id="m-globalpwd"><div class="modal"><div class="modal-head"><div class="modal-title">Default Passwords</div><button class="modal-close-btn" onclick="closeModal('m-globalpwd')">✕</button></div><div class="modal-body"><label class="form-label">Technician Default</label><input class="form-input" id="def-tech-pwd" placeholder="New default password"><label class="form-label" style="margin-top:12px;">Team Leader Default</label><input class="form-input" id="def-lead-pwd" placeholder="New default password"><label class="form-label" style="margin-top:12px;">Developer Default</label><input class="form-input" id="def-dev-pwd" placeholder="New default password"></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-globalpwd')">Cancel</button><button class="btn btn-primary" onclick="saveDefaultPasswords()">Save</button></div></div></div>
 <div class="modal-bg" id="m-import-tech"><div class="modal"><div class="modal-head"><div class="modal-title">Import Technicians</div><button class="modal-close-btn" onclick="closeModal('m-import-tech')">✕</button></div><div class="modal-body"><div style="border:2px dashed var(--border2);border-radius:8px;padding:24px;text-align:center;cursor:pointer;" onclick="document.getElementById('import-tech-file').click()">📂 Click to upload CSV/Excel<input type="file" id="import-tech-file" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleTechImport(this)"></div></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-import-tech')">Cancel</button></div></div></div>
 <div class="modal-bg" id="m-import-part"><div class="modal"><div class="modal-head"><div class="modal-title">Import Parts</div><button class="modal-close-btn" onclick="closeModal('m-import-part')">✕</button></div><div class="modal-body"><div style="border:2px dashed var(--border2);border-radius:8px;padding:24px;text-align:center;cursor:pointer;" onclick="document.getElementById('import-part-file').click()">📂 Click to upload CSV/Excel<input type="file" id="import-part-file" accept=".csv,.xlsx,.xls" style="display:none" onchange="handlePartImport(this)"></div></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-import-part')">Cancel</button></div></div></div>
+
+<!-- Ratio Override Modal -->
+<div class="modal-bg" id="m-ratio-override">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-head">
+      <div class="modal-title" id="mro-title">Add Task Code Ratio Override</div>
+      <button class="modal-close-btn" onclick="closeModal('m-ratio-override')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:14px;">
+        <label class="form-label">Task Code</label>
+        <input class="form-input" id="mro-code" placeholder="e.g. TSFN800GRE30" style="font-family:var(--mono);text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div>
+          <label class="form-label" style="color:var(--blue);">🔧 Tech %</label>
+          <input class="ratio-input" id="mro-tech" type="number" min="0" max="100" value="25" style="width:100%;" oninput="onRatioInput('override')">
+        </div>
+        <div>
+          <label class="form-label" style="color:var(--emerald);">👁 Supervision %</label>
+          <input class="ratio-input" id="mro-sup" type="number" min="0" max="100" value="65" style="width:100%;" oninput="onRatioInput('override')">
+        </div>
+        <div>
+          <label class="form-label" style="color:var(--violet);">🔍 Inspector %</label>
+          <input class="ratio-input" id="mro-insp" type="number" min="0" max="100" value="10" style="width:100%;" oninput="onRatioInput('override')">
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--border);">
+        <span style="font-size:13px;color:var(--text-2);">Total:</span>
+        <span class="ratio-total ok" id="rt-override">100%</span>
+        <div class="ratio-visual" id="rv-override" style="flex:1;max-width:none;">
+          <div class="rv-seg" style="background:var(--blue);flex:25;"></div>
+          <div class="rv-seg" style="background:var(--emerald);flex:65;"></div>
+          <div class="rv-seg" style="background:var(--violet);flex:10;"></div>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <label class="form-label">Note (optional)</label>
+        <input class="form-input" id="mro-note" placeholder="e.g. Complex repair, adjusted">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-ratio-override')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRatioOverride()">Save Override</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"><span class="toast-icon">✅</span><span class="toast-msg"></span></div>
 
 <script>
@@ -400,13 +570,14 @@ function getDailyTarget(monthlyTarget) { return monthlyTarget / 20; }
 function getWeeklyTarget(monthlyTarget) { return getDailyTarget(monthlyTarget) * 5; }
 
 // Navigation
-const navMap = { tech: ['entry', 'mystats', 'taskgroups'], lead: ['dashboard', 'allentries', 'reports', 'taskgroups'], dev: ['techs', 'parts', 'leaders', 'taskgroups', 'system'] };
+const navMap = { tech: ['entry', 'mystats', 'taskgroups'], lead: ['dashboard', 'ratios', 'allentries', 'reports', 'taskgroups'], dev: ['techs', 'parts', 'leaders', 'ratios', 'taskgroups', 'system'] };
 const pageTitles = {
   entry: { title: 'Production Entry', desc: 'Log production hours' },
   mystats: { title: 'My Stats', desc: 'Monthly progress' },
   dashboard: { title: 'Team Dashboard', desc: 'Monthly performance' },
   allentries: { title: 'All Entries', desc: 'Complete log' },
   reports: { title: 'Reports', desc: 'Monthly summary' },
+  ratios: { title: 'Hour Ratio Settings', desc: 'Set Std Hour allocation % per job role' },
   taskgroups: { title: 'Task Code Groups', desc: 'View personnel grouped by JIC task code' },
   techs: { title: 'Manage Technicians', desc: 'Set monthly targets' },
   parts: { title: 'Parts', desc: 'Manage parts' },
@@ -417,7 +588,7 @@ const pageTitles = {
 function buildNav() {
   const nav = document.getElementById('sb-nav');
   if (!nav) return;
-  const icons = { entry: '⊕', mystats: '📊', dashboard: '🖥', allentries: '📋', reports: '📈', taskgroups: '🗂', techs: '👷', parts: '🔩', leaders: '👥', system: '⚙️' };
+  const icons = { entry: '⊕', mystats: '📊', dashboard: '🖥', allentries: '📋', reports: '📈', ratios: '⚖️', taskgroups: '🗂', techs: '👷', parts: '🔩', leaders: '👥', system: '⚙️' };
   nav.innerHTML = '<div class="sb-section">Menu</div>' + (navMap[currentRole] || []).map(p => `<div class="sb-link" data-page="${p}" onclick="navigateTo('${p}')"><span class="si">${icons[p]}</span>${p.charAt(0).toUpperCase() + p.slice(1)}</div>`).join('');
 }
 window.navigateTo = function(page) {
@@ -437,6 +608,7 @@ window.navigateTo = function(page) {
   if (page === 'dashboard') { populateTechFilter(); renderDashboard(); }
   if (page === 'allentries') { populateTechFilter(); renderAllEntries(); }
   if (page === 'reports') renderReports();
+  if (page === 'ratios') renderRatios();
   if (page === 'taskgroups') renderTaskGroups();
   if (page === 'techs') renderTechs();
   if (page === 'parts') renderParts();
@@ -1084,6 +1256,151 @@ window.pickJobRole = function(role, el, variant) {
   else el.classList.add('sel');
 };
 
+// ── RATIO HELPERS ──
+function getDefaultRatios() {
+  return settings.ratios || { tech: 25, sup: 65, insp: 10 };
+}
+function getRatiosForCode(code) {
+  const overrides = settings.taskRatios || {};
+  return overrides[code] || getDefaultRatios();
+}
+function calcAllocatedHrs(totalHrs, rolePct, roleCount) {
+  if (!roleCount) return 0;
+  return (totalHrs * rolePct / 100) / roleCount;
+}
+
+// ── RATIO PAGE RENDER ──
+function renderRatios() {
+  const r = getDefaultRatios();
+  // Set sliders and inputs
+  ['tech','sup','insp'].forEach(k => {
+    const inp = document.getElementById('r-' + k);
+    const sl  = document.getElementById('rs-' + k);
+    if (inp) inp.value = r[k] || 0;
+    if (sl)  sl.value  = r[k] || 0;
+  });
+  updateRatioUI('default');
+  renderRatioOverrides();
+}
+
+function updateRatioUI(scope) {
+  let tech, sup, insp, totalEl, visualEl;
+  if (scope === 'default') {
+    tech    = parseFloat(document.getElementById('r-tech')?.value)  || 0;
+    sup     = parseFloat(document.getElementById('r-sup')?.value)   || 0;
+    insp    = parseFloat(document.getElementById('r-insp')?.value)  || 0;
+    totalEl  = document.getElementById('rt-default');
+    visualEl = document.getElementById('rv-default');
+  } else {
+    tech    = parseFloat(document.getElementById('mro-tech')?.value)  || 0;
+    sup     = parseFloat(document.getElementById('mro-sup')?.value)   || 0;
+    insp    = parseFloat(document.getElementById('mro-insp')?.value)  || 0;
+    totalEl  = document.getElementById('rt-override');
+    visualEl = document.getElementById('rv-override');
+  }
+  const total = tech + sup + insp;
+  if (totalEl) {
+    totalEl.textContent = total + '%';
+    totalEl.className = 'ratio-total ' + (total === 100 ? 'ok' : 'bad');
+  }
+  if (visualEl) {
+    const segs = visualEl.querySelectorAll('.rv-seg');
+    if (segs[0]) segs[0].style.flex = Math.max(tech, 0);
+    if (segs[1]) segs[1].style.flex = Math.max(sup, 0);
+    if (segs[2]) segs[2].style.flex = Math.max(insp, 0);
+  }
+}
+
+window.onRatioInput = function(scope) { updateRatioUI(scope); };
+window.syncSlider = function(key, scope) {
+  const sl  = document.getElementById('rs-' + key);
+  const inp = document.getElementById('r-' + key);
+  if (sl && inp) inp.value = sl.value;
+  updateRatioUI(scope);
+};
+
+window.saveDefaultRatios = async function() {
+  const tech = parseFloat(document.getElementById('r-tech')?.value) || 0;
+  const sup  = parseFloat(document.getElementById('r-sup')?.value)  || 0;
+  const insp = parseFloat(document.getElementById('r-insp')?.value) || 0;
+  if (tech + sup + insp !== 100) { toast('Ratios must total exactly 100%', 'error'); return; }
+  settings.ratios = { tech, sup, insp };
+  await persistSettings();
+  toast('Default ratios saved: Tech ' + tech + '% / Sup ' + sup + '% / Insp ' + insp + '%');
+};
+
+function renderRatioOverrides() {
+  const overrides = settings.taskRatios || {};
+  const list = document.getElementById('ratio-overrides-list');
+  if (!list) return;
+  const codes = Object.keys(overrides);
+  if (!codes.length) {
+    list.innerHTML = '<div class="empty" style="padding:28px;">No overrides yet — all task codes use the default ratios above.</div>';
+    return;
+  }
+  list.innerHTML = codes.sort().map(code => {
+    const r = overrides[code];
+    const total = (r.tech||0) + (r.sup||0) + (r.insp||0);
+    const totalColor = total === 100 ? 'var(--emerald)' : 'var(--rose)';
+    return `<div style="display:grid;grid-template-columns:180px 90px 90px 90px 60px 1fr auto;align-items:center;gap:10px;padding:11px 20px;border-bottom:1px solid rgba(30,45,71,.35);">
+      <span class="mono" style="color:var(--blue);font-weight:700;">${code}</span>
+      <span style="color:var(--blue);font-weight:700;font-family:var(--mono);">${r.tech||0}%</span>
+      <span style="color:var(--emerald);font-weight:700;font-family:var(--mono);">${r.sup||0}%</span>
+      <span style="color:var(--violet);font-weight:700;font-family:var(--mono);">${r.insp||0}%</span>
+      <span class="ratio-total ${total===100?'ok':'bad'}" style="font-size:13px;">${total}%</span>
+      <span style="font-size:12px;color:var(--text-2);">${r.note||'—'}</span>
+      <button class="btn btn-danger btn-sm" onclick="deleteRatioOverride('${code}')">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+let editingRatioCode = null;
+window.openAddRatioOverride = function() {
+  editingRatioCode = null;
+  document.getElementById('mro-code').value = '';
+  document.getElementById('mro-code').removeAttribute('readonly');
+  document.getElementById('mro-tech').value = getDefaultRatios().tech;
+  document.getElementById('mro-sup').value  = getDefaultRatios().sup;
+  document.getElementById('mro-insp').value = getDefaultRatios().insp;
+  document.getElementById('mro-note').value = '';
+  document.getElementById('mro-title').textContent = 'Add Task Code Ratio Override';
+  updateRatioUI('override');
+  openModal('m-ratio-override');
+};
+
+window.saveRatioOverride = async function() {
+  const code = document.getElementById('mro-code')?.value.trim().toUpperCase();
+  const tech = parseFloat(document.getElementById('mro-tech')?.value) || 0;
+  const sup  = parseFloat(document.getElementById('mro-sup')?.value)  || 0;
+  const insp = parseFloat(document.getElementById('mro-insp')?.value) || 0;
+  const note = document.getElementById('mro-note')?.value.trim();
+  if (!code) { toast('Enter a task code', 'error'); return; }
+  if (tech + sup + insp !== 100) { toast('Ratios must total exactly 100%', 'error'); return; }
+  if (!settings.taskRatios) settings.taskRatios = {};
+  settings.taskRatios[code] = { tech, sup, insp, note };
+  await persistSettings();
+  closeModal('m-ratio-override');
+  renderRatioOverrides();
+  toast('Override saved for ' + code);
+};
+
+window.deleteRatioOverride = async function(code) {
+  if (!confirm('Remove ratio override for ' + code + '?')) return;
+  if (settings.taskRatios) delete settings.taskRatios[code];
+  await persistSettings();
+  renderRatioOverrides();
+  toast('Override removed');
+};
+
+async function persistSettings() {
+  try {
+    const settingsRef = window.collection(window.db, 'settings');
+    const snap = await window.getDocs(settingsRef);
+    if (!snap.empty) await window.setDoc(window.doc(window.db, 'settings', snap.docs[0].id), settings);
+    else await window.setDoc(window.doc(window.db, 'settings', 'global'), settings);
+  } catch(e) { console.warn('Settings persist failed', e); }
+}
+
 // ── TASK CODE GROUPS ──
 function getFilteredEntriesForTC() {
   const dateFilter = document.getElementById('tc-date')?.value || 'today';
@@ -1130,24 +1447,41 @@ function renderTaskGroups() {
 
   container.innerHTML = sortedCodes.map(code => {
     const g = groups[code];
-    const techs_   = g.entries.filter(e => (e.jobRole || 'Technician') === 'Technician');
-    const underSup = g.entries.filter(e => e.jobRole === 'Under Supervision');
-    const inspects = g.entries.filter(e => e.jobRole === 'Inspector');
-    const totalHrs = g.entries.reduce((s,e) => s + (e.hours || 0), 0);
+    const techEntries = g.entries.filter(e => (e.jobRole || 'Technician') === 'Technician');
+    const supEntries  = g.entries.filter(e => e.jobRole === 'Under Supervision');
+    const inspEntries = g.entries.filter(e => e.jobRole === 'Inspector');
+
+    // Get std hours from first entry (all entries of same task share same part)
+    const stdHrs = g.entries[0]?.hours || 0;
+    const ratios = getRatiosForCode(code);
+    const isOverridden = !!(settings.taskRatios && settings.taskRatios[code]);
+
+    // Allocated hours per person in each role
+    const techAllocEach = calcAllocatedHrs(stdHrs, ratios.tech, techEntries.length);
+    const supAllocEach  = calcAllocatedHrs(stdHrs, ratios.sup,  supEntries.length);
+    const inspAllocEach = calcAllocatedHrs(stdHrs, ratios.insp, inspEntries.length);
+
+    const totalHrs = stdHrs; // The std hours is per-task, not multiplied
     const partName = g.entries[0]?.pname || '—';
     const lastTime = new Date(Math.max(...g.entries.map(e => new Date(e.time || 0)))).toLocaleString();
 
-    function personRows(arr) {
+    function personRows(arr, allocEach, badgeClass) {
       if (!arr.length) return `<div class="tc-empty-col">No entries</div>`;
       return arr.map((e, i) => `
         <div class="tc-person">
           ${getAv(e.techName, i)}
           <div class="tc-pinfo">
-            <div class="tc-pname">${e.techName}</div>
-            <div class="tc-ptime">${new Date(e.time).toLocaleString()} · ${e.hours}h · SN: ${e.serial || '—'}</div>
+            <div class="tc-pname">${e.techName}
+              <span class="alloc-badge ${badgeClass}" style="margin-left:6px;">⏱ ${allocEach.toFixed(2)}h</span>
+            </div>
+            <div class="tc-ptime">${new Date(e.time).toLocaleString()} · SN: ${e.serial || '—'}</div>
           </div>
         </div>`).join('');
     }
+
+    const ratioLabel = isOverridden
+      ? `<span style="font-size:10.5px;background:var(--amber-dim);color:var(--amber);padding:2px 8px;border-radius:99px;font-weight:700;">Custom Ratio</span>`
+      : `<span style="font-size:10.5px;background:rgba(255,255,255,.06);color:var(--text-3);padding:2px 8px;border-radius:99px;">Default Ratio</span>`;
 
     return `
     <div class="tc-group">
@@ -1155,37 +1489,37 @@ function renderTaskGroups() {
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
           <span class="tc-code">${code}</span>
           <span style="font-size:12.5px;color:var(--text-2);">📋 ${partName}</span>
+          ${ratioLabel}
         </div>
         <div class="tc-meta">
-          <span>👷 ${techs_.length} tech${techs_.length!==1?'s':''}</span>
-          <span>👁 ${underSup.length} supervision</span>
-          <span>🔍 ${inspects.length} inspector${inspects.length!==1?'s':''}</span>
-          <span style="color:var(--amber);font-family:var(--mono);font-weight:700;">${totalHrs.toFixed(1)}h total</span>
-          <span style="color:var(--text-3);">Last: ${lastTime}</span>
-          <span style="font-size:12px;color:var(--text-3);">▼</span>
+          <span>🔧 ${techEntries.length} tech · <span style="color:var(--blue);font-family:var(--mono);">${ratios.tech}% = ${(stdHrs*ratios.tech/100).toFixed(2)}h</span></span>
+          <span>👁 ${supEntries.length} sup · <span style="color:var(--emerald);font-family:var(--mono);">${ratios.sup}% = ${(stdHrs*ratios.sup/100).toFixed(2)}h</span></span>
+          <span>🔍 ${inspEntries.length} insp · <span style="color:var(--violet);font-family:var(--mono);">${ratios.insp}% = ${(stdHrs*ratios.insp/100).toFixed(2)}h</span></span>
+          <span style="color:var(--amber);font-family:var(--mono);font-weight:700;">Std: ${totalHrs}h</span>
+          <span style="color:var(--text-3);">▼</span>
         </div>
       </div>
       <div class="tc-body">
         <div class="tc-role-col">
           <div class="tc-role-head" style="color:var(--blue);">
-            🔧 TECHNICIAN
-            <span class="count-pill" style="background:var(--blue);">${techs_.length}</span>
+            🔧 TECHNICIAN <span class="count-pill" style="background:var(--blue);">${techEntries.length}</span>
+            <span style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--blue);">${ratios.tech}% · ${(stdHrs*ratios.tech/100).toFixed(2)}h pool</span>
           </div>
-          ${personRows(techs_)}
+          ${personRows(techEntries, techAllocEach, 'ab-blue')}
         </div>
         <div class="tc-role-col">
           <div class="tc-role-head" style="color:var(--emerald);">
-            👁 UNDER SUPERVISION
-            <span class="count-pill" style="background:var(--emerald);">${underSup.length}</span>
+            👁 UNDER SUPERVISION <span class="count-pill" style="background:var(--emerald);">${supEntries.length}</span>
+            <span style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--emerald);">${ratios.sup}% · ${(stdHrs*ratios.sup/100).toFixed(2)}h pool</span>
           </div>
-          ${personRows(underSup)}
+          ${personRows(supEntries, supAllocEach, 'ab-green')}
         </div>
         <div class="tc-role-col">
           <div class="tc-role-head" style="color:var(--violet);">
-            🔍 INSPECTOR
-            <span class="count-pill" style="background:var(--violet);">${inspects.length}</span>
+            🔍 INSPECTOR <span class="count-pill" style="background:var(--violet);">${inspEntries.length}</span>
+            <span style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--violet);">${ratios.insp}% · ${(stdHrs*ratios.insp/100).toFixed(2)}h pool</span>
           </div>
-          ${personRows(inspects)}
+          ${personRows(inspEntries, inspAllocEach, 'ab-violet')}
         </div>
         ${g.entries[0]?.notes ? `<div class="tc-comment-row"><strong>Comment:</strong> ${g.entries[0].notes}</div>` : ''}
       </div>
@@ -1201,10 +1535,18 @@ function exportTaskGroups() {
     if (!groups[code]) groups[code] = [];
     groups[code].push(e);
   });
-  let csv = 'TaskCode,JobRole,TechnicianName,TechnicianID,Part,PartNumber,Serial,StdHours,DateTime\n';
+  let csv = 'TaskCode,JobRole,TechnicianName,TechnicianID,Ratio%,AllocatedHrs,StdHrsTotal,Part,PartNumber,Serial,DateTime\n';
   Object.keys(groups).sort().forEach(code => {
-    groups[code].forEach(e => {
-      csv += `"${code}","${e.jobRole || 'Technician'}","${e.techName}","${e.techId}","${e.pname}","${e.pnum}","${e.serial}",${e.hours},"${new Date(e.time).toLocaleString()}"\n`;
+    const arr = groups[code];
+    const ratios = getRatiosForCode(code);
+    const stdHrs = arr[0]?.hours || 0;
+    const counts = { Technician: arr.filter(e=>(e.jobRole||'Technician')==='Technician').length, 'Under Supervision': arr.filter(e=>e.jobRole==='Under Supervision').length, Inspector: arr.filter(e=>e.jobRole==='Inspector').length };
+    arr.forEach(e => {
+      const role = e.jobRole || 'Technician';
+      const ratioKey = role === 'Technician' ? 'tech' : role === 'Under Supervision' ? 'sup' : 'insp';
+      const rolePct = ratios[ratioKey] || 0;
+      const alloc = counts[role] ? (stdHrs * rolePct / 100) / counts[role] : 0;
+      csv += `"${code}","${role}","${e.techName}","${e.techId}",${rolePct}%,${alloc.toFixed(2)},${stdHrs},"${e.pname}","${e.pnum}","${e.serial}","${new Date(e.time).toLocaleString()}"\n`;
     });
   });
   const a = document.createElement('a');
@@ -1212,11 +1554,12 @@ function exportTaskGroups() {
   a.download = `task_groups_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
   URL.revokeObjectURL(a.href);
-  toast('Task groups exported');
+  toast('Task groups exported with allocated hours');
 }
 
 window.renderTaskGroups = renderTaskGroups;
 window.exportTaskGroups = exportTaskGroups;
+window.renderRatios = renderRatios;
 
 // ── END TASK CODE FUNCTIONS ──
 window.onPartSelect = onPartSelect;
@@ -1239,6 +1582,7 @@ window.renderMyStats = renderMyStats;
 window.renderDashboard = renderDashboard;
 window.renderTechs = renderTechs;
 window.renderParts = renderParts;
+window.renderRatios = renderRatios;
 window.renderLeaders = renderLeaders;
 window.renderSystem = renderSystem;
 </script>
