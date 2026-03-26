@@ -6,38 +6,38 @@
   <title>ProTrack — Central Production Tracker</title>
 
   <!-- Firebase (imports and exports to window) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBmVe4COOYoXIFuHTBppL2cm8vY78aLaek",
-      authDomain: "protrack-e9960.firebaseapp.com",
-      projectId: "protrack-e9960",
-      storageBucket: "protrack-e9960.firebasestorage.app",
-      messagingSenderId: "796146110275",
-      appId: "1:796146110275:web:d0b8775340b1b1245629f6"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyBmVe4COOYoXIFuHTBppL2cm8vY78aLaek",
+    authDomain: "protrack-e9960.firebaseapp.com",
+    projectId: "protrack-e9960",
+    storageBucket: "protrack-e9960.firebasestorage.app",
+    messagingSenderId: "796146110275",
+    appId: "1:796146110275:web:d0b8775340b1b1245629f6"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
 
-    // Expose Firestore and Auth to the global scope
-    window.db = db;
-    window.auth = auth;
-    window.getDocs = getDocs;
-    window.collection = collection;
-    window.doc = doc;
-    window.setDoc = setDoc;
-    window.addDoc = addDoc;
-    window.deleteDoc = deleteDoc;
+  // IMPORTANT: attach everything to window so the main script can use them
+  window.db = db;
+  window.auth = auth;
+  window.getDocs = getDocs;
+  window.collection = collection;
+  window.doc = doc;
+  window.setDoc = setDoc;
+  window.addDoc = addDoc;
+  window.deleteDoc = deleteDoc;
 
-    signInAnonymously(auth)
-      .then(() => console.log("Firebase: Anonymous session active"))
-      .catch(err => console.error("Firebase Error:", err));
-  </script>
+  signInAnonymously(auth)
+    .then(() => console.log("Firebase: Anonymous session active"))
+    .catch(err => console.error("Firebase Error:", err));
+</script>
 
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
