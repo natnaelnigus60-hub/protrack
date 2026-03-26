@@ -6,48 +6,46 @@
   <title>ProTrack — Central Production Tracker</title>
 
   <!-- Firebase (imports and exports to window) -->
- <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { 
-      getFirestore, collection, addDoc, getDocs, doc, setDoc, deleteDoc, query, where, serverTimestamp 
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { 
+        getFirestore, collection, addDoc, getDocs, doc, setDoc, deleteDoc, query, where, serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBmVe4COOYoXIFuHTBppL2cm8vY78aLaek",
-    authDomain: "protrack-e9960.firebaseapp.com",
-    projectId: "protrack-e9960",
-    storageBucket: "protrack-e9960.appspot.com",
-    messagingSenderId: "338575084922",
-    appId: "1:338575084922:web:68c1704e67303f27622878"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmVe4COOYoXIFuHTBppL2cm8vY78aLaek",
+      authDomain: "protrack-e9960.firebaseapp.com",
+      projectId: "protrack-e9960",
+      storageBucket: "protrack-e9960.appspot.com",
+      messagingSenderId: "338575084922",
+      appId: "1:338575084922:web:68c1704e67303f27622878"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-  // --- THE CRITICAL FIX ---
-  // We attach these to 'window' so your Submit button can find them!
-  window.db = db;
-  window.collection = collection;
-  window.addDoc = addDoc;
-  window.getDocs = getDocs;
-  window.doc = doc;
-  window.setDoc = setDoc;
-  window.deleteDoc = deleteDoc;
-  window.query = query;
-  window.where = where;
-  window.serverTimestamp = serverTimestamp;
+    // Attach everything to window for the main script
+    window.db = db;
+    window.collection = collection;
+    window.addDoc = addDoc;
+    window.getDocs = getDocs;
+    window.doc = doc;
+    window.setDoc = setDoc;
+    window.deleteDoc = deleteDoc;
+    window.query = query;
+    window.where = where;
+    window.serverTimestamp = serverTimestamp;
 
-  console.log("Firebase Global Tools Initialized");
+    console.log("Firebase Global Tools Initialized");
 
-  // Sign in automatically
-  signInAnonymously(auth).then(() => {
-      console.log("Firebase: Anonymous session active");
-  }).catch((error) => {
-      console.error("Auth Error:", error);
-  });
-</script>
+    signInAnonymously(auth).then(() => {
+        console.log("Firebase: Anonymous session active");
+    }).catch((error) => {
+        console.error("Auth Error:", error);
+    });
+  </script>
 
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -244,7 +242,7 @@
           <div>
             <div class="card"><div class="card-header"><span class="card-title">📷 Production Entry</span></div><div class="card-body"><div class="scan-zone" onclick="doScan()"><span style="font-size:32px;">⬡</span><div style="margin-top:8px;">Click to Simulate Scan</div><div style="font-size:11px;color:var(--text-2);margin-top:4px;">Auto-fills part details</div></div><div class="form-grid form-2"><div class="form-group form-full"><label class="form-label">🔍 Search Part</label><div style="display:flex;gap:8px;"><input class="form-input" id="part-search-input" placeholder="Name / Part #"><button class="btn btn-primary btn-sm" onclick="searchPartAndFill()">Search</button></div></div><div class="form-group form-full"><label class="form-label">Select Part</label><select class="form-select" id="e-part-sel" onchange="onPartSelect()"><option value="">— Choose Part —</option></select></div><div class="form-group"><label class="form-label">Description</label><input class="form-input" id="e-desc" readonly></div><div class="form-group"><label class="form-label">ATA</label><input class="form-input" id="e-ata" readonly></div><div class="form-group"><label class="form-label">Part Number</label><input class="form-input" id="e-pnum" readonly></div><div class="form-group"><label class="form-label">Std Hours</label><input class="form-input" id="e-hours" readonly></div><div class="form-group"><label class="form-label">Serial *</label><input class="form-input" id="e-serial" placeholder="Enter serial number"></div><div class="form-group"><label class="form-label">Time</label><input class="form-input" id="e-time" type="datetime-local"></div></div><div style="margin-top:16px;display:flex;gap:10px;"><button class="btn btn-primary" onclick="submitEntry()">✓ Submit Entry</button><button class="btn btn-outline" onclick="clearEntry()">✕ Clear Form</button><button class="btn btn-outline" onclick="cancelEntry()">✖ Cancel</button></div></div></div>
           </div>
-          <div><div class="kpi-grid kpi-2"><div class="kpi-card"><div class="kpi-label">Today (Hours)</div><div class="kpi-val" id="e-today-hrs">0</div><div class="kpi-sub">daily target: <span id="e-daily-target">0</span> hrs</div></div><div class="kpi-card"><div class="kpi-label">This Week (Hours)</div><div class="kpi-val" id="e-week-hrs">0</div><div class="kpi-sub">weekly target: <span id="e-week-target">0</span> hrs</div></div></div><div class="card"><div class="card-header"><span class="card-title">Today's Submissions</span></div><div class="tbl-wrap" style="max-height:400px;overflow-y:auto;">   <thead>   <tr><th>Time</th><th>Part</th><th>Hrs</th><th>Serial</th></tr> </thead><tbody id="e-today-list"></tbody> </div></div></div>
+          <div><div class="kpi-grid kpi-2"><div class="kpi-card"><div class="kpi-label">Today (Hours)</div><div class="kpi-val" id="e-today-hrs">0</div><div class="kpi-sub">daily target: <span id="e-daily-target">0</span> hrs</div></div><div class="kpi-card"><div class="kpi-label">This Week (Hours)</div><div class="kpi-val" id="e-week-hrs">0</div><div class="kpi-sub">weekly target: <span id="e-week-target">0</span> hrs</div></div></div><div class="card"><div class="card-header"><span class="card-title">Today's Submissions</span></div><div class="tbl-wrap" style="max-height:400px;overflow-y:auto;">   <thead>    <tr><th>Time</th><th>Part</th><th>Hrs</th><th>Serial</th></tr> </thead><tbody id="e-today-list"></tbody> </div></div></div>
         </div>
       </div>
       <!-- Technician Stats Page -->
@@ -280,7 +278,7 @@
   </main>
 </div>
 
-<!-- Modals -->
+<!-- Modals (unchanged) -->
 <div class="modal-bg" id="m-tech"><div class="modal"><div class="modal-head"><div class="modal-title">Technician</div><button class="modal-close-btn" onclick="closeModal('m-tech')">✕</button></div><div class="modal-body"><input class="form-input" id="mt-id" placeholder="ID (e.g., T1007)"><input class="form-input" id="mt-name" placeholder="Full Name"><input class="form-input" id="mt-month-target" type="number" step="1" placeholder="Monthly Target (hours)"><select id="mt-status" class="form-select"><option value="active">Active</option><option value="inactive">Inactive</option></select><input class="form-input" id="mt-pwd" type="password" placeholder="Password (default: demo)" value="demo"></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-tech')">Cancel</button><button class="btn btn-primary" onclick="saveTech()">Save</button></div></div></div>
 <div class="modal-bg" id="m-part"><div class="modal"><div class="modal-head"><div class="modal-title">Part</div><button class="modal-close-btn" onclick="closeModal('m-part')">✕</button></div><div class="modal-body"><input class="form-input" id="mp-name" placeholder="Part Name *"><input class="form-input" id="mp-num" placeholder="Part Number *"><input class="form-input" id="mp-hours" type="number" step="0.1" placeholder="Std Hours *"><input class="form-input" id="mp-ata" placeholder="ATA"><input class="form-input" id="mp-desc" placeholder="Description"></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-part')">Cancel</button><button class="btn btn-primary" onclick="savePart()">Save</button></div></div></div>
 <div class="modal-bg" id="m-password"><div class="modal"><div class="modal-head"><div class="modal-title">Change Password</div><button class="modal-close-btn" onclick="closeModal('m-password')">✕</button></div><div class="modal-body"><input class="form-input" id="pwd-old" type="password" placeholder="Current Password"><input class="form-input" id="pwd-new" type="password" placeholder="New Password"></div><div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('m-password')">Cancel</button><button class="btn btn-primary" onclick="changeMyPassword()">Update</button></div></div></div>
@@ -305,14 +303,7 @@ let leaders = [];
 let settings = { defaultMonthlyTarget: 160, passwords: { tech: 'demo', lead: 'demo', dev: 'demo' } };
 let entries = [];
 
-// Use global Firebase objects set by the module (window)
-const firestoreDb = window.db;
-const firestoreGetDocs = window.getDocs;
-const collection = window.collection;
-const firestoreDoc = window.doc;
-const firestoreSetDoc = window.setDoc;
-const firestoreAddDoc = window.addDoc;
-const firestoreDeleteDoc = window.deleteDoc;
+// --- NO LOCAL ALIASES! We'll use window.collection, window.db, etc. directly. ---
 
 function toast(msg, type = 'success') {
   const t = document.getElementById('toast');
@@ -381,7 +372,7 @@ window.navigateTo = function(page) {
   if (page === 'system') renderSystem();
 };
 
-// RENDER FUNCTIONS
+// RENDER FUNCTIONS (using window.db, window.collection etc.)
 function renderEntry() {
   const today = new Date().toISOString().slice(0,10);
   const userEntries = entries.filter(e => e.techId === currentUser.id);
@@ -400,7 +391,7 @@ function renderEntry() {
   document.getElementById('e-time').value = new Date().toISOString().slice(0,16);
   const tbody = document.getElementById('e-today-list');
   const todayEntries = userEntries.filter(e => e.time?.startsWith(today)).slice(0,15);
-  tbody.innerHTML = todayEntries.length ? todayEntries.map(e => `   <tr><td class="mono">${new Date(e.time).toLocaleTimeString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">No entries today</td></tr>';
+  tbody.innerHTML = todayEntries.length ? todayEntries.map(e => `<tr><td class="mono">${new Date(e.time).toLocaleTimeString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">No entries today</td></tr>';
 }
 function onPartSelect() {
   const partId = document.getElementById('e-part-sel').value;
@@ -442,7 +433,8 @@ async function submitEntry() {
     ata: part.ata
   };
   try {
-    const docRef = await firestoreAddDoc(collection(firestoreDb, 'entries'), entry);
+    // Use window.addDoc and window.collection directly
+    const docRef = await window.addDoc(window.collection(window.db, 'entries'), entry);
     entry.id = docRef.id;
     entries.unshift(entry);
     clearEntry();
@@ -488,7 +480,7 @@ function renderMyStats() {
   document.getElementById('ms-progress').textContent = progress + '%';
   document.getElementById('ms-remaining').textContent = remaining.toFixed(1);
   const tbody = document.getElementById('ms-hist');
-  tbody.innerHTML = userEntries.slice(0,30).map(e => `   <tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">No history</td></tr>';
+  tbody.innerHTML = userEntries.slice(0,30).map(e => `<tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">No history</td></tr>';
 }
 
 function renderDashboard() {
@@ -541,7 +533,7 @@ function renderAllEntries() {
   if (dateFilter === 'month') filtered = filtered.filter(e => e.time >= monthRange.start && e.time <= monthRange.end);
   if (search) filtered = filtered.filter(e => (e.techName + e.pname + e.serial).toLowerCase().includes(search));
   const tbody = document.getElementById('ae-body');
-  tbody.innerHTML = filtered.slice(0,200).map(e => `   <tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.techName}</td><td>${e.pname}</td><td class="mono">${e.serial}</td><td>${e.hours}h</td></tr>`).join('') || '<tr><td colspan="5" class="empty">No entries</td></tr>';
+  tbody.innerHTML = filtered.slice(0,200).map(e => `<tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.techName}</td><td>${e.pname}</td><td class="mono">${e.serial}</td><td>${e.hours}h</td></tr>`).join('') || '<tr><td colspan="5" class="empty">No entries</td></tr>';
 }
 function exportAllEntries() {
   let csv = 'Date,Technician,Part,Serial,Hours\n';
@@ -565,14 +557,14 @@ function renderReports() {
     const dailyAvg = monthHrs / 20;
     const status = progress >= 100 ? '✅ Achieved' : progress >= 80 ? '⚠️ Near' : progress >= 60 ? '🟡 In Progress' : '🔴 Behind';
     const statusClass = progress >= 100 ? 'badge-green' : progress >= 80 ? 'badge-amber' : progress >= 60 ? 'badge-blue' : 'badge-red';
-    return `   <tr><td><strong>${t.name}</strong></td><td>${target}h</td><td>${monthHrs.toFixed(1)}h</td><td><span class="badge ${statusClass}">${progress}%</span></td><td>${dailyAvg.toFixed(1)}h</td><td>${status}</td></tr>`;
+    return `<tr><td><strong>${t.name}</strong></td><td>${target}h</td><td>${monthHrs.toFixed(1)}h</td><td><span class="badge ${statusClass}">${progress}%</span></td><td>${dailyAvg.toFixed(1)}h</td><td>${status}</td></tr>`;
   }).join('') || '<tr><td colspan="6" class="empty">No technicians</td></tr>';
 }
 
-// ADMIN FUNCTIONS (simplified for brevity, but they use the same renamed Firebase functions)
+// ADMIN FUNCTIONS (using window versions)
 function renderTechs() {
   const tbody = document.getElementById('at-body');
-  tbody.innerHTML = techs.map(t => `   <tr><td class="mono">${t.id}</td><td>${t.name}</td><td><span class="badge badge-blue">${t.monthlyTarget || 160}h</span></td><td>${(t.monthlyTarget / 20).toFixed(1)}h</td><td><span class="badge ${t.status === 'active' ? 'badge-green' : 'badge-gray'}">${t.status}</span></td><td><button class="btn-outline btn-sm" onclick="openEditTech('${t.id}')">✏️</button> <button class="btn-outline btn-sm" onclick="deleteTech('${t.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No technicians</td></tr>';
+  tbody.innerHTML = techs.map(t => `<tr><td class="mono">${t.id}</td><td>${t.name}</td><td><span class="badge badge-blue">${t.monthlyTarget || 160}h</span></td><td>${(t.monthlyTarget / 20).toFixed(1)}h</td><td><span class="badge ${t.status === 'active' ? 'badge-green' : 'badge-gray'}">${t.status}</span></td><td><button class="btn-outline btn-sm" onclick="openEditTech('${t.id}')">✏️</button> <button class="btn-outline btn-sm" onclick="deleteTech('${t.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No technicians</td></tr>';
 }
 window.openAddTech = () => { editingTechId = null; document.getElementById('mt-id').value = ''; document.getElementById('mt-name').value = ''; document.getElementById('mt-month-target').value = ''; document.getElementById('mt-status').value = 'active'; document.getElementById('mt-pwd').value = 'demo'; openModal('m-tech'); };
 window.openEditTech = (id) => { const t = techs.find(t => t.id === id); if (t) { editingTechId = id; document.getElementById('mt-id').value = t.id; document.getElementById('mt-name').value = t.name; document.getElementById('mt-month-target').value = t.monthlyTarget || 160; document.getElementById('mt-status').value = t.status; document.getElementById('mt-pwd').value = t.password || 'demo'; openModal('m-tech'); } };
@@ -588,7 +580,7 @@ window.saveTech = async () => {
     const idx = techs.findIndex(t => t.id === editingTechId);
     if (idx !== -1) {
       const updated = { ...techs[idx], id, name, monthlyTarget, status, password: pwd };
-      await firestoreSetDoc(firestoreDoc(firestoreDb, 'technicians', editingTechId), updated);
+      await window.setDoc(window.doc(window.db, 'technicians', editingTechId), updated);
       techs[idx] = updated;
       if (currentUser && currentUser.id === editingTechId) currentUser = updated;
       toast('Technician updated');
@@ -596,7 +588,7 @@ window.saveTech = async () => {
   } else {
     if (techs.find(t => t.id === id)) { toast('ID exists', 'error'); return; }
     const newTech = { id, name, monthlyTarget, status, password: pwd, initials: name.slice(0,2).toUpperCase(), color: colors[techs.length % colors.length] };
-    await firestoreSetDoc(firestoreDoc(firestoreDb, 'technicians', id), newTech);
+    await window.setDoc(window.doc(window.db, 'technicians', id), newTech);
     techs.push(newTech);
     toast('Technician added');
   }
@@ -606,7 +598,7 @@ window.saveTech = async () => {
 };
 window.deleteTech = async (id) => {
   if (!confirm('Delete technician?')) return;
-  await firestoreDeleteDoc(firestoreDoc(firestoreDb, 'technicians', id));
+  await window.deleteDoc(window.doc(window.db, 'technicians', id));
   techs = techs.filter(t => t.id !== id);
   renderTechs();
   if (currentRole === 'lead') renderDashboard();
@@ -615,7 +607,7 @@ window.deleteTech = async (id) => {
 
 function renderParts() {
   const tbody = document.getElementById('ap-body');
-  tbody.innerHTML = parts.map(p => `   <tr><td><strong>${p.name}</strong></td><td class="mono">${p.num}</td><td><span class="badge badge-blue">${p.hours}h</span></td><td>${p.ata || '—'}</td><td>${p.desc || '—'}</td><td><button class="btn-outline btn-sm" onclick="openEditPart('${p.id}')">✏️</button> <button class="btn-outline btn-sm" onclick="deletePart('${p.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No parts</td></tr>';
+  tbody.innerHTML = parts.map(p => `<tr><td><strong>${p.name}</strong></td><td class="mono">${p.num}</td><td><span class="badge badge-blue">${p.hours}h</span></td><td>${p.ata || '—'}</td><td>${p.desc || '—'}</td><td><button class="btn-outline btn-sm" onclick="openEditPart('${p.id}')">✏️</button> <button class="btn-outline btn-sm" onclick="deletePart('${p.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="6" class="empty">No parts</td></tr>';
 }
 window.openAddPart = () => { editingPartId = null; document.getElementById('mp-name').value = ''; document.getElementById('mp-num').value = ''; document.getElementById('mp-hours').value = ''; document.getElementById('mp-ata').value = ''; document.getElementById('mp-desc').value = ''; openModal('m-part'); };
 window.openEditPart = (id) => { const p = parts.find(p => p.id === id); if (p) { editingPartId = id; document.getElementById('mp-name').value = p.name; document.getElementById('mp-num').value = p.num; document.getElementById('mp-hours').value = p.hours; document.getElementById('mp-ata').value = p.ata || ''; document.getElementById('mp-desc').value = p.desc || ''; openModal('m-part'); } };
@@ -626,13 +618,13 @@ window.savePart = async () => {
   if (!name || !num || !hours) { toast('Name, Number and Hours required', 'error'); return; }
   const part = { name, num, hours, ata: document.getElementById('mp-ata').value, desc: document.getElementById('mp-desc').value };
   if (editingPartId) {
-    await firestoreSetDoc(firestoreDoc(firestoreDb, 'parts', editingPartId), { id: editingPartId, ...part });
+    await window.setDoc(window.doc(window.db, 'parts', editingPartId), { id: editingPartId, ...part });
     const idx = parts.findIndex(p => p.id === editingPartId);
     if (idx !== -1) parts[idx] = { id: editingPartId, ...part };
     toast('Part updated');
   } else {
     const newId = Date.now().toString();
-    await firestoreSetDoc(firestoreDoc(firestoreDb, 'parts', newId), { id: newId, ...part });
+    await window.setDoc(window.doc(window.db, 'parts', newId), { id: newId, ...part });
     parts.push({ id: newId, ...part });
     toast('Part added');
   }
@@ -641,7 +633,7 @@ window.savePart = async () => {
 };
 window.deletePart = async (id) => {
   if (!confirm('Delete part?')) return;
-  await firestoreDeleteDoc(firestoreDoc(firestoreDb, 'parts', id));
+  await window.deleteDoc(window.doc(window.db, 'parts', id));
   parts = parts.filter(p => p.id !== id);
   renderParts();
   toast('Part removed');
@@ -649,7 +641,7 @@ window.deletePart = async (id) => {
 
 function renderLeaders() {
   const tbody = document.getElementById('leaders-body');
-  tbody.innerHTML = leaders.map(l => `   <tr><td class="mono">${l.id}</td><td>${l.name}</td><td>${l.email || '—'}</td><td><button class="btn-outline btn-sm" onclick="deleteLeader('${l.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="4" class="empty">No leaders</td></tr>';
+  tbody.innerHTML = leaders.map(l => `<tr><td class="mono">${l.id}</td><td>${l.name}</td><td>${l.email || '—'}</td><td><button class="btn-outline btn-sm" onclick="deleteLeader('${l.id}')">🗑</button></td></tr>`).join('') || '<tr><td colspan="4" class="empty">No leaders</td></tr>';
 }
 window.openAddLeader = () => { document.getElementById('leader-id').value = ''; document.getElementById('leader-name').value = ''; document.getElementById('leader-email').value = ''; document.getElementById('leader-pwd').value = 'demo'; openModal('m-leader'); };
 window.saveLeader = async () => {
@@ -658,7 +650,7 @@ window.saveLeader = async () => {
   if (!id || !name) { toast('ID and Name required', 'error'); return; }
   if (leaders.find(l => l.id === id)) { toast('ID exists', 'error'); return; }
   const newLeader = { id, name, email: document.getElementById('leader-email').value, password: document.getElementById('leader-pwd').value || 'demo' };
-  await firestoreSetDoc(firestoreDoc(firestoreDb, 'leaders', id), newLeader);
+  await window.setDoc(window.doc(window.db, 'leaders', id), newLeader);
   leaders.push(newLeader);
   closeModal('m-leader');
   renderLeaders();
@@ -666,7 +658,7 @@ window.saveLeader = async () => {
 };
 window.deleteLeader = async (id) => {
   if (!confirm('Delete leader?')) return;
-  await firestoreDeleteDoc(firestoreDoc(firestoreDb, 'leaders', id));
+  await window.deleteDoc(window.doc(window.db, 'leaders', id));
   leaders = leaders.filter(l => l.id !== id);
   renderLeaders();
   toast('Leader removed');
@@ -678,10 +670,10 @@ function renderSystem() {
 window.saveDefaultMonthlyTarget = async () => {
   const val = parseFloat(document.getElementById('sys-default-month-target').value) || 160;
   settings.defaultMonthlyTarget = val;
-  const settingsRef = collection(firestoreDb, 'settings');
-  const snap = await firestoreGetDocs(settingsRef);
-  if (!snap.empty) await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', snap.docs[0].id), settings);
-  else await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', 'global'), settings);
+  const settingsRef = window.collection(window.db, 'settings');
+  const snap = await window.getDocs(settingsRef);
+  if (!snap.empty) await window.setDoc(window.doc(window.db, 'settings', snap.docs[0].id), settings);
+  else await window.setDoc(window.doc(window.db, 'settings', 'global'), settings);
   toast('Default monthly target set');
 };
 window.openMonthlyTargetModal = () => {
@@ -697,7 +689,7 @@ window.saveMonthlyTarget = async () => {
   const idx = techs.findIndex(t => t.id === techId);
   if (idx !== -1) {
     techs[idx].monthlyTarget = newTarget;
-    await firestoreSetDoc(firestoreDoc(firestoreDb, 'technicians', techId), techs[idx]);
+    await window.setDoc(window.doc(window.db, 'technicians', techId), techs[idx]);
     toast(`Monthly target for ${techs[idx].name} set to ${newTarget}h`);
     if (currentRole === 'lead') renderDashboard();
     else if (currentRole === 'dev') renderTechs();
@@ -713,20 +705,20 @@ window.changeMyPassword = async () => {
     const idx = techs.findIndex(t => t.id === currentUser.id);
     if (techs[idx].password !== old) { toast('Wrong current password', 'error'); return; }
     techs[idx].password = newPwd;
-    await firestoreSetDoc(firestoreDoc(firestoreDb, 'technicians', currentUser.id), techs[idx]);
+    await window.setDoc(window.doc(window.db, 'technicians', currentUser.id), techs[idx]);
     currentUser.password = newPwd;
   } else if (currentRole === 'lead') {
     const idx = leaders.findIndex(l => l.id === currentUser.id);
     if (leaders[idx].password !== old) { toast('Wrong current password', 'error'); return; }
     leaders[idx].password = newPwd;
-    await firestoreSetDoc(firestoreDoc(firestoreDb, 'leaders', currentUser.id), leaders[idx]);
+    await window.setDoc(window.doc(window.db, 'leaders', currentUser.id), leaders[idx]);
   } else if (currentRole === 'dev') {
     if ((settings.passwords?.dev || 'demo') !== old) { toast('Wrong current password', 'error'); return; }
     settings.passwords = { ...settings.passwords, dev: newPwd };
-    const settingsRef = collection(firestoreDb, 'settings');
-    const snap = await firestoreGetDocs(settingsRef);
-    if (!snap.empty) await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', snap.docs[0].id), settings);
-    else await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', 'global'), settings);
+    const settingsRef = window.collection(window.db, 'settings');
+    const snap = await window.getDocs(settingsRef);
+    if (!snap.empty) await window.setDoc(window.doc(window.db, 'settings', snap.docs[0].id), settings);
+    else await window.setDoc(window.doc(window.db, 'settings', 'global'), settings);
   }
   closeModal('m-password');
   toast('Password changed successfully');
@@ -739,10 +731,10 @@ window.saveDefaultPasswords = async () => {
   if (techPwd) settings.passwords = { ...settings.passwords, tech: techPwd };
   if (leadPwd) settings.passwords.lead = leadPwd;
   if (devPwd) settings.passwords.dev = devPwd;
-  const settingsRef = collection(firestoreDb, 'settings');
-  const snap = await firestoreGetDocs(settingsRef);
-  if (!snap.empty) await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', snap.docs[0].id), settings);
-  else await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', 'global'), settings);
+  const settingsRef = window.collection(window.db, 'settings');
+  const snap = await window.getDocs(settingsRef);
+  if (!snap.empty) await window.setDoc(window.doc(window.db, 'settings', snap.docs[0].id), settings);
+  else await window.setDoc(window.doc(window.db, 'settings', 'global'), settings);
   closeModal('m-globalpwd');
   toast('Default passwords updated');
 };
@@ -763,17 +755,17 @@ window.importBackup = (input) => {
       const d = JSON.parse(e.target.result);
       const collections = ['technicians', 'parts', 'leaders', 'entries'];
       for (const coll of collections) {
-        const snap = await firestoreGetDocs(collection(firestoreDb, coll));
-        for (const docSnap of snap.docs) await firestoreDeleteDoc(firestoreDoc(firestoreDb, coll, docSnap.id));
+        const snap = await window.getDocs(window.collection(window.db, coll));
+        for (const docSnap of snap.docs) await window.deleteDoc(window.doc(window.db, coll, docSnap.id));
       }
-      if (d.techs) for (const t of d.techs) await firestoreSetDoc(firestoreDoc(firestoreDb, 'technicians', t.id), t);
-      if (d.parts) for (const p of d.parts) await firestoreSetDoc(firestoreDoc(firestoreDb, 'parts', p.id), p);
-      if (d.leaders) for (const l of d.leaders) await firestoreSetDoc(firestoreDoc(firestoreDb, 'leaders', l.id), l);
-      if (d.entries) for (const e of d.entries) await firestoreAddDoc(collection(firestoreDb, 'entries'), e);
+      if (d.techs) for (const t of d.techs) await window.setDoc(window.doc(window.db, 'technicians', t.id), t);
+      if (d.parts) for (const p of d.parts) await window.setDoc(window.doc(window.db, 'parts', p.id), p);
+      if (d.leaders) for (const l of d.leaders) await window.setDoc(window.doc(window.db, 'leaders', l.id), l);
+      if (d.entries) for (const e of d.entries) await window.addDoc(window.collection(window.db, 'entries'), e);
       if (d.settings) {
-        const snap = await firestoreGetDocs(collection(firestoreDb, 'settings'));
-        if (!snap.empty) await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', snap.docs[0].id), d.settings);
-        else await firestoreSetDoc(firestoreDoc(firestoreDb, 'settings', 'global'), d.settings);
+        const snap = await window.getDocs(window.collection(window.db, 'settings'));
+        if (!snap.empty) await window.setDoc(window.doc(window.db, 'settings', snap.docs[0].id), d.settings);
+        else await window.setDoc(window.doc(window.db, 'settings', 'global'), d.settings);
       }
       toast('Restored successfully');
       location.reload();
@@ -785,8 +777,8 @@ window.factoryReset = async () => {
   if (!confirm('⚠️ FULL RESET: All data will be wiped. Continue?')) return;
   const collections = ['technicians', 'parts', 'leaders', 'entries', 'settings'];
   for (const coll of collections) {
-    const snap = await firestoreGetDocs(collection(firestoreDb, coll));
-    for (const docSnap of snap.docs) await firestoreDeleteDoc(firestoreDoc(firestoreDb, coll, docSnap.id));
+    const snap = await window.getDocs(window.collection(window.db, coll));
+    for (const docSnap of snap.docs) await window.deleteDoc(window.doc(window.db, coll, docSnap.id));
   }
   toast('Reset complete. Reloading...');
   setTimeout(() => location.reload(), 1000);
@@ -813,7 +805,7 @@ function handleTechImport(input) {
               initials: name.slice(0,2).toUpperCase(),
               color: colors[techs.length % colors.length]
             };
-            await firestoreSetDoc(firestoreDoc(firestoreDb, 'technicians', id), newTech);
+            await window.setDoc(window.doc(window.db, 'technicians', id), newTech);
             techs.push(newTech);
           }
         }
@@ -844,7 +836,7 @@ function handlePartImport(input) {
             ata: row.ATA || '',
             desc: row.Description || ''
           };
-          await firestoreSetDoc(firestoreDoc(firestoreDb, 'parts', newPart.id), newPart);
+          await window.setDoc(window.doc(window.db, 'parts', newPart.id), newPart);
           parts.push(newPart);
         }
       }
@@ -876,17 +868,17 @@ window.doLogin = async function() {
   const id = document.getElementById('li-id').value.trim();
   const pwd = document.getElementById('li-pw').value;
 
-  // Load fresh data from Firestore
+  // Load fresh data from Firestore using window functions
   try {
-    const techSnap = await firestoreGetDocs(collection(firestoreDb, 'technicians'));
+    const techSnap = await window.getDocs(window.collection(window.db, 'technicians'));
     techs = techSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const leadSnap = await firestoreGetDocs(collection(firestoreDb, 'leaders'));
+    const leadSnap = await window.getDocs(window.collection(window.db, 'leaders'));
     leaders = leadSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const partSnap = await firestoreGetDocs(collection(firestoreDb, 'parts'));
+    const partSnap = await window.getDocs(window.collection(window.db, 'parts'));
     parts = partSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const entrySnap = await firestoreGetDocs(collection(firestoreDb, 'entries'));
+    const entrySnap = await window.getDocs(window.collection(window.db, 'entries'));
     entries = entrySnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const settingsSnap = await firestoreGetDocs(collection(firestoreDb, 'settings'));
+    const settingsSnap = await window.getDocs(window.collection(window.db, 'settings'));
     if (!settingsSnap.empty) settings = settingsSnap.docs[0].data();
     else settings = { defaultMonthlyTarget: 160, passwords: { tech: 'demo', lead: 'demo', dev: 'demo' } };
   } catch (e) { console.warn("Using fallback data", e); }
