@@ -308,8 +308,8 @@
                 <div class="job-role-opt" id="jr-insp" onclick="pickJobRole('Inspector',this,'violet')"><span class="jr-icon">🔍</span><span class="jr-label">INSPECTOR</span></div>
               </div>
             </div>
-            <div class="form-group form-full"><label class="form-label">🏷 Task Code (JIC) *</label><input class="form-input" id="e-taskcode" placeholder="e.g. TSFN800GRE30" style="font-family:var(--mono);text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
-            <div class="form-group form-full"><label class="form-label">🔍 Search Part</label><div style="display:flex;gap:8px;"><input class="form-input" id="part-search-input" placeholder="Name / Part #"><button class="btn btn-primary btn-sm" onclick="searchPartAndFill()">Search</button></div></div><div class="form-group form-full"><label class="form-label">Select Part</label><select class="form-select" id="e-part-sel" onchange="onPartSelect()"><option value="">— Choose Part —</option></select></div><div class="form-group"><label class="form-label">Description</label><input class="form-input" id="e-desc" readonly></div><div class="form-group"><label class="form-label">ATA</label><input class="form-input" id="e-ata" readonly></div><div class="form-group"><label class="form-label">Part Number</label><input class="form-input" id="e-pnum" readonly></div><div class="form-group"><label class="form-label">Std Hours</label><input class="form-input" id="e-hours" readonly></div><div class="form-group"><label class="form-label">Serial *</label><input class="form-input" id="e-serial" placeholder="Enter serial number"></div><div class="form-group"><label class="form-label">Time</label><input class="form-input" id="e-time" type="datetime-local"></div></div><div style="margin-top:16px;display:flex;gap:10px;"><button class="btn btn-primary" onclick="submitEntry()">✓ Submit Entry</button><button class="btn btn-outline" onclick="clearEntry()">✕ Clear Form</button><button class="btn btn-outline" onclick="cancelEntry()">✖ Cancel</button></div></div></div>
+            <div class="form-group form-full"><label class="form-label">🏷 Task Code (JIC) *</label><input class="form-input" id="e-taskcode" placeholder="e.g. TSFN800GRE30" style="font-family:var(--mono);text-transform:uppercase;" oninput="this.value=this.value.toUpperCase();refreshAllocatedHours(null)"></div>
+            <div class="form-group form-full"><label class="form-label">🔍 Search Part</label><div style="display:flex;gap:8px;"><input class="form-input" id="part-search-input" placeholder="Name / Part #"><button class="btn btn-primary btn-sm" onclick="searchPartAndFill()">Search</button></div></div><div class="form-group form-full"><label class="form-label">Select Part</label><select class="form-select" id="e-part-sel" onchange="onPartSelect()"><option value="">— Choose Part —</option></select></div><div class="form-group"><label class="form-label">Description</label><input class="form-input" id="e-desc" readonly></div><div class="form-group"><label class="form-label">ATA</label><input class="form-input" id="e-ata" readonly></div><div class="form-group"><label class="form-label">Part Number</label><input class="form-input" id="e-pnum" readonly></div><div class="form-group"><label class="form-label" id="e-hours-label">Allocated Hours</label><input class="form-input" id="e-hours" readonly></div><div class="form-group"><label class="form-label">Serial *</label><input class="form-input" id="e-serial" placeholder="Enter serial number"></div><div class="form-group"><label class="form-label">Time</label><input class="form-input" id="e-time" type="datetime-local"></div></div><div style="margin-top:16px;display:flex;gap:10px;"><button class="btn btn-primary" onclick="submitEntry()">✓ Submit Entry</button><button class="btn btn-outline" onclick="clearEntry()">✕ Clear Form</button><button class="btn btn-outline" onclick="cancelEntry()">✖ Cancel</button></div></div></div>
           </div>
           <div><div class="kpi-grid kpi-2"><div class="kpi-card"><div class="kpi-label">Today (Hours)</div><div class="kpi-val" id="e-today-hrs">0</div><div class="kpi-sub">daily target: <span id="e-daily-target">0</span> hrs</div></div><div class="kpi-card"><div class="kpi-label">This Week (Hours)</div><div class="kpi-val" id="e-week-hrs">0</div><div class="kpi-sub">weekly target: <span id="e-week-target">0</span> hrs</div></div></div><div class="card"><div class="card-header"><span class="card-title">Today's Submissions</span></div><div class="tbl-wrap" style="max-height:400px;overflow-y:auto;"><table style="width:100%;"><thead><tr><th>Time</th><th>Task Code</th><th>Job Role</th><th>Part</th><th>Hrs</th></tr></thead><tbody id="e-today-list"></tbody></table></div></div></div>
         </div>
@@ -569,6 +569,37 @@ function getCurrentWeekRange() {
 function getDailyTarget(monthlyTarget) { return monthlyTarget / 20; }
 function getWeeklyTarget(monthlyTarget) { return getDailyTarget(monthlyTarget) * 5; }
 
+// ── ETHIOPIAN TIME HELPERS (EAT = Africa/Addis_Ababa, UTC+3) ──
+const EAT_LOCALE = 'en-GB';
+const EAT_TZ     = 'Africa/Addis_Ababa';
+function fmtEAT(iso, mode = 'datetime') {
+  if (!iso) return '—';
+  try {
+    const d = new Date(iso);
+    if (isNaN(d)) return iso;
+    if (mode === 'time')
+      return d.toLocaleTimeString(EAT_LOCALE, { timeZone: EAT_TZ, hour: '2-digit', minute: '2-digit' });
+    if (mode === 'date')
+      return d.toLocaleDateString(EAT_LOCALE, { timeZone: EAT_TZ, day: '2-digit', month: 'short', year: 'numeric' });
+    return d.toLocaleString(EAT_LOCALE, {
+      timeZone: EAT_TZ,
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  } catch(e) { return iso; }
+}
+// Returns current EAT time as "YYYY-MM-DDTHH:MM" for datetime-local inputs
+function nowEAT() {
+  const now = new Date();
+  const eat = new Date(now.toLocaleString('en-US', { timeZone: EAT_TZ }));
+  const pad = n => String(n).padStart(2, '0');
+  return `${eat.getFullYear()}-${pad(eat.getMonth()+1)}-${pad(eat.getDate())}T${pad(eat.getHours())}:${pad(eat.getMinutes())}`;
+}
+// Today's date string in EAT for filtering
+function todayEAT() {
+  return new Date().toLocaleDateString('en-CA', { timeZone: EAT_TZ }); // YYYY-MM-DD
+}
+
 // Navigation
 const navMap = { tech: ['entry', 'mystats', 'taskgroups'], lead: ['dashboard', 'ratios', 'allentries', 'reports', 'taskgroups'], dev: ['techs', 'parts', 'leaders', 'ratios', 'taskgroups', 'system'] };
 const pageTitles = {
@@ -618,7 +649,7 @@ window.navigateTo = function(page) {
 
 // RENDER FUNCTIONS (with null checks)
 function renderEntry() {
-  const today = new Date().toISOString().slice(0,10);
+  const today = todayEAT();
   const userEntries = entries.filter(e => e.techId === currentUser.id);
   const todayHrs = userEntries.filter(e => e.time?.startsWith(today)).reduce((s,e) => s + (e.hours || 0), 0);
   const weekRange = getCurrentWeekRange();
@@ -641,14 +672,14 @@ function renderEntry() {
     sel.innerHTML = '<option value="">— Choose Part —</option>' + parts.map(p => `<option value="${p.id}">${p.name} (${p.hours}h)</option>`).join('');
   }
   const timeInput = document.getElementById('e-time');
-  if (timeInput && !timeInput.value) timeInput.value = new Date().toISOString().slice(0,16);
+  if (timeInput && !timeInput.value) timeInput.value = nowEAT();
   
   const tbody = document.getElementById('e-today-list');
   if (tbody) {
     const todayEntries = userEntries.filter(e => e.time?.startsWith(today)).slice(0,15);
     tbody.innerHTML = todayEntries.length ? todayEntries.map(e => {
       const roleColor = e.jobRole === 'Inspector' ? 'var(--violet)' : e.jobRole === 'Under Supervision' ? 'var(--emerald)' : 'var(--blue)';
-      return `<tr><td class="mono">${new Date(e.time).toLocaleTimeString()}</td><td class="mono" style="color:var(--blue);font-weight:600;">${e.taskCode || '—'}</td><td><span style="font-size:11px;font-weight:700;color:${roleColor}">${e.jobRole || 'Technician'}</span></td><td>${e.pname}</td><td>${e.hours}h</td></tr>`;
+      return `<tr><td class="mono">${fmtEAT(e.time,'time')}</td><td class="mono" style="color:var(--blue);font-weight:600;">${e.taskCode || '—'}</td><td><span style="font-size:11px;font-weight:700;color:${roleColor}">${e.jobRole || 'Technician'}</span></td><td>${e.pname}</td><td>${e.hours}h</td></tr>`;
     }).join('') : '<tr><td colspan="5" class="empty">No entries today</td></tr>';
   }
 }
@@ -657,15 +688,39 @@ function onPartSelect() {
   if (!partId) return;
   const part = parts.find(p => p.id === partId);
   if (part) {
-    const descEl = document.getElementById('e-desc');
-    const ataEl = document.getElementById('e-ata');
-    const pnumEl = document.getElementById('e-pnum');
+    const descEl  = document.getElementById('e-desc');
+    const ataEl   = document.getElementById('e-ata');
+    const pnumEl  = document.getElementById('e-pnum');
     const hoursEl = document.getElementById('e-hours');
-    if (descEl) descEl.value = part.desc || '';
-    if (ataEl) ataEl.value = part.ata || '';
-    if (pnumEl) pnumEl.value = part.num;
-    if (hoursEl) hoursEl.value = part.hours;
+    if (descEl)  descEl.value  = part.desc || '';
+    if (ataEl)   ataEl.value   = part.ata  || '';
+    if (pnumEl)  pnumEl.value  = part.num;
+    refreshAllocatedHours(part);
   }
+}
+
+// Re-calculate and display allocated hours whenever role or part changes
+function refreshAllocatedHours(part) {
+  if (!part) {
+    const partId = document.getElementById('e-part-sel')?.value;
+    if (!partId) return;
+    part = parts.find(p => p.id === partId);
+    if (!part) return;
+  }
+  const taskCode = (document.getElementById('e-taskcode')?.value || '').toUpperCase();
+  const ratios   = getRatiosForCode(taskCode) || getDefaultRatios();
+  const role     = selectedJobRole || 'Technician';
+  const ratioKey = role === 'Technician' ? 'tech' : role === 'Under Supervision' ? 'sup' : 'insp';
+  const rolePct  = ratios[ratioKey] || 0;
+  const allocHrs = parseFloat((part.hours * rolePct / 100).toFixed(3));
+  const hoursEl  = document.getElementById('e-hours');
+  if (hoursEl) {
+    hoursEl.value = allocHrs;
+    hoursEl.title = `Std: ${part.hours}h × ${rolePct}% (${role}) = ${allocHrs}h allocated`;
+  }
+  // Also show label hint
+  const hoursLabel = document.getElementById('e-hours-label');
+  if (hoursLabel) hoursLabel.textContent = `Allocated Hours — ${role} (${rolePct}% of ${part.hours}h std)`;
 }
 function searchPartAndFill() {
   const term = document.getElementById('part-search-input')?.value.toLowerCase();
@@ -679,26 +734,36 @@ function searchPartAndFill() {
   } else toast('No matching part', 'warn');
 }
 async function submitEntry() {
-  const partId = document.getElementById('e-part-sel')?.value;
-  const serial = document.getElementById('e-serial')?.value.trim();
+  const partId   = document.getElementById('e-part-sel')?.value;
+  const serial   = document.getElementById('e-serial')?.value.trim();
   const taskCode = document.getElementById('e-taskcode')?.value.trim().toUpperCase();
-  if (!partId) { toast('Select a part', 'error'); return; }
-  if (!serial) { toast('Enter serial number', 'error'); return; }
+  if (!partId)   { toast('Select a part', 'error'); return; }
+  if (!serial)   { toast('Enter serial number', 'error'); return; }
   if (!taskCode) { toast('Enter a Task Code (JIC)', 'error'); return; }
   const part = parts.find(p => p.id === partId);
   if (!part) return;
+
+  // Calculate allocated hours from ratio
+  const ratios   = getRatiosForCode(taskCode) || getDefaultRatios();
+  const role     = selectedJobRole || 'Technician';
+  const ratioKey = role === 'Technician' ? 'tech' : role === 'Under Supervision' ? 'sup' : 'insp';
+  const rolePct  = ratios[ratioKey] || 0;
+  const allocHrs = parseFloat((part.hours * rolePct / 100).toFixed(3));
+
   const entry = {
-    techId: currentUser.id,
-    techName: currentUser.name,
-    pname: part.name,
-    pnum: part.num,
+    techId:    currentUser.id,
+    techName:  currentUser.name,
+    pname:     part.name,
+    pnum:      part.num,
     serial,
     taskCode,
-    jobRole: selectedJobRole || 'Technician',
-    time: document.getElementById('e-time')?.value || new Date().toISOString(),
-    hours: part.hours,
-    desc: part.desc,
-    ata: part.ata
+    jobRole:   role,
+    time:      document.getElementById('e-time')?.value || nowEAT(),
+    hours:     allocHrs,      // allocated hours (this person's share by ratio)
+    stdHours:  part.hours,    // original std hours of the part
+    ratioApplied: rolePct,    // % ratio used
+    desc:      part.desc,
+    ata:       part.ata
   };
   try {
     const docRef = await window.addDoc(window.collection(window.db, 'entries'), entry);
@@ -706,7 +771,7 @@ async function submitEntry() {
     entries.unshift(entry);
     clearEntry();
     renderEntry();
-    toast(`✓ ${part.name} — Task: ${taskCode} — ${entry.jobRole} — ${part.hours}h logged`);
+    toast(`✓ ${part.name} — ${role} — ${allocHrs}h allocated (${rolePct}% of ${part.hours}h std)`);
   } catch (err) {
     console.error("Firestore error:", err);
     toast("Failed to save entry: " + err.message, "error");
@@ -719,7 +784,7 @@ function clearEntry() {
     if (el) el.value = '';
   });
   const timeEl = document.getElementById('e-time');
-  if (timeEl) timeEl.value = new Date().toISOString().slice(0,16);
+  if (timeEl) timeEl.value = nowEAT();
   // Reset job role to Technician
   selectedJobRole = 'Technician';
   document.querySelectorAll('.job-role-opt').forEach(o => o.className = 'job-role-opt');
@@ -731,7 +796,7 @@ function doScan() { if (!parts.length) { toast('No parts', 'error'); return; } c
 
 function renderMyStats() {
   const userEntries = entries.filter(e => e.techId === currentUser.id);
-  const today = new Date().toISOString().slice(0,10);
+  const today = todayEAT();
   const todayHrs = userEntries.filter(e => e.time?.startsWith(today)).reduce((s,e) => s + (e.hours || 0), 0);
   const weekRange = getCurrentWeekRange();
   const weekHrs = userEntries.filter(e => e.time >= weekRange.start && e.time <= weekRange.end).reduce((s,e) => s + (e.hours || 0), 0);
@@ -762,7 +827,7 @@ function renderMyStats() {
   
   const tbody = document.getElementById('ms-hist');
   if (tbody) {
-    tbody.innerHTML = userEntries.slice(0,30).map(e => `   <tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.pname}</td><td>${e.hours}h</td><td class="mono">${e.serial}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">No history</td></tr>';
+    tbody.innerHTML = userEntries.slice(0,30).map(e => `<tr><td class="mono">${fmtEAT(e.time)}</td><td>${e.pname}</td><td>${e.hours}h ${e.stdHours ? '<span style="font-size:10px;color:var(--text-3);">(std '+e.stdHours+'h)</span>' : ''}</td><td class="mono">${e.serial}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">No history</td></tr>';
   }
 }
 
@@ -813,7 +878,7 @@ function renderAllEntries() {
   const techFilter = document.getElementById('ae-tech')?.value;
   const dateFilter = document.getElementById('ae-date')?.value;
   const search = document.getElementById('ae-search')?.value.toLowerCase() || '';
-  const today = new Date().toISOString().slice(0,10);
+  const today = todayEAT();
   const weekRange = getCurrentWeekRange();
   const monthRange = getCurrentMonthRange();
   let filtered = entries;
@@ -826,16 +891,16 @@ function renderAllEntries() {
   if (tbody) {
     tbody.innerHTML = filtered.slice(0,200).map(e => {
       const roleColor = e.jobRole === 'Inspector' ? 'var(--violet)' : e.jobRole === 'Under Supervision' ? 'var(--emerald)' : 'var(--blue)';
-      return `<tr><td class="mono">${new Date(e.time).toLocaleString()}</td><td>${e.techName}</td><td class="mono" style="color:var(--blue);font-weight:600;">${e.taskCode || '—'}</td><td><span style="font-size:11px;font-weight:700;color:${roleColor}">${e.jobRole || 'Technician'}</span></td><td>${e.pname}</td><td class="mono">${e.serial}</td><td>${e.hours}h</td></tr>`;
+      return `<tr><td class="mono">${fmtEAT(e.time)}</td><td>${e.techName}</td><td class="mono" style="color:var(--blue);font-weight:600;">${e.taskCode || '—'}</td><td><span style="font-size:11px;font-weight:700;color:${roleColor}">${e.jobRole || 'Technician'}</span></td><td>${e.pname}</td><td class="mono">${e.serial}</td><td>${e.hours}h${e.stdHours ? ' <span style="font-size:10px;color:var(--text-3);">(std '+e.stdHours+'h)</span>' : ''}</td></tr>`;
     }).join('') || '<tr><td colspan="7" class="empty">No entries</td></tr>';
   }
 }
 function exportAllEntries() {
-  let csv = 'Date,Technician,TaskCode,JobRole,Part,Serial,Hours\n';
-  entries.forEach(e => csv += `"${new Date(e.time).toLocaleString()}","${e.techName}","${e.taskCode || ''}","${e.jobRole || 'Technician'}","${e.pname}","${e.serial}",${e.hours}\n`);
+  let csv = 'Date (EAT),Technician,TaskCode,JobRole,Part,Serial,AllocatedHours,StdHours\n';
+  entries.forEach(e => csv += `"${fmtEAT(e.time)}","${e.techName}","${e.taskCode || ''}","${e.jobRole || 'Technician'}","${e.pname}","${e.serial}",${e.hours},${e.stdHours || e.hours}\n`);
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-  a.download = `production_${new Date().toISOString().slice(0,10)}.csv`;
+  a.download = `production_${todayEAT()}.csv`;
   a.click();
   URL.revokeObjectURL(a.href);
   toast('CSV exported');
@@ -1254,6 +1319,8 @@ window.pickJobRole = function(role, el, variant) {
   if (variant === 'green') el.classList.add('sel-green');
   else if (variant === 'violet') el.classList.add('sel-violet');
   else el.classList.add('sel');
+  // Refresh allocated hours for currently selected part
+  refreshAllocatedHours(null);
 };
 
 // ── RATIO HELPERS ──
@@ -1405,7 +1472,7 @@ async function persistSettings() {
 function getFilteredEntriesForTC() {
   const dateFilter = document.getElementById('tc-date')?.value || 'today';
   const search = (document.getElementById('tc-search')?.value || '').toLowerCase().trim();
-  const today = new Date().toISOString().slice(0,10);
+  const today = todayEAT();
   const weekRange = getCurrentWeekRange();
   const monthRange = getCurrentMonthRange();
   let filtered = [...entries];
@@ -1463,7 +1530,7 @@ function renderTaskGroups() {
 
     const totalHrs = stdHrs; // The std hours is per-task, not multiplied
     const partName = g.entries[0]?.pname || '—';
-    const lastTime = new Date(Math.max(...g.entries.map(e => new Date(e.time || 0)))).toLocaleString();
+    const lastTime = fmtEAT(new Date(Math.max(...g.entries.map(e => new Date(e.time || 0)))).toISOString());
 
     function personRows(arr, allocEach, badgeClass) {
       if (!arr.length) return `<div class="tc-empty-col">No entries</div>`;
@@ -1474,7 +1541,7 @@ function renderTaskGroups() {
             <div class="tc-pname">${e.techName}
               <span class="alloc-badge ${badgeClass}" style="margin-left:6px;">⏱ ${allocEach.toFixed(2)}h</span>
             </div>
-            <div class="tc-ptime">${new Date(e.time).toLocaleString()} · SN: ${e.serial || '—'}</div>
+            <div class="tc-ptime">${fmtEAT(e.time)} · SN: ${e.serial || '—'}</div>
           </div>
         </div>`).join('');
     }
@@ -1535,18 +1602,18 @@ function exportTaskGroups() {
     if (!groups[code]) groups[code] = [];
     groups[code].push(e);
   });
-  let csv = 'TaskCode,JobRole,TechnicianName,TechnicianID,Ratio%,AllocatedHrs,StdHrsTotal,Part,PartNumber,Serial,DateTime\n';
+  let csv = 'TaskCode,JobRole,TechnicianName,TechnicianID,Ratio%,AllocatedHrs,StdHrs,Part,PartNumber,Serial,DateTime(EAT)\n';
   Object.keys(groups).sort().forEach(code => {
     const arr = groups[code];
     const ratios = getRatiosForCode(code);
-    const stdHrs = arr[0]?.hours || 0;
+    const stdHrs = arr[0]?.stdHours || arr[0]?.hours || 0;
     const counts = { Technician: arr.filter(e=>(e.jobRole||'Technician')==='Technician').length, 'Under Supervision': arr.filter(e=>e.jobRole==='Under Supervision').length, Inspector: arr.filter(e=>e.jobRole==='Inspector').length };
     arr.forEach(e => {
       const role = e.jobRole || 'Technician';
       const ratioKey = role === 'Technician' ? 'tech' : role === 'Under Supervision' ? 'sup' : 'insp';
       const rolePct = ratios[ratioKey] || 0;
       const alloc = counts[role] ? (stdHrs * rolePct / 100) / counts[role] : 0;
-      csv += `"${code}","${role}","${e.techName}","${e.techId}",${rolePct}%,${alloc.toFixed(2)},${stdHrs},"${e.pname}","${e.pnum}","${e.serial}","${new Date(e.time).toLocaleString()}"\n`;
+      csv += `"${code}","${role}","${e.techName}","${e.techId}",${rolePct}%,${alloc.toFixed(2)},${stdHrs},"${e.pname}","${e.pnum}","${e.serial}","${fmtEAT(e.time)}"\n`;
     });
   });
   const a = document.createElement('a');
@@ -1563,6 +1630,7 @@ window.renderRatios = renderRatios;
 
 // ── END TASK CODE FUNCTIONS ──
 window.onPartSelect = onPartSelect;
+window.refreshAllocatedHours = refreshAllocatedHours;
 window.searchPartAndFill = searchPartAndFill;
 window.submitEntry = submitEntry;
 window.clearEntry = clearEntry;
