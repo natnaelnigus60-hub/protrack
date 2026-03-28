@@ -469,9 +469,9 @@ tbody tr:hover td{background:var(--card2);}
       <div class="lh">Welcome back</div>
       <div class="ls">MRO Production KPI — Central Database</div>
       <label class="fl">Employee / User ID</label>
-      <input class="fi" id="li-id" autocomplete="username" autocapitalize="none" value="T1001">
+      <input class="fi" id="li-id" autocomplete="off" autocapitalize="none" value="">
       <label class="fl">Password</label>
-      <input class="fi" id="li-pw" type="password" autocomplete="current-password" value="demo">
+      <input class="fi" id="li-pw" type="password" autocomplete="new-password" value="">
       <span class="forgot-link" onclick="openForgot()">Forgot password?</span>
       <div class="fl" style="margin-bottom:8px;">Access Level</div>
       <div class="rg" id="rg">
@@ -1532,19 +1532,24 @@ window.openReviewModal=openReviewModal;
 
 async function confirmSave(){
   if(!pendingEntry){toast('No pending entry','error');return;}
-  // Duplicate check
   if(isDuplicate(pendingEntry)){
     toast('Duplicate entry detected — this task code + part + role was already submitted within 5 minutes.','error');
     return;
   }
   const btn=document.getElementById('confirm-save-btn');
   if(btn){btn.classList.add('saving');btn.disabled=true;}
+  
+  // Store a copy BEFORE clearing pendingEntry
+  const savedEntry = {...pendingEntry}; 
+  
   try{
     const ref=await window.addDoc(window.collection(window.db,'entries'),pendingEntry);
-    pendingEntry.id=ref.id;entries.unshift(pendingEntry);
-    closeModal('m-review');clearEntry();renderEntry();
-    toast(`✓ ${pendingEntry.pname} — ${pendingEntry.jobRole} — ${pendingEntry.hours}h saved`);
-    pendingEntry=null;
+    savedEntry.id=ref.id;
+    entries.unshift(savedEntry);
+    closeModal('m-review');
+    clearEntry(); // this nullifies pendingEntry
+    renderEntry();
+    toast(`✓ ${savedEntry.pname} — ${savedEntry.jobRole} — ${savedEntry.hours}h saved`);
   }catch(err){toast('Save failed: '+err.message,'error');}
   finally{if(btn){btn.classList.remove('saving');btn.disabled=false;}}
 }
