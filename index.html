@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="description" content="ProTrack MRO Production KPI System">
 <meta name="theme-color" content="#070c18">
-<title>ProTrack v3.1 — MRO Production KPI</title>
+<title>ProTrack v1.0 — MRO Production KPI</title>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -467,7 +467,7 @@ tbody tr:hover td{background:var(--card2);}
     <div class="lb_"><div class="lmk">PT</div><div class="lnm">Pro<em>Track</em></div></div>
     <div class="lcard">
       <div class="lh">Welcome back</div>
-      <div class="ls">MRO Production KPI — Central Database</div>
+      <div class="ls">Electric shop Production Tracking Web</div>
       <label class="fl">Employee / User ID</label>
       <input class="fi" id="li-id" autocomplete="off" autocapitalize="none" value="">
       <label class="fl">Password</label>
@@ -483,19 +483,19 @@ tbody tr:hover td{background:var(--card2);}
         <span id="lbtn-txt">Sign In →</span>
       </button>
       <div class="login-attempts" id="login-attempts"></div>
-      <div class="ql">Demo: <a onclick="ql('T1001','tech')">Technician</a> · <a onclick="ql('TL001','lead')">Team Leader</a></div>
+      <div class="ql">Default password is <a onclick="ql('T1001','tech')">demo</a> · <a onclick="ql('TL001','lead')"></a></div>
     </div>
     <!-- VERSION HISTORY -->
     <div class="ver-badge">
       <div class="ver-pill" onclick="toggleVer()">
         <span>📋</span>
-        <span class="v-current" id="ver-current">v3.1.0</span>
+        <span class="v-current" id="ver-current">v1.0</span>
         <span style="color:var(--tx3);">Release Notes ▾</span>
       </div>
       <div class="ver-history" id="ver-history">
-        <div class="ver-item"><span class="ver-tag">v3.1.0</span><span class="ver-note">Updated rules for SDT allocation, scrap controls, review modal, duplicate prevention, mobile improvements, password recovery, and import summaries.</span></div>
-        <div class="ver-item"><span class="ver-tag">v2.0.0</span><span class="ver-note">Inspector fixed HRS, per-part overrides, task code grouping, ratio-based SDT division, Ethiopian time zone.</span></div>
-        <div class="ver-item"><span class="ver-tag">v1.0.0</span><span class="ver-note">Initial release — Firebase backend, technician/leader/developer roles, monthly KPI targets.</span></div>
+        <div class="ver-item"><span class="ver-tag">v1.0</span><span class="ver-note">Updated rules for SDT allocation, scrap controls, review modal, duplicate prevention, mobile improvements, password recovery, and import summaries.</span></div>
+        <div class="ver-item"><span class="ver-tag"></span><span class="ver-note"></span></div>
+        <div class="ver-item"><span class="ver-tag"></span><span class="ver-note"></span></div>
       </div>
     </div>
     <div class="lcredit">Developed by <strong>NATNAEL N.</strong></div>
@@ -525,7 +525,7 @@ tbody tr:hover td{background:var(--card2);}
           <button class="lob" onclick="logout()" title="Sign out">Sign Out</button>
         </div>
         <div style="margin-top:6px;display:flex;gap:5px;">
-          <button class="btn bo bsm" onclick="openModal('m-password')" style="flex:1;font-size:11px;">🔐 Pwd</button>
+          <button class="btn bo bsm" onclick="openModal('m-password')" style="flex:1;font-size:11px;">🔐 Change password </button>
           <button class="btn bo bsm" onclick="toggleTheme()" style="font-size:11px;">🌙</button>
         </div>
         <div class="sb-cred">Developed by <strong>NATNAEL N.</strong></div>
@@ -542,18 +542,12 @@ tbody tr:hover td{background:var(--card2);}
 
         <!-- ═══ TECH: ENTRY ═══ -->
         <div class="pg" id="pg-entry">
-          <div class="al al-b"><span class="al-ico">ℹ️</span><div id="entry-alert-txt">Log completed or scrap work. A review step appears before saving. If only you work a task with no supervision, you receive 100% of SDT hours.</div></div>
+          <div class="al al-b"><span class="al-ico">ℹ️</span><div id="entry-alert-txt">Be sure before you submit your completed task information.</div></div>
           <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:14px;align-items:start;">
             <div>
               <div class="card">
                 <div class="ch"><span class="ct">📋 Production Entry</span></div>
                 <div class="cb">
-                  <div class="szn" id="szn">
-                    <span style="font-size:24px;">🔍</span>
-                    <div style="font-size:13px;font-weight:600;margin-top:5px;">Search Part or Select from List</div>
-                    <div style="font-size:11px;color:var(--tx2);margin-top:2px;">Barcode scan removed for cleaner entry</div>
-                  </div>
-                  <div class="fg f2">
                     <!-- JOB TYPE -->
                     <div class="fgroup ff"><label class="flabel">Job Type *</label>
                       <div class="cs-toggle">
@@ -576,7 +570,7 @@ tbody tr:hover td{background:var(--card2);}
                     </div>
                     <!-- PART SEARCH -->
                     <div class="fgroup ff"><label class="flabel">🔍 Search Part</label>
-                      <div style="display:flex;gap:7px;"><input class="finput" id="part-si" placeholder="Description or Part #"><button class="btn bp bsm" onclick="searchPart()">Search</button></div>
+                      <div style="display:flex;gap:7px;"><input class="finput" id="part-si" placeholder="Part Name or Part #"><button class="btn bp bsm" onclick="searchPart()">Search</button></div>
                     </div>
                     <div class="fgroup ff"><label class="flabel">Select Part</label>
                       <select class="fselect" id="e-part-sel" onchange="onPartSel()"><option value="">— Choose Part —</option></select>
@@ -629,8 +623,8 @@ tbody tr:hover td{background:var(--card2);}
           </div>
           <!-- Assignments KPI -->
           <div class="kg k2" style="margin-bottom:14px;">
-            <div class="kc"><div class="kac" style="background:var(--cyan)"></div><div class="kl">Assignment Hrs (Month)</div><div class="kv" id="ms-asn" style="color:var(--cyan)">0h</div><div class="ks">counted in achieved hrs</div></div>
-            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Total Achieved (SDT+Asn)</div><div class="kv" id="ms-total" style="color:var(--green)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-tot-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-tot-tl">Target: —</span><span id="ms-tot-pc">0%</span></div></div></div>
+            <div class="kc"><div class="kac" style="background:var(--cyan)"></div><div class="kl">Additional Assignment Hrs (Month)</div><div class="kv" id="ms-asn" style="color:var(--cyan)">0h</div><div class="ks">counted in achieved hrs</div></div>
+            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Total Achieved </div><div class="kv" id="ms-total" style="color:var(--green)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-tot-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-tot-tl">Target: —</span><span id="ms-tot-pc">0%</span></div></div></div>
           </div>
           <div class="card">
             <div class="ch"><span class="ct">Production History</span><button class="btn bo bsm" onclick="exportMine()">⬇ Export</button></div>
@@ -638,7 +632,7 @@ tbody tr:hover td{background:var(--card2);}
             <tbody id="ms-hist"></tbody></table></div>
           </div>
           <div class="card">
-            <div class="ch"><span class="ct">📌 My Assignments</span></div>
+            <div class="ch"><span class="ct">📌 My Additional Assignments</span></div>
             <div id="ms-asn-list"><div class="empty"><div class="ei">📌</div><div class="et">No assignments</div></div></div>
           </div>
         </div>
@@ -747,7 +741,7 @@ tbody tr:hover td{background:var(--card2);}
 
         <!-- ═══ RATIOS ═══ -->
         <div class="pg" id="pg-ratios">
-          <div class="al al-b"><span class="al-ico">⚖️</span><div>Tech% + Supervision% must = 100%. Inspector and Preliminary Inspector use fixed hours — completely separate from SDT. If no supervision is recorded for a task, the technician gets 100% of SDT.</div></div>
+          <div class="al al-b"><span class="al-ico">⚖️</span><div>Tech% + Under Supervision% must = 100%. Inspector and Preliminary Inspector use fixed hours — completely separate from SDT. If no supervision is recorded for a task, the technician gets 100% of SDT.</div></div>
           <!-- SCRAP HOURS SETTING — Team Leader can adjust default scrap inspector hours -->
           <div class="card" style="margin-bottom:14px;">
             <div class="ch"><span class="ct">🗑 Scrap Operation — Inspector Default Hours</span><button class="btn bp bsm" onclick="saveScrapDefaultHrs()">💾 Save</button></div>
@@ -849,7 +843,7 @@ tbody tr:hover td{background:var(--card2);}
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
             <div class="card"><div class="ch"><span class="ct">🔄 Reset User Password</span></div><div class="cb">
               <div class="fg" style="margin-bottom:12px;">
-                <div class="fgroup"><label class="flabel">User Type</label><select class="fselect" id="rp-type" onchange="fillRpUsers()"><option value="tech">Technician</option><option value="lead">Team Leader</option></select></div>
+                <div class="fgroup"><label class="flabel">User Type</label><select class="fselect" id="rp-type" onchange="fillRpUsers()"><option value="Technician">Technician</option><option value="Team leader">Team Leader</option></select></div>
                 <div class="fgroup"><label class="flabel">Select User</label><select class="fselect" id="rp-user"></select></div>
                 <div class="fgroup"><label class="flabel">New Password</label><input class="finput" id="rp-new" type="text" placeholder="Enter new password"></div>
               </div>
@@ -942,10 +936,10 @@ tbody tr:hover td{background:var(--card2);}
   <div class="modal msm">
     <div class="mhd"><div class="mttl">Forgot Password</div><button class="mxb" onclick="closeModal('m-forgot')">✕</button></div>
     <div class="mbody">
-      <div class="al al-a"><span class="al-ico">💡</span><div>Contact your Developer/Admin to reset your password. They can reset it independently in the Password Management section.</div></div>
+      <div class="al al-a"><span class="al-ico">💡</span><div>Contact your Developer/Admin to reset your password. Email: NATNAELNI@ETHIOPIANAIRLINES.COM".</div></div>
       <div style="margin-top:8px;">
-        <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Developer Recovery</div>
-        <div style="font-size:12.5px;color:var(--tx2);margin-bottom:10px;">If the developer has also forgotten their password, use the recovery code on the login screen (appears after 5 failed attempts). Developer reset can also be managed independently by the Developer page.</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px;"></div>
+        <div style="font-size:12.5px;color:var(--tx2);margin-bottom:10px;"></div>
         <div class="fg">
           <div class="fgroup"><label class="flabel">Recovery Code (for developer only)</label><input class="finput" id="rc-code" type="text" placeholder="Enter recovery code"></div>
           <div class="fgroup"><label class="flabel">New Developer Password</label><input class="finput" id="rc-newpw" type="password" placeholder="New password"></div>
@@ -1033,7 +1027,18 @@ tbody tr:hover td{background:var(--card2);}
   <div class="modal mmd">
     <div class="mhd"><div class="mttl">Part Number Ratio Override</div><button class="mxb" onclick="closeModal('m-override')">✕</button></div>
     <div class="mbody"><div class="fg f2">
-      <div class="fgroup ff"><label class="flabel">Part Number *</label><select class="fselect" id="mro-pnum"><option value="">— Select Part —</option></select></div>
+      <div class="fgroup ff">
+        <label class="flabel">Search &amp; Select Part *</label>
+        <div style="position:relative;">
+          <input class="finput" id="mro-part-search" placeholder="🔍 Type part number or description..." oninput="filterOverrideParts()" autocomplete="off" style="padding-right:36px;">
+          <span id="mro-sel-clear" onclick="clearOverrideSel()" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--tx3);font-size:15px;">✕</span>
+        </div>
+        <div id="mro-part-list" style="max-height:190px;overflow-y:auto;border:1px solid var(--bdr);border-radius:7px;background:var(--inp-bg);margin-top:4px;display:none;"></div>
+        <input type="hidden" id="mro-pnum" value="">
+        <div id="mro-sel-display" style="display:none;margin-top:6px;padding:8px 11px;background:var(--gdim);border:1px solid rgba(16,185,129,.25);border-radius:7px;font-size:12.5px;">
+          <span style="color:var(--green);font-weight:700;" id="mro-sel-num"></span> — <span style="color:var(--tx2);" id="mro-sel-name"></span>
+        </div>
+      </div>
       <div class="fgroup"><label class="flabel" style="color:var(--blue);">🔧 Tech %</label><input class="ratio-input" id="mro-tech" type="number" min="0" max="100" value="25" style="width:100%;" oninput="updOvUI()"></div>
       <div class="fgroup"><label class="flabel" style="color:var(--green);">👁 Sup %</label><input class="ratio-input" id="mro-sup" type="number" min="0" max="100" value="75" style="width:100%;" oninput="updOvUI()"></div>
       <div style="grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr);">
@@ -1088,7 +1093,7 @@ tbody tr:hover td{background:var(--card2);}
 // ════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ════════════════════════════════════════════════
-const APP_VERSION = '3.1.0';
+const APP_VERSION = '1.0';
 const DEV_RECOVERY_CODE = 'PROTRACK-DEV-2025-RESET';
 const EAT_TZ='Africa/Addis_Ababa';
 const ROLES=['Technician','Under Supervision','Inspector','Preliminary Inspector'];
@@ -1234,7 +1239,7 @@ window.previewPic=previewPic;
 function getDefR(){return settings.ratios||{tech:25,sup:75,inspHrs:1.0,prelimHrs:1.0};}
 function getRatioForPart(partNum){return(settings.partRatios||{})[partNum]||getDefR();}
 function isInspRole(role){return role==='Inspector'||role==='Preliminary Inspector';}
-function isSDT(e){return!e.isInspector&&e.jobRole!=='Inspector'&&e.jobRole!=='Preliminary Inspector';}
+function isSDT(e){if(e.jobType==='scrap')return true;return!e.isInspector&&e.jobRole!=='Inspector'&&e.jobRole!=='Preliminary Inspector';}
 
 /**
  * Calculate pool hours for a role on a part.
@@ -1253,6 +1258,8 @@ function calcPoolHrs(part,role){
  */
 function getDividedHours(entry,allEntries){
   if(!entry)return 0;
+  // Scrap entries: use scrapHrs field (the credited inspector hours for scrap), not the pool hrs
+  if(entry.jobType==='scrap'){return parseFloat(entry.scrapHrs||2);}
   const role=entry.jobRole||'Technician';
   const peers=allEntries.filter(e=>e.taskCode===entry.taskCode&&(e.jobRole||'Technician')===role&&e.pnum===entry.pnum);
   // Special rule: solo technician with no supervision => 100% of SDT
@@ -1347,10 +1354,60 @@ function renderOvList(){
   }).join('');
 }
 window.openAddOverride=function(){
-  const sel=document.getElementById('mro-pnum');
-  sel.innerHTML='<option value="">— Select Part —</option>'+parts.map(p=>`<option value="${p.num}">${p.num} — ${p.name}</option>`).join('');
+  // Reset search UI
+  const si=document.getElementById('mro-part-search');if(si)si.value='';
+  const hid=document.getElementById('mro-pnum');if(hid)hid.value='';
+  const pl=document.getElementById('mro-part-list');if(pl){pl.innerHTML='';pl.style.display='none';}
+  const sd=document.getElementById('mro-sel-display');if(sd)sd.style.display='none';
+  const sc=document.getElementById('mro-sel-clear');if(sc)sc.style.display='none';
   const d=getDefR();sv('mro-tech',d.tech);sv('mro-sup',d.sup);sv('mro-insp',d.inspHrs||1);sv('mro-prelim',d.prelimHrs||1);sv('mro-note','');
   updOvUI();openModal('m-override');
+};
+window.filterOverrideParts=function(){
+  const q=(document.getElementById('mro-part-search')?.value||'').toLowerCase().trim();
+  const pl=document.getElementById('mro-part-list');
+  const sc=document.getElementById('mro-sel-clear');
+  if(sc)sc.style.display=q?'block':'none';
+  if(!q){if(pl)pl.style.display='none';return;}
+  const matches=parts.filter(p=>p.num.toLowerCase().includes(q)||p.name.toLowerCase().includes(q)).slice(0,40);
+  if(!pl)return;
+  if(!matches.length){pl.style.display='block';pl.innerHTML='<div style="padding:10px 13px;font-size:12.5px;color:var(--tx3);">No matching parts</div>';return;}
+  pl.style.display='block';
+  pl.innerHTML=matches.map(p=>`<div onclick="selectOverridePart('${p.num.replace(/'/g,"\'")}','${p.name.replace(/'/g,"\'")}','${p.id.replace(/'/g,"\'")}' )" style="padding:9px 13px;cursor:pointer;border-bottom:1px solid var(--bdr);font-size:12.5px;transition:background .1s;" onmouseenter="this.style.background='var(--bdim)'" onmouseleave="this.style.background=''">
+    <span style="font-family:'JetBrains Mono',monospace;color:var(--amber);font-size:11.5px;">${p.num}</span>
+    <div style="color:var(--tx2);font-size:11px;margin-top:2px;">${p.name} · <span style="color:var(--tx3);">${p.ata||'—'}</span> · <span style="color:var(--blue);">${p.hours}h</span></div>
+  </div>`).join('');
+};
+window.selectOverridePart=function(num,name,id){
+  const hid=document.getElementById('mro-pnum');if(hid)hid.value=num;
+  const si=document.getElementById('mro-part-search');if(si)si.value=num;
+  const pl=document.getElementById('mro-part-list');if(pl)pl.style.display='none';
+  const sd=document.getElementById('mro-sel-display');if(sd)sd.style.display='block';
+  const sn=document.getElementById('mro-sel-num');if(sn)sn.textContent=num;
+  const snm=document.getElementById('mro-sel-name');if(snm)snm.textContent=name;
+  const sc=document.getElementById('mro-sel-clear');if(sc)sc.style.display='block';
+  // Auto-load existing override if any
+  const existing=(settings.partRatios||{})[num];
+  if(existing){
+    sv('mro-tech',existing.tech||25);sv('mro-sup',existing.sup||75);
+    sv('mro-insp',existing.inspHrs||1);sv('mro-prelim',existing.prelim||1);
+    sv('mro-note',existing.note||'');
+    updOvUI();toast('Existing override loaded for this part','warn');
+  }
+};
+
+// Close override part list when clicking outside
+document.addEventListener('click',function(e){
+  const pl=document.getElementById('mro-part-list');
+  const si=document.getElementById('mro-part-search');
+  if(pl&&si&&!pl.contains(e.target)&&e.target!==si){pl.style.display='none';}
+});
+window.clearOverrideSel=function(){
+  const si=document.getElementById('mro-part-search');if(si)si.value='';
+  const hid=document.getElementById('mro-pnum');if(hid)hid.value='';
+  const pl=document.getElementById('mro-part-list');if(pl){pl.innerHTML='';pl.style.display='none';}
+  const sd=document.getElementById('mro-sel-display');if(sd)sd.style.display='none';
+  const sc=document.getElementById('mro-sel-clear');if(sc)sc.style.display='none';
 };
 window.saveOverride=async function(){
   const pnum=document.getElementById('mro-pnum')?.value.trim();
@@ -1520,7 +1577,7 @@ function openReviewModal(){
     ['Your Pool Hours',`<span class="mono" style="font-weight:700;">${pool}h</span>${insp?' <span class="not-sdt">NOT SDT</span>':''}`],
     ['Date &amp; Time (EAT)',fmtEAT(pendingEntry.time)],
   ];
-  if(scrapHrs)fields.push(['Scrap Hours (Leader)',`<span class="mono" style="color:var(--rose);">${scrapHrs}h</span>`]);
+  if(scrapHrs)fields.push(['Scrap Hrs (counts as Pool/SDT)',`<span class="mono" style="color:var(--green);font-weight:700;">${scrapHrs}h</span>`]);
   document.getElementById('m-review-body').innerHTML=
     `<div style="background:var(--card2);border-radius:8px;padding:12px 14px;margin-bottom:10px;">`+
     fields.map(([l,v])=>`<div class="review-field"><div class="rf-label">${l}</div><div class="rf-val">${v}</div></div>`).join('')+
@@ -1772,7 +1829,7 @@ function renderReports(){
     const total=sdt+asn;const tgt=t.monthlyTarget||160;
     const pct=Math.min(100,Math.round(total/tgt*100));
     const cls=pct>=100?'bgr':pct>=80?'bamb':pct>=60?'bblu':'bred';
-    const status=pct>=100?'✅ Achieved':pct>=80?'⚠️ Near':pct>=60?'🟡 Progress':'🔴 Behind';
+    const status=pct>=100?'✅ Achieved':pct>=80?'⚠️ Near':pct>=60?'🟡 Progress':'🔴 Low';
     return`<tr>
       <td style="font-weight:600;">${t.name}</td>
       <td class="mono">${tgt}h</td><td class="mono">${sdt.toFixed(2)}h</td>
@@ -2108,7 +2165,7 @@ const NAV={
 };
 const META={
   entry:{t:'Production Entry',d:'Log completed or scrap work'},
-  mystats:{t:'My Stats',d:'Personal KPI and history'},
+  mystats:{t:'My Stats',d:'Personal Production history'},
   dashboard:{t:'Team Dashboard',d:'Real-time performance'},
   assignments:{t:'Assignments',d:'Assign tasks to technicians'},
   allentries:{t:'All Entries',d:'Complete production log'},
