@@ -2007,6 +2007,44 @@ function renderParts(){
 }
 window.openAddPart=function(){editPartId=null;['mp-name','mp-ata','mp-num','mp-hours'].forEach(id=>sv(id,''));stxt('mp-title','Add Part');openModal('m-part');};
 window.openEditPart=function(id){const p=parts.find(x=>x.id===id);if(!p)return;editPartId=id;sv('mp-name',p.name);sv('mp-ata',p.ata||'');sv('mp-num',p.num);sv('mp-hours',p.hours);stxt('mp-title','Edit Part');openModal('m-part');};
+window.deleteAllParts = async function() {
+  // A. THE SAFETY LOCK
+  // This prevents accidental clicks. If you click 'Cancel', the code stops here.
+  if (!confirm("Are you sure? This will permanently delete ALL parts from the database.")) return;
+  
+  // B. THE VISUAL CUE
+  // This turns on your loading spinner so the user knows the app hasn't crashed.
+  showLoading();
+
+  try {
+    // C. THE LOOP (The "Eraser")
+    // 'parts' is your local list of all items. 
+    // We go through them one-by-one (for...of).
+    for (const part of parts) {
+      // window.deleteDoc tells Google Firebase: 
+      // "Go to the 'parts' collection and delete the document with this ID."
+      await window.deleteDoc(window.doc(window.db, 'parts', part.id));
+    }
+    
+    // D. RESET LOCAL MEMORY
+    // After the database is empty, we must empty the app's local memory.
+    parts = [];
+    
+    // E. REFRESH THE SCREEN
+    // This clears the table on the website so it shows "No parts found."
+    renderParts();
+    toast('All parts deleted successfully');
+    
+  } catch (err) {
+    // F. ERROR HANDLING
+    console.error(err);
+    toast('Failed to delete parts', 'error');
+  } finally {
+    // G. CLEANUP
+    // No matter if it worked or failed, hide the loading spinner at the end.
+    hideLoading();
+  }
+};
 window.savePart=async function(){
   const name=sanitize(document.getElementById('mp-name')?.value);const num=sanitize(document.getElementById('mp-num')?.value);
   const hours=sanitizeNum(document.getElementById('mp-hours')?.value);
