@@ -1093,7 +1093,7 @@ tbody tr:hover td{background:var(--card2);}
 // ════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ════════════════════════════════════════════════
-const APP_VERSION = '1.1';
+const APP_VERSION = '1.0';
 const DEV_RECOVERY_CODE = 'PROTRACK-DEV-2025-RESET';
 const EAT_TZ='Africa/Addis_Ababa';
 const ROLES=['Technician','Under Supervision','Inspector','Preliminary Inspector'];
@@ -2144,21 +2144,22 @@ window.handlePartImport = function(input) {
   const r = new FileReader();
   
   r.onload = async e => {
+    // 1. START LOADING
+    showLoading(); 
+    
     try {
       lastImportedParts = [];
-      let duplicateCount = 0; // Keep track of how many were skipped
+      let duplicateCount = 0;
       
       const wb = XLSX.read(e.target.result, { type: 'array' });
       const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
       
       for (const rawRow of rows) {
-        // 1. Format headers to lowercase
         const row = {};
         for (let key in rawRow) {
           row[key.trim().toLowerCase()] = rawRow[key];
         }
 
-        // 2. Find the data regardless of exact header name
         const partName = row['name'] || row['description'] || row['desc'];
         const partNum = row['number'] || row['part number'] || row['part num'] || row['num'] || row['part #'];
         const partHours = row['hours'] || row['std hours'] || row['std_hours'];
@@ -2166,16 +2167,13 @@ window.handlePartImport = function(input) {
 
         if (partName && partNum) {
           const cleanNum = sanitize(partNum.toString());
-          
-          // 3. THE DUPLICATE CHECK: Does this part number already exist?
           const isDuplicate = parts.some(p => p.num === cleanNum);
           
           if (isDuplicate) {
-            duplicateCount++; // Count it and skip to the next row
+            duplicateCount++;
             continue; 
           }
 
-          // 4. If it's not a duplicate, save it
           const np = {
             id: Date.now().toString() + Math.random(),
             name: sanitize(partName.toString()),
@@ -2185,13 +2183,13 @@ window.handlePartImport = function(input) {
             desc: sanitize(partName.toString())
           };
           
+          // This "await" is what takes time; the loading screen stays up during this
           await window.setDoc(window.doc(window.db, 'parts', np.id), np);
           parts.push(np);
           lastImportedParts.push(np);
         }
       }
       
-      // 5. Update UI and report back
       renderParts();
       closeModal('m-import-part');
       
@@ -2205,7 +2203,12 @@ window.handlePartImport = function(input) {
       
     } catch (err) {
       console.error(err);
-      toast('Import failed. Check console for details.', 'error');
+      toast('Import failed. Check console.', 'error');
+    } finally {
+      // 2. STOP LOADING (Always runs, even if there is an error)
+      hideLoading(); 
+      // Reset input so you can re-upload the same file if needed
+      input.value = ''; 
     }
   };
   r.readAsArrayBuffer(f);
