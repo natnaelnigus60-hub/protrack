@@ -447,6 +447,44 @@ tbody tr:hover td{background:var(--card2);}
 
 /* VERSION HISTORY */
 .v-current{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--green);}
+/* --- FIX FOR PINNING TABS TO TOP --- */
+
+/* 1. This ensures the main page stays inside the screen */
+.pg {
+  display: flex !important;
+  flex-direction: column !important;
+  height: calc(100vh - 70px) !important; /* Adjusts for your top/side bar */
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+/* 2. This keeps your Search and Add buttons at the very top */
+.tbr {
+  display: flex !important;
+  align-items: center !important;
+  gap: 15px !important;
+  padding: 15px !important;
+  background: #070c18 !important; /* Your dark blue/black color */
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  flex-shrink: 0 !important; /* Prevents the bar from squashing */
+  border-bottom: 1px solid #1e293b !important;
+}
+
+/* 3. This makes the table area scrollable while the top stays still */
+.pg .card {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  margin: 10px !important;
+  background: #0f172a !important; /* Darker card background */
+  border-radius: 8px !important;
+}
+
+/* 4. Keeps the Search Input wide */
+.sbx {
+  flex: 1 !important;
+}
 </style>
 </head>
 <body>
@@ -818,6 +856,7 @@ tbody tr:hover td{background:var(--card2);}
             <div class="sbx"><input type="text" id="ap-q" placeholder="Search parts..." oninput="renderParts()"></div>
             <button class="btn bp" onclick="openAddPart()">+ Add</button>
             <button class="btn bo" onclick="openModal('m-import-part')">⬆ Import</button>
+            <button class="btn" style="background: #e74c3c; color: white; margin-left: 10px;" onclick="deleteAllParts()">Clear All Parts</button>
           </div>
           <div class="card"><div class="tw"><table>
             <thead><tr><th>Description</th><th>ATA</th><th>Part Number</th><th>Std Hours</th><th>Actions</th></tr></thead>
@@ -1093,7 +1132,7 @@ tbody tr:hover td{background:var(--card2);}
 // ════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ════════════════════════════════════════════════
-const APP_VERSION = '1.1';
+const APP_VERSION = '1.0';
 const DEV_RECOVERY_CODE = 'PROTRACK-DEV-2025-RESET';
 const EAT_TZ='Africa/Addis_Ababa';
 const ROLES=['Technician','Under Supervision','Inspector','Preliminary Inspector'];
