@@ -2138,7 +2138,78 @@ window.saveMonthTgt=async function(){const tid=document.getElementById('tgt-sel'
 //  IMPORT
 // ════════════════════════════════════════════════
 window.handleTechImport=function(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{lastImportedTechs=[];const wb=XLSX.read(e.target.result,{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);for(const row of rows){if(row.ID&&row.Name){const id=sanitize(row.ID.toString());if(!techs.find(t=>t.id===id)){const nt={id,name:sanitize(row.Name.toString()),monthlyTarget:parseFloat(row.MonthlyTarget)||settings.defaultMonthlyTarget||160,status:'active',password:settings.passwords?.tech||'demo',initials:row.Name.toString().slice(0,2).toUpperCase(),color:'#3b82f6'};await window.setDoc(window.doc(window.db,'technicians',id),nt);techs.push(nt);lastImportedTechs.push(nt);}}}renderTechs();toast('Import complete');closeModal('m-import-tech');renderImportSummary('tech');}catch(err){toast('Import failed','error');}};r.readAsArrayBuffer(f);};
-window.handlePartImport=function(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{lastImportedParts=[];const wb=XLSX.read(e.target.result,{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);for(const row of rows){if(row.Name&&row.Number){const np={id:Date.now().toString()+Math.random(),name:sanitize(row.Name.toString()),num:sanitize(row.Number.toString()),hours:parseFloat(row.Hours)||1,ata:sanitize(row.ATA||''),desc:sanitize(row.Description||row.Name.toString())};await window.setDoc(window.doc(window.db,'parts',np.id),np);parts.push(np);lastImportedParts.push(np);}}renderParts();toast('Import complete');closeModal('m-import-part');renderImportSummary('part');}catch(err){toast('Import failed','error');}};r.readAsArrayBuffer(f);};
+window.handlePartImport = function(input) {
+  const f = input.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  
+  r.onload = async e => {
+    try {
+      lastImportedParts = [];
+      let duplicateCount = 0; // Keep track of how many were skipped
+      
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+      
+      for (const rawRow of rows) {
+        // 1. Format headers to lowercase
+        const row = {};
+        for (let key in rawRow) {
+          row[key.trim().toLowerCase()] = rawRow[key];
+        }
+
+        // 2. Find the data regardless of exact header name
+        const partName = row['name'] || row['description'] || row['desc'];
+        const partNum = row['number'] || row['part number'] || row['part num'] || row['num'] || row['part #'];
+        const partHours = row['hours'] || row['std hours'] || row['std_hours'];
+        const partAta = row['ata'] || row['ata chapter'];
+
+        if (partName && partNum) {
+          const cleanNum = sanitize(partNum.toString());
+          
+          // 3. THE DUPLICATE CHECK: Does this part number already exist?
+          const isDuplicate = parts.some(p => p.num === cleanNum);
+          
+          if (isDuplicate) {
+            duplicateCount++; // Count it and skip to the next row
+            continue; 
+          }
+
+          // 4. If it's not a duplicate, save it
+          const np = {
+            id: Date.now().toString() + Math.random(),
+            name: sanitize(partName.toString()),
+            num: cleanNum,
+            hours: parseFloat(partHours) || 1,
+            ata: sanitize(partAta ? partAta.toString() : ''),
+            desc: sanitize(partName.toString())
+          };
+          
+          await window.setDoc(window.doc(window.db, 'parts', np.id), np);
+          parts.push(np);
+          lastImportedParts.push(np);
+        }
+      }
+      
+      // 5. Update UI and report back
+      renderParts();
+      closeModal('m-import-part');
+      
+      if (duplicateCount > 0) {
+        toast(`Added ${lastImportedParts.length} parts. Skipped ${duplicateCount} duplicates.`, 'warn');
+      } else {
+        toast(`Import complete. Added ${lastImportedParts.length} parts.`);
+      }
+      
+      renderImportSummary('part');
+      
+    } catch (err) {
+      console.error(err);
+      toast('Import failed. Check console for details.', 'error');
+    }
+  };
+  r.readAsArrayBuffer(f);
+};
 
 // ════════════════════════════════════════════════
 //  EXPORT HELPERS
