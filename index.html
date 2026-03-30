@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="description" content="ProTrack MRO Production KPI System">
 <meta name="theme-color" content="#070c18">
-<title>ProTrack v1.0 — MRO Production KPI</title>
+<title>ProTrack v3.1 — MRO Production KPI</title>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -467,7 +467,7 @@ tbody tr:hover td{background:var(--card2);}
     <div class="lb_"><div class="lmk">PT</div><div class="lnm">Pro<em>Track</em></div></div>
     <div class="lcard">
       <div class="lh">Welcome back</div>
-      <div class="ls">Electric shop Production Tracking Web</div>
+      <div class="ls">Electric Shop Production Tracking Web</div>
       <label class="fl">Employee / User ID</label>
       <input class="fi" id="li-id" autocomplete="off" autocapitalize="none" value="">
       <label class="fl">Password</label>
@@ -483,19 +483,19 @@ tbody tr:hover td{background:var(--card2);}
         <span id="lbtn-txt">Sign In →</span>
       </button>
       <div class="login-attempts" id="login-attempts"></div>
-      <div class="ql">Default password is <a onclick="ql('T1001','tech')">demo</a> · <a onclick="ql('TL001','lead')"></a></div>
+      <div class="ql">Default Password: <a onclick="ql('T1001','tech')">demo</a> · <a onclick="ql('TL001','lead')"></a></div>
     </div>
     <!-- VERSION HISTORY -->
     <div class="ver-badge">
       <div class="ver-pill" onclick="toggleVer()">
         <span>📋</span>
-        <span class="v-current" id="ver-current">v1.0</span>
+        <span class="v-current" id="ver-current">v3.1.0</span>
         <span style="color:var(--tx3);">Release Notes ▾</span>
       </div>
       <div class="ver-history" id="ver-history">
-        <div class="ver-item"><span class="ver-tag">v1.0</span><span class="ver-note">Updated rules for SDT allocation, scrap controls, review modal, duplicate prevention, mobile improvements, password recovery, and import summaries.</span></div>
         <div class="ver-item"><span class="ver-tag"></span><span class="ver-note"></span></div>
         <div class="ver-item"><span class="ver-tag"></span><span class="ver-note"></span></div>
+        <div class="ver-item"><span class="ver-tag">v1.0.0</span><span class="ver-note">Initial release — Firebase backend, technician/leader/developer roles, monthly KPI targets.</span></div>
       </div>
     </div>
     <div class="lcredit">Developed by <strong>NATNAEL N.</strong></div>
@@ -525,7 +525,7 @@ tbody tr:hover td{background:var(--card2);}
           <button class="lob" onclick="logout()" title="Sign out">Sign Out</button>
         </div>
         <div style="margin-top:6px;display:flex;gap:5px;">
-          <button class="btn bo bsm" onclick="openModal('m-password')" style="flex:1;font-size:11px;">🔐 Change password </button>
+          <button class="btn bo bsm" onclick="openModal('m-password')" style="flex:1;font-size:11px;">🔐 Pwd</button>
           <button class="btn bo bsm" onclick="toggleTheme()" style="font-size:11px;">🌙</button>
         </div>
         <div class="sb-cred">Developed by <strong>NATNAEL N.</strong></div>
@@ -542,14 +542,21 @@ tbody tr:hover td{background:var(--card2);}
 
         <!-- ═══ TECH: ENTRY ═══ -->
         <div class="pg" id="pg-entry">
-          <div class="al al-b"><span class="al-ico">ℹ️</span><div id="entry-alert-txt">Be sure before you submit your completed task information.</div></div>
+          <div class="al al-b"><span class="al-ico">ℹ️</span><div id="entry-alert-txt">Be sure before you sebmite your task </div></div>
           <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:14px;align-items:start;">
             <div>
               <div class="card">
                 <div class="ch"><span class="ct">📋 Production Entry</span></div>
                 <div class="cb">
+                  <div class="szn" id="szn">
+                    <span style="font-size:24px;">🔍</span>
+                    <div style="font-size:13px;font-weight:600;margin-top:5px;">Search Part or Select from List</div>
+                    <div style="font-size:11px;color:var(--tx2);margin-top:2px;">Barcode scan removed for cleaner entry</div>
+                  </div>
+                  <div class="fg f2">
                     <!-- JOB TYPE -->
-                    <div class="fgroup ff"><label class="flabel">Job Type *</label>
+                    <div class="fgroup ff"><label cla
+                      ss="flabel">Job Type *</label>
                       <div class="cs-toggle">
                         <button class="cs-opt sel-comp" id="cs-comp" onclick="setJobType('completed')">✅ Completed</button>
                         <button class="cs-opt" id="cs-scrap" onclick="setJobType('scrap')">🗑 Scrap</button>
@@ -570,7 +577,7 @@ tbody tr:hover td{background:var(--card2);}
                     </div>
                     <!-- PART SEARCH -->
                     <div class="fgroup ff"><label class="flabel">🔍 Search Part</label>
-                      <div style="display:flex;gap:7px;"><input class="finput" id="part-si" placeholder="Part Name or Part #"><button class="btn bp bsm" onclick="searchPart()">Search</button></div>
+                      <div style="display:flex;gap:7px;"><input class="finput" id="part-si" placeholder="Description or Part #"><button class="btn bp bsm" onclick="searchPart()">Search</button></div>
                     </div>
                     <div class="fgroup ff"><label class="flabel">Select Part</label>
                       <select class="fselect" id="e-part-sel" onchange="onPartSel()"><option value="">— Choose Part —</option></select>
@@ -623,8 +630,8 @@ tbody tr:hover td{background:var(--card2);}
           </div>
           <!-- Assignments KPI -->
           <div class="kg k2" style="margin-bottom:14px;">
-            <div class="kc"><div class="kac" style="background:var(--cyan)"></div><div class="kl">Additional Assignment Hrs (Month)</div><div class="kv" id="ms-asn" style="color:var(--cyan)">0h</div><div class="ks">counted in achieved hrs</div></div>
-            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Total Achieved </div><div class="kv" id="ms-total" style="color:var(--green)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-tot-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-tot-tl">Target: —</span><span id="ms-tot-pc">0%</span></div></div></div>
+            <div class="kc"><div class="kac" style="background:var(--cyan)"></div><div class="kl">Assignment Hrs (Month)</div><div class="kv" id="ms-asn" style="color:var(--cyan)">0h</div><div class="ks">counted in achieved hrs</div></div>
+            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Total Achieved (SDT+Asn)</div><div class="kv" id="ms-total" style="color:var(--green)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-tot-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-tot-tl">Target: —</span><span id="ms-tot-pc">0%</span></div></div></div>
           </div>
           <div class="card">
             <div class="ch"><span class="ct">Production History</span><button class="btn bo bsm" onclick="exportMine()">⬇ Export</button></div>
@@ -633,7 +640,7 @@ tbody tr:hover td{background:var(--card2);}
           </div>
           <div class="card">
             <div class="ch"><span class="ct">📌 My Additional Assignments</span></div>
-            <div id="ms-asn-list"><div class="empty"><div class="ei">📌</div><div class="et">No assignments</div></div></div>
+            <div id="ms-asn-list"><div class="empty"><div class="ei">📌</div><div class="et">No Additional assignments</div></div></div>
           </div>
         </div>
 
@@ -818,7 +825,6 @@ tbody tr:hover td{background:var(--card2);}
             <div class="sbx"><input type="text" id="ap-q" placeholder="Search parts..." oninput="renderParts()"></div>
             <button class="btn bp" onclick="openAddPart()">+ Add</button>
             <button class="btn bo" onclick="openModal('m-import-part')">⬆ Import</button>
-            <button class="btn" style="background: #e74c3c; color: white; margin-left: 10px;" onclick="deleteAllParts()">Clear All Parts</button>
           </div>
           <div class="card"><div class="tw"><table>
             <thead><tr><th>Description</th><th>ATA</th><th>Part Number</th><th>Std Hours</th><th>Actions</th></tr></thead>
@@ -844,7 +850,7 @@ tbody tr:hover td{background:var(--card2);}
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
             <div class="card"><div class="ch"><span class="ct">🔄 Reset User Password</span></div><div class="cb">
               <div class="fg" style="margin-bottom:12px;">
-                <div class="fgroup"><label class="flabel">User Type</label><select class="fselect" id="rp-type" onchange="fillRpUsers()"><option value="Technician">Technician</option><option value="Team leader">Team Leader</option></select></div>
+                <div class="fgroup"><label class="flabel">User Type</label><select class="fselect" id="rp-type" onchange="fillRpUsers()"><option value="tech">Technician</option><option value="lead">Team Leader</option></select></div>
                 <div class="fgroup"><label class="flabel">Select User</label><select class="fselect" id="rp-user"></select></div>
                 <div class="fgroup"><label class="flabel">New Password</label><input class="finput" id="rp-new" type="text" placeholder="Enter new password"></div>
               </div>
@@ -937,9 +943,9 @@ tbody tr:hover td{background:var(--card2);}
   <div class="modal msm">
     <div class="mhd"><div class="mttl">Forgot Password</div><button class="mxb" onclick="closeModal('m-forgot')">✕</button></div>
     <div class="mbody">
-      <div class="al al-a"><span class="al-ico">💡</span><div>Contact your Developer/Admin to reset your password. Email: NATNAELNI@ETHIOPIANAIRLINES.COM".</div></div>
+      <div class="al al-a"><span class="al-ico">💡</span><div>Contact your Developer/Admin to reset your password. Email: natnaelni@ethiopianairlines.com</div></div>
       <div style="margin-top:8px;">
-        <div style="font-size:13px;font-weight:600;margin-bottom:8px;"></div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Developer Recovery</div>
         <div style="font-size:12.5px;color:var(--tx2);margin-bottom:10px;"></div>
         <div class="fg">
           <div class="fgroup"><label class="flabel">Recovery Code (for developer only)</label><input class="finput" id="rc-code" type="text" placeholder="Enter recovery code"></div>
@@ -1830,7 +1836,7 @@ function renderReports(){
     const total=sdt+asn;const tgt=t.monthlyTarget||160;
     const pct=Math.min(100,Math.round(total/tgt*100));
     const cls=pct>=100?'bgr':pct>=80?'bamb':pct>=60?'bblu':'bred';
-    const status=pct>=100?'✅ Achieved':pct>=80?'⚠️ Near':pct>=60?'🟡 Progress':'🔴 Low';
+    const status=pct>=100?'✅ Achieved':pct>=80?'⚠️ Near':pct>=60?'🟡 Progress':'🔴 Behind';
     return`<tr>
       <td style="font-weight:600;">${t.name}</td>
       <td class="mono">${tgt}h</td><td class="mono">${sdt.toFixed(2)}h</td>
@@ -2008,44 +2014,6 @@ function renderParts(){
 }
 window.openAddPart=function(){editPartId=null;['mp-name','mp-ata','mp-num','mp-hours'].forEach(id=>sv(id,''));stxt('mp-title','Add Part');openModal('m-part');};
 window.openEditPart=function(id){const p=parts.find(x=>x.id===id);if(!p)return;editPartId=id;sv('mp-name',p.name);sv('mp-ata',p.ata||'');sv('mp-num',p.num);sv('mp-hours',p.hours);stxt('mp-title','Edit Part');openModal('m-part');};
-window.deleteAllParts = async function() {
-  // A. THE SAFETY LOCK
-  // This prevents accidental clicks. If you click 'Cancel', the code stops here.
-  if (!confirm("Are you sure? This will permanently delete ALL parts from the database.")) return;
-  
-  // B. THE VISUAL CUE
-  // This turns on your loading spinner so the user knows the app hasn't crashed.
-  showLoading();
-
-  try {
-    // C. THE LOOP (The "Eraser")
-    // 'parts' is your local list of all items. 
-    // We go through them one-by-one (for...of).
-    for (const part of parts) {
-      // window.deleteDoc tells Google Firebase: 
-      // "Go to the 'parts' collection and delete the document with this ID."
-      await window.deleteDoc(window.doc(window.db, 'parts', part.id));
-    }
-    
-    // D. RESET LOCAL MEMORY
-    // After the database is empty, we must empty the app's local memory.
-    parts = [];
-    
-    // E. REFRESH THE SCREEN
-    // This clears the table on the website so it shows "No parts found."
-    renderParts();
-    toast('All parts deleted successfully');
-    
-  } catch (err) {
-    // F. ERROR HANDLING
-    console.error(err);
-    toast('Failed to delete parts', 'error');
-  } finally {
-    // G. CLEANUP
-    // No matter if it worked or failed, hide the loading spinner at the end.
-    hideLoading();
-  }
-};
 window.savePart=async function(){
   const name=sanitize(document.getElementById('mp-name')?.value);const num=sanitize(document.getElementById('mp-num')?.value);
   const hours=sanitizeNum(document.getElementById('mp-hours')?.value);
@@ -2177,81 +2145,7 @@ window.saveMonthTgt=async function(){const tid=document.getElementById('tgt-sel'
 //  IMPORT
 // ════════════════════════════════════════════════
 window.handleTechImport=function(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{lastImportedTechs=[];const wb=XLSX.read(e.target.result,{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);for(const row of rows){if(row.ID&&row.Name){const id=sanitize(row.ID.toString());if(!techs.find(t=>t.id===id)){const nt={id,name:sanitize(row.Name.toString()),monthlyTarget:parseFloat(row.MonthlyTarget)||settings.defaultMonthlyTarget||160,status:'active',password:settings.passwords?.tech||'demo',initials:row.Name.toString().slice(0,2).toUpperCase(),color:'#3b82f6'};await window.setDoc(window.doc(window.db,'technicians',id),nt);techs.push(nt);lastImportedTechs.push(nt);}}}renderTechs();toast('Import complete');closeModal('m-import-tech');renderImportSummary('tech');}catch(err){toast('Import failed','error');}};r.readAsArrayBuffer(f);};
-window.handlePartImport = function(input) {
-  const f = input.files[0];
-  if (!f) return;
-  const r = new FileReader();
-  
-  r.onload = async e => {
-    // 1. START LOADING
-    showLoading(); 
-    
-    try {
-      lastImportedParts = [];
-      let duplicateCount = 0;
-      
-      const wb = XLSX.read(e.target.result, { type: 'array' });
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-      
-      for (const rawRow of rows) {
-        const row = {};
-        for (let key in rawRow) {
-          row[key.trim().toLowerCase()] = rawRow[key];
-        }
-
-        const partName = row['name'] || row['description'] || row['desc'];
-        const partNum = row['number'] || row['part number'] || row['part num'] || row['num'] || row['part #'];
-        const partHours = row['hours'] || row['std hours'] || row['std_hours'];
-        const partAta = row['ata'] || row['ata chapter'];
-
-        if (partName && partNum) {
-          const cleanNum = sanitize(partNum.toString());
-          const isDuplicate = parts.some(p => p.num === cleanNum);
-          
-          if (isDuplicate) {
-            duplicateCount++;
-            continue; 
-          }
-
-          const np = {
-            id: Date.now().toString() + Math.random(),
-            name: sanitize(partName.toString()),
-            num: cleanNum,
-            hours: parseFloat(partHours) || 1,
-            ata: sanitize(partAta ? partAta.toString() : ''),
-            desc: sanitize(partName.toString())
-          };
-          
-          // This "await" is what takes time; the loading screen stays up during this
-          await window.setDoc(window.doc(window.db, 'parts', np.id), np);
-          parts.push(np);
-          lastImportedParts.push(np);
-        }
-      }
-      
-      renderParts();
-      closeModal('m-import-part');
-      
-      if (duplicateCount > 0) {
-        toast(`Added ${lastImportedParts.length} parts. Skipped ${duplicateCount} duplicates.`, 'warn');
-      } else {
-        toast(`Import complete. Added ${lastImportedParts.length} parts.`);
-      }
-      
-      renderImportSummary('part');
-      
-    } catch (err) {
-      console.error(err);
-      toast('Import failed. Check console.', 'error');
-    } finally {
-      // 2. STOP LOADING (Always runs, even if there is an error)
-      hideLoading(); 
-      // Reset input so you can re-upload the same file if needed
-      input.value = ''; 
-    }
-  };
-  r.readAsArrayBuffer(f);
-};
+window.handlePartImport=function(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{lastImportedParts=[];const wb=XLSX.read(e.target.result,{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);for(const row of rows){if(row.Name&&row.Number){const np={id:Date.now().toString()+Math.random(),name:sanitize(row.Name.toString()),num:sanitize(row.Number.toString()),hours:parseFloat(row.Hours)||1,ata:sanitize(row.ATA||''),desc:sanitize(row.Description||row.Name.toString())};await window.setDoc(window.doc(window.db,'parts',np.id),np);parts.push(np);lastImportedParts.push(np);}}renderParts();toast('Import complete');closeModal('m-import-part');renderImportSummary('part');}catch(err){toast('Import failed','error');}};r.readAsArrayBuffer(f);};
 
 // ════════════════════════════════════════════════
 //  EXPORT HELPERS
@@ -2278,7 +2172,7 @@ const NAV={
 };
 const META={
   entry:{t:'Production Entry',d:'Log completed or scrap work'},
-  mystats:{t:'My Stats',d:'Personal Production history'},
+  mystats:{t:'My Stats',d:'Personal KPI and history'},
   dashboard:{t:'Team Dashboard',d:'Real-time performance'},
   assignments:{t:'Assignments',d:'Assign tasks to technicians'},
   allentries:{t:'All Entries',d:'Complete production log'},
