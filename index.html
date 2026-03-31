@@ -133,34 +133,6 @@ input,select,button,textarea{font-family:inherit;}
 .theme-btn{position:fixed;top:14px;right:14px;z-index:100;background:var(--card);border:1px solid var(--bdr);border-radius:50%;width:38px;height:38px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s;box-shadow:0 2px 8px var(--shadow);}
 .theme-btn:hover{border-color:var(--bdr2);transform:scale(1.05);}
 
-/* ═══════════ EXIT TV BUTTON (NEW) ═══════════ */
-.exit-tv-btn {
-  position: fixed;
-  top: 14px;
-  right: 14px;
-  z-index: 1001;
-  background: var(--card);
-  border: 1px solid var(--bdr);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  display: none;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 8px var(--shadow);
-  transition: all .2s;
-  font-family: inherit;
-}
-.exit-tv-btn:hover {
-  background: var(--rose);
-  border-color: var(--rose);
-  color: white;
-}
-body.tv-mode .exit-tv-btn {
-  display: flex;
-}
 
 /* ═══════════ APP SHELL ═══════════ */
 #app{flex-direction:column;}
@@ -459,7 +431,6 @@ tbody tr:hover td{background:var(--card2);}
 
 /* ═══════════ TV / EXPORT / TV DISPLAY ═══════════ */
 .export-group{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
-.tv-toggle{padding:5px 10px;}
 .tv-board{width:100%;}
 .tv-board .ch{gap:8px;}
 .tv-board .ct{font-size:16px;}
@@ -474,26 +445,6 @@ tbody tr:hover td{background:var(--card2);}
 .tv-board .ach-bar{border-radius:6px 6px 0 0;}
 .tv-board .ach-pct{font-size:13px;}
 .tv-board .ach-nm{font-size:11px;max-width:72px;}
-body.tv-mode{--tv-scale:1;}
-body.tv-mode .sb, body.tv-mode .mob-topbar, body.tv-mode .hdr, body.tv-mode .theme-btn{display:none !important;}
-body.tv-mode .main{min-height:100vh;overflow:visible;}
-body.tv-mode .pc{padding:24px 26px;max-width:100%;margin:0 auto;}
-body.tv-mode .card{border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.18);}
-body.tv-mode .kg{gap:16px;}
-body.tv-mode .kv{font-size:34px;}
-body.tv-mode .kl{font-size:12px;}
-body.tv-mode .ks{font-size:12px;}
-body.tv-mode .btn{font-size:14px;padding:9px 16px;}
-body.tv-mode .finput, body.tv-mode .fselect{font-size:15px;padding:11px 13px;}
-body.tv-mode .ach-filters .btn, body.tv-mode .ach-filters .af-btn{font-size:12px;}
-body.tv-mode .empty{padding:48px 16px;font-size:15px;}
-body.tv-mode .lb-row, body.tv-mode .ach-col{transform:scale(1.02);}
-body.tv-mode .tv-board .ch{padding-top:16px;padding-bottom:16px;}
-@media print{
-  .theme-btn,.mob-topbar,.sb,.hdr,.toast,.mbg{display:none !important;}
-  .main{overflow:visible !important;}
-  .pc{padding:0 !important;}
-}
 
 </style>
 </head>
@@ -501,8 +452,6 @@ body.tv-mode .tv-board .ch{padding-top:16px;padding-bottom:16px;}
 
 <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark mode" aria-label="Toggle theme">🌙</button>
 
-<!-- Exit TV Mode Button (NEW) -->
-<button id="exit-tv-btn" class="exit-tv-btn" onclick="toggleTVMode(false)" title="Exit TV Mode" aria-label="Exit TV Mode">✕ Exit TV</button>
 
 <div id="loading-overlay">
   <div class="lmk" style="width:46px;height:46px;font-size:14px;margin-bottom:4px;">PT</div>
@@ -662,11 +611,16 @@ body.tv-mode .tv-board .ch{padding-top:16px;padding-bottom:16px;}
 
         <!-- TECH: MY STATS -->
         <div class="pg" id="pg-mystats">
+          <div class="tbr" style="margin-bottom:12px;">
+            <div class="fgroup" style="max-width:240px;">
+              <label class="flabel">Month Filter</label>
+              <input type="month" class="finput" id="ms-month-filter" onchange="renderMyStats()">
+            </div>
+          </div>
           <div class="kg k4" style="margin-bottom:5px;">
             <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Today SDT</div><div class="kv" id="ms-today" style="color:var(--blue)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-t-pb" style="background:var(--blue);width:0%"></div></div><div class="kpb-s"><span id="ms-dt">Daily: —</span><span id="ms-dpc">0%</span></div></div></div>
             <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">This Week</div><div class="kv" id="ms-week" style="color:var(--amber)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-w-pb" style="background:var(--amber);width:0%"></div></div><div class="kpb-s"><span id="ms-wt">Weekly: —</span><span id="ms-wpc">0%</span></div></div></div>
-            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Month SDT</div><div class="kv" id="ms-month" style="color:var(--green)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-m-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-mt">Target: —</span><span id="ms-mpc">0%</span></div></div></div>
-            <div class="kc"><div class="kac" style="background:var(--violet)"></div><div class="kl">Inspector Hrs</div><div class="kv" id="ms-insp" style="color:var(--violet)">0h</div><div class="ks">separate from SDT</div></div>
+            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Month SDT</div><div class="kv" id="ms-month" style="color:var(--green)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-m-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-mt">Month: —</span><span id="ms-mpc">0%</span></div></div></div>
           </div>
           <div class="kg k2" style="margin-bottom:14px;">
             <div class="kc"><div class="kac" style="background:var(--cyan)"></div><div class="kl">Assignment Hrs (Month)</div><div class="kv" id="ms-asn" style="color:var(--cyan)">0h</div><div class="ks">counted in achieved hrs</div></div>
@@ -715,8 +669,7 @@ body.tv-mode .tv-board .ch{padding-top:16px;padding-bottom:16px;}
                 <div class="sbx" style="max-width:200px;"><input type="text" id="lb-q" placeholder="Search..." oninput="renderLB()"></div>
                 <button class="btn bo bsm" onclick="exportLeaderboard('lb-card','image')">🖼 Image</button>
                 <button class="btn bo bsm" onclick="exportLeaderboard('lb-card','pdf')">⬇ PDF</button>
-                <button class="btn bo bsm tv-toggle" onclick="toggleTVMode()">📺 TV</button>
-              </div>
+                              </div>
             </div>
             <div id="lb-body"></div>
           </div>
@@ -746,6 +699,15 @@ body.tv-mode .tv-board .ch{padding-top:16px;padding-bottom:16px;}
               <div class="tbr">
                 <div class="sbx"><input type="text" id="asn-q" placeholder="Search..." oninput="renderAssignments()"></div>
                 <select class="fsel" id="asn-ft" onchange="renderAssignments()"><option value="">All Techs</option></select>
+                <input type="date" class="fsel" id="asn-dt-from" onchange="renderAssignments()" title="From date" style="color:var(--tx);">
+                <input type="date" class="fsel" id="asn-dt-to" onchange="renderAssignments()" title="To date" style="color:var(--tx);">
+                <select class="fsel" id="asn-dt-preset" onchange="applyAsnPreset(this.value)" title="Quick range">
+                  <option value="">Quick Range…</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="all">All Time</option>
+                </select>
               </div>
               <div id="asn-list"></div>
             </div>
@@ -965,8 +927,7 @@ body.tv-mode .tv-board .ch{padding-top:16px;padding-bottom:16px;}
                   <div class="sbx" style="max-width:200px;"><input type="text" id="dev-lb-q" placeholder="Search..." oninput="renderLB()"></div>
                   <button class="btn bo bsm" onclick="exportLeaderboard('dev-lb-card','image')">🖼 Image</button>
                   <button class="btn bo bsm" onclick="exportLeaderboard('dev-lb-card','pdf')">⬇ PDF</button>
-                  <button class="btn bo bsm tv-toggle" onclick="toggleTVMode()">📺 TV</button>
-                </div>
+                                  </div>
               </div>
               <div id="dev-lb-body"></div>
             </div>
@@ -1040,18 +1001,6 @@ body.tv-mode .tv-board .ch{padding-top:16px;padding-bottom:16px;}
                     <tbody id="le-today-list"></tbody>
                    </table>
                 </div>
-              </div>
-              <div class="card tv-board" id="ctrl-lb-card" style="margin-top:14px;">
-                <div class="ch">
-                  <span class="ct">🏆 Leaderboard for TV</span>
-                  <div class="export-group">
-                    <div class="sbx" style="max-width:200px;"><input type="text" id="ctrl-lb-q" placeholder="Search..." oninput="renderLB()"></div>
-                    <button class="btn bo bsm" onclick="exportLeaderboard('ctrl-lb-card','image')">🖼 Image</button>
-                    <button class="btn bo bsm" onclick="exportLeaderboard('ctrl-lb-card','pdf')">⬇ PDF</button>
-                    <button class="btn bo bsm tv-toggle" onclick="toggleTVMode()">📺 TV</button>
-                  </div>
-                </div>
-                <div id="ctrl-lb-body"></div>
               </div>
             </div>
           </div>
@@ -1360,8 +1309,42 @@ function nowEAT(){
   return `${eat.getFullYear()}-${p(eat.getMonth()+1)}-${p(eat.getDate())}T${p(eat.getHours())}:${p(eat.getMinutes())}`;
 }
 function todayEAT(){return new Date().toLocaleDateString('en-CA',{timeZone:EAT_TZ});}
-function getMR(){const n=new Date(),y=n.getFullYear(),m=n.getMonth();return{start:new Date(y,m,1).toISOString().slice(0,10),end:new Date(y,m+1,0).toISOString().slice(0,10)};}
-function getWR(){const n=new Date(),d=n.getDay(),mon=new Date(n);mon.setDate(n.getDate()-(d===0?6:d-1));const fri=new Date(mon);fri.setDate(mon.getDate()+4);return{start:mon.toISOString().slice(0,10),end:fri.toISOString().slice(0,10)};}
+function getEATPartsFromISO(isoDate){
+  const d=(isoDate||todayEAT()).slice(0,10);
+  const [y,m,day]=d.split('-').map(Number);
+  return {y,m,day};
+}
+function pad2(n){return String(n).padStart(2,'0');}
+function makeDateStr(y,m,d){return `${y}-${pad2(m)}-${pad2(d)}`;}
+function daysInMonth(y,m){return new Date(Date.UTC(y,m,0)).getUTCDate();}
+function getMR(){
+  const {y,m}=getEATPartsFromISO(todayEAT());
+  return {start:makeDateStr(y,m,1),end:makeDateStr(y,m,daysInMonth(y,m))};
+}
+function getWR(){
+  const {y,m,day}=getEATPartsFromISO(todayEAT());
+  const utc=new Date(Date.UTC(y,m-1,day));
+  const dow=utc.getUTCDay();
+  const mon=new Date(utc);
+  mon.setUTCDate(utc.getUTCDate()-(dow===0?6:dow-1));
+  const fri=new Date(mon);
+  fri.setUTCDate(mon.getUTCDate()+4);
+  return {
+    start:makeDateStr(mon.getUTCFullYear(),mon.getUTCMonth()+1,mon.getUTCDate()),
+    end:makeDateStr(fri.getUTCFullYear(),fri.getUTCMonth()+1,fri.getUTCDate())
+  };
+}
+function getMonthRangeFromInput(v){
+  const fallback=todayEAT().slice(0,7);
+  const ym=(v||fallback).slice(0,7);
+  const [yy,mm]=ym.split('-').map(Number);
+  if(!yy||!mm){const mr=getMR();return {...mr,label:new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'})};}
+  const start=`${yy}-${String(mm).padStart(2,'0')}-01`;
+  const end=makeDateStr(yy,mm,daysInMonth(yy,mm));
+  const label=new Date(Date.UTC(yy,mm-1,1)).toLocaleDateString('en-GB',{month:'long',year:'numeric',timeZone:'UTC'});
+  return {start,end,label};
+}
+function dateInRange(iso,start,end){const d=(iso||'').slice(0,10);return !!d&&d>=start&&d<=end;}
 function getDailyTgt(m){return parseFloat((m/22).toFixed(2));}
 function getWeeklyTgt(m){return parseFloat((getDailyTgt(m)*5).toFixed(2));}
 
@@ -1869,19 +1852,19 @@ function stxt(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 // ════════════════════════════════════════════════
 function renderMyStats(){
   const me=entries.filter(e=>e.techId===CU.id);
-  const today=todayEAT(),wr=getWR(),mr=getMR();
+  const mrSel=getMonthRangeFromInput(document.getElementById('ms-month-filter')?.value);
+  const today=todayEAT(),wr=getWR();
   const mt=CU.monthlyTarget||160;
   const dt=getDailyTgt(mt),wt=getWeeklyTgt(mt);
   const todaySDT=me.filter(e=>e.time?.startsWith(today)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const weekSDT=me.filter(e=>e.time>=wr.start&&e.time<=wr.end&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const monthSDT=me.filter(e=>e.time>=mr.start&&e.time<=mr.end&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const inspHrs=me.filter(e=>e.time>=mr.start&&e.time<=mr.end&&!isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const asnHrs=assignments.filter(a=>a.techId===CU.id&&a.date>=mr.start&&a.date<=mr.end).reduce((s,a)=>s+(a.hrs||0),0);
+  const weekSDT=me.filter(e=>dateInRange(e.time,wr.start,wr.end)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
+  const monthSDT=me.filter(e=>dateInRange(e.time,mrSel.start,mrSel.end)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
+  const asnHrs=assignments.filter(a=>a.techId===CU.id&&a.date>=mrSel.start&&a.date<=mrSel.end).reduce((s,a)=>s+(a.hrs||0),0);
   const totalAchieved=monthSDT+asnHrs;
   stxt('ms-today',todaySDT.toFixed(2)+'h');stxt('ms-week',weekSDT.toFixed(2)+'h');
-  stxt('ms-month',monthSDT.toFixed(2)+'h');stxt('ms-insp',inspHrs.toFixed(2)+'h');
+  stxt('ms-month',monthSDT.toFixed(2)+'h');
   stxt('ms-asn',asnHrs.toFixed(2)+'h');stxt('ms-total',totalAchieved.toFixed(2)+'h');
-  stxt('ms-dt',`Daily: ${dt.toFixed(1)}h`);stxt('ms-wt',`Weekly: ${wt.toFixed(1)}h`);stxt('ms-mt',`Target: ${mt}h`);
+  stxt('ms-dt',`Daily: ${dt.toFixed(1)}h`);stxt('ms-wt',`Weekly: ${wt.toFixed(1)}h`);stxt('ms-mt',`Month: ${mrSel.label}`);
   stxt('ms-tot-tl',`Target: ${mt}h`);
   pb('ms-t-pb',todaySDT,dt);pb('ms-w-pb',weekSDT,wt);pb('ms-m-pb',monthSDT,mt);pb('ms-tot-pb',totalAchieved,mt);
   const dpc=Math.min(100,dt?Math.round(todaySDT/dt*100):0);
@@ -1900,7 +1883,7 @@ function renderMyStats(){
       <td><span class="${e.jobType==='scrap'?'cp-scrap':'cp-comp'}">${e.jobType==='scrap'?'Scrap':'Done'}</span></td>
      </tr>`;
   }).join('')||'<tr><td colspan="8" class="empty">No entries</td></tr>';}
-  const myAsn=assignments.filter(a=>a.techId===CU.id).sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
+  const myAsn=assignments.filter(a=>a.techId===CU.id&&a.date>=mrSel.start&&a.date<=mrSel.end).sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
   const asnEl=document.getElementById('ms-asn-list');
   if(asnEl){asnEl.innerHTML=myAsn.length?myAsn.map(a=>`<div class="asn-card">
     <div class="asn-hd"><span class="asn-nm">📌 ${sanitize(a.desc)}</span></div>
@@ -1909,13 +1892,13 @@ function renderMyStats(){
   </div>`).join(''):'<div class="empty"><div class="ei">📌</div><div class="et">No assignments</div></div>';}
 }
 function pb(id,val,max){const e=document.getElementById(id);if(e)e.style.width=Math.min(100,max?Math.round(val/max*100):0)+'%';}
-
+window.renderMyStats=renderMyStats;
 // ════════════════════════════════════════════════
 //  DASHBOARD + ACHIEVEMENT GRAPH
 // ════════════════════════════════════════════════
 function renderDashboard(){
   const mr=getMR();
-  const sdtEnt=entries.filter(e=>e.time>=mr.start&&e.time<=mr.end&&isSDT(e));
+  const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
   const activeTechs=new Set(sdtEnt.map(e=>e.techId)).size;
   const totalSDT=sdtEnt.reduce((s,e)=>s+getDividedHours(e,entries),0);
   const totalTgt=techs.filter(t=>t.status==='active').reduce((s,t)=>s+(t.monthlyTarget||160),0);
@@ -1930,7 +1913,7 @@ window.setAF=setAF;
 function renderAchievGraph(){
   const cont=document.getElementById('achiev-chart');if(!cont)return;
   const mr=getMR();
-  const sdtEnt=entries.filter(e=>e.time>=mr.start&&e.time<=mr.end&&isSDT(e));
+  const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
   let stats=techs.filter(t=>t.status==='active').map(t=>{
     const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
     const asn=assignments.filter(a=>a.techId===t.id&&a.date>=mr.start&&a.date<=mr.end).reduce((s,a)=>s+(a.hrs||0),0);
@@ -1955,7 +1938,7 @@ function renderAchievGraph(){
 }
 function getLeaderboardStats(){
   const mr=getMR();
-  const sdtEnt=entries.filter(e=>e.time>=mr.start&&e.time<=mr.end&&isSDT(e));
+  const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
   return techs.filter(t=>t.status==='active').map(t=>{
     const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
     const asn=assignments.filter(a=>a.techId===t.id&&a.date>=mr.start&&a.date<=mr.end).reduce((s,a)=>s+(a.hrs||0),0);
@@ -1980,38 +1963,61 @@ function renderLeaderboardInto(bodyId,qId){
 }
 function renderLB(){
   renderLeaderboardInto('lb-body','lb-q');
-  renderLeaderboardInto('ctrl-lb-body','ctrl-lb-q');
   renderLeaderboardInto('dev-lb-body','dev-lb-q');
 }
 window.renderLB=renderLB;
-function toggleTVMode(force){
-  const body=document.body;
-  const next=typeof force==='boolean'?force:!body.classList.contains('tv-mode');
-  body.classList.toggle('tv-mode',next);
-  localStorage.setItem('pt-tv-mode',next?'1':'0');
-  const txt=next?'📺 Exit TV':'📺 TV';
-  document.querySelectorAll('.tv-toggle').forEach(b=>b.textContent=txt);
+function buildLeaderboardExportPanel(stats){
+  const panel=document.createElement('div');
+  panel.id='lb-export-panel';
+  panel.style.position='fixed';
+  panel.style.left='-99999px';
+  panel.style.top='0';
+  panel.style.width='1280px';
+  panel.style.background='#f0f4f8';
+  panel.style.color='#0f172a';
+  panel.style.border='1px solid #e2e8f0';
+  panel.style.fontFamily="'Plus Jakarta Sans', sans-serif";
+  panel.innerHTML=`
+    <div style="background:#c1121f;color:#fff;padding:18px 26px 14px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+      <div style="font-size:40px;font-weight:800;letter-spacing:-1px;line-height:1;">LEADERBOARD</div>
+      <div style="font-size:14px;font-weight:700;opacity:.95;">TOP 5 MONTHLY</div>
+    </div>
+    <div style="padding:12px 26px 8px;display:flex;justify-content:flex-end;align-items:center;gap:10px;font-size:14px;font-weight:700;">
+      <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;background:#10b981;display:inline-block;border-radius:2px;"></span>SAFE</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;background:#f59e0b;display:inline-block;border-radius:2px;"></span>NEUTRAL</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;background:#f43f5e;display:inline-block;border-radius:2px;"></span>TROUBLE</span>
+    </div>
+    <div style="padding:0 24px 20px;">
+      <div style="height:460px;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);display:grid;grid-template-columns:repeat(5,1fr);gap:16px;align-items:end;padding:18px 18px 16px;box-sizing:border-box;">
+        ${stats.slice(0,5).map((t,i)=>{
+          const pct=Math.min(100,t.tgt?Math.round(t.total/t.tgt*100):0);
+          const col=pct>=100?'#10b981':pct>=70?'#f59e0b':'#f43f5e';
+          const barH=Math.max(60,Math.round(pct/100*280));
+          return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+            <div style="font-size:26px;font-weight:800;color:${col};margin-bottom:8px;">${pct}%</div>
+            <div style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;min-height:0;">
+              <div style="width:100%;max-width:180px;height:${barH}px;background:${col};border-radius:10px 10px 0 0;position:relative;display:flex;align-items:flex-end;justify-content:center;">
+                <div style="position:absolute;top:-56px;left:50%;transform:translateX(-50%);width:52px;height:52px;border-radius:50%;overflow:hidden;border:3px solid ${col};background:#fff;">${avatarHtml(t.id,t.name,52)}</div>
+              </div>
+            </div>
+            <div style="width:100%;max-width:180px;padding-top:10px;text-align:center;">
+              <div style="font-size:18px;font-weight:800;line-height:1.15;">${sanitize(t.name)}</div>
+              <div style="font-size:12px;color:#64748b;margin-top:3px;">${sanitize(t.id)} · ${t.total.toFixed(1)}/${t.tgt}h</div>
+              <div style="font-size:11px;color:${col};font-weight:700;margin-top:4px;">Rank ${i+1}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  return panel;
 }
-(function initTVMode(){
-  const on=localStorage.getItem('pt-tv-mode')==='1';
-  document.body.classList.toggle('tv-mode',on);
-  document.querySelectorAll('.tv-toggle').forEach(b=>b.textContent=on?'📺 Exit TV':'📺 TV');
-})();
 async function exportLeaderboard(panelId,format='image'){
-  const panel=document.getElementById(panelId);
-  if(!panel){toast('Leaderboard panel not found','error');return;}
   if(!window.html2canvas){toast('Export library not loaded','error');return;}
-  const clone=panel.cloneNode(true);
-  clone.querySelectorAll('input,button').forEach(el=>{if(el.tagName==='INPUT')el.style.display='none'; else el.remove();});
-  clone.style.position='fixed';
-  clone.style.left='-99999px';
-  clone.style.top='0';
-  clone.style.width=Math.max(panel.offsetWidth,1200)+'px';
-  clone.style.background=getComputedStyle(document.body).getPropertyValue('--card')||'#111827';
-  clone.style.zIndex='-1';
-  document.body.appendChild(clone);
+  const stats=getLeaderboardStats().sort((a,b)=>b.total-a.total);
+  const exportPanel=buildLeaderboardExportPanel(stats);
+  document.body.appendChild(exportPanel);
   try{
-    const canvas=await html2canvas(clone,{scale:2,backgroundColor:getComputedStyle(document.documentElement).getPropertyValue('--bg')||'#070c18',useCORS:true});
+    const canvas=await html2canvas(exportPanel,{scale:2,backgroundColor:'#f0f4f8',useCORS:true});
     const safeDate=todayEAT();
     if(format==='pdf'){
       const imgData=canvas.toDataURL('image/png');
@@ -2038,10 +2044,9 @@ async function exportLeaderboard(panelId,format='image'){
     console.error(err);
     toast('Export failed','error');
   }finally{
-    clone.remove();
+    exportPanel.remove();
   }
 }
-
 // ════════════════════════════════════════════════
 //  ASSIGNMENTS
 // ════════════════════════════════════════════════
@@ -2054,6 +2059,17 @@ function populateAsnSels(){
     if(cur)sel.value=cur;
   });
 }
+function applyAsnPreset(v){
+  const today=todayEAT(),wr=getWR(),mr=getMR();
+  const fromEl=document.getElementById('asn-dt-from'),toEl=document.getElementById('asn-dt-to');
+  if(!fromEl||!toEl)return;
+  if(v==='today'){fromEl.value=today;toEl.value=today;}
+  else if(v==='week'){fromEl.value=wr.start;toEl.value=wr.end;}
+  else if(v==='month'){fromEl.value=mr.start;toEl.value=mr.end;}
+  else if(v==='all'){fromEl.value='';toEl.value='';}
+  renderAssignments();
+}
+window.applyAsnPreset=applyAsnPreset;
 async function submitAssignment(){
   const techId=document.getElementById('asn-tech')?.value;
   const desc=sanitize(document.getElementById('asn-desc')?.value);
@@ -2070,8 +2086,12 @@ window.clearAssignment=clearAssignment;
 function renderAssignments(){
   const q=(document.getElementById('asn-q')?.value||'').toLowerCase();
   const tf=document.getElementById('asn-ft')?.value||'';
+  const fromV=document.getElementById('asn-dt-from')?.value||'';
+  const toV=document.getElementById('asn-dt-to')?.value||'';
   let list=[...assignments];
   if(tf)list=list.filter(a=>a.techId===tf);
+  if(fromV)list=list.filter(a=>a.date>=fromV);
+  if(toV)list=list.filter(a=>a.date<=toV);
   if(q)list=list.filter(a=>(a.techName+a.desc).toLowerCase().includes(q));
   const cont=document.getElementById('asn-list');if(!cont)return;
   if(!list.length){cont.innerHTML='<div class="empty"><div class="ei">📌</div><div class="et">No assignments</div></div>';return;}
@@ -2087,7 +2107,6 @@ function renderAssignments(){
     </div>`).join('');
 }
 window.delAsn=async function(id){if(!confirm('Delete assignment?'))return;try{await window.deleteDoc(window.doc(window.db,'assignments',id));assignments=assignments.filter(a=>a.id!==id);renderAssignments();}catch(e){toast('Error','error');}};
-
 // ════════════════════════════════════════════════
 //  ALL ENTRIES
 // ════════════════════════════════════════════════
@@ -2134,8 +2153,8 @@ function renderAllEntries(){
 // ════════════════════════════════════════════════
 function renderReports(){
   const mr=getMR();
-  const sdtEnt=entries.filter(e=>e.time>=mr.start&&e.time<=mr.end&&isSDT(e));
-  const inspEnt=entries.filter(e=>e.time>=mr.start&&e.time<=mr.end&&!isSDT(e));
+  const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
+  const inspEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&!isSDT(e));
   const tbody=document.getElementById('rpt-body');if(!tbody)return;
   tbody.innerHTML=techs.filter(t=>t.status==='active').map(t=>{
     const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
@@ -2669,7 +2688,7 @@ window.clearLeEntry=clearLeEntry;
 // ════════════════════════════════════════════════
 const NAV={
   tech:['mystats','taskgroups'],
-  lead:['dashboard','assignments','allentries','reports','ratios','taskgroups'],
+  lead:['dashboard','controllerentry','assignments','allentries','reports','ratios','taskgroups'],
   ctrl:['controllerentry','allentries','taskgroups'],
   dev:['techs','parts','leaders','controllers','pwmgmt','ratios','taskgroups','system']
 };
@@ -2703,7 +2722,7 @@ window.navTo=function(page){
   const ln=document.querySelector(`.nl[data-page="${page}"]`);if(ln)ln.classList.add('on');
   const m=META[page]||{};stxt('pg-title',m.t||page);stxt('pg-desc',m.d||'');
   if(page==='entry')renderEntry();
-  if(page==='mystats')renderMyStats();
+  if(page==='mystats'){const mf=document.getElementById('ms-month-filter');if(mf&&!mf.value)mf.value=todayEAT().slice(0,7);renderMyStats();}
   if(page==='dashboard'){populateTechFilter();renderDashboard();renderLB();}
   if(page==='assignments'){populateAsnSels();renderAssignments();}
   if(page==='allentries'){populateTechFilter();if(!document.getElementById('ae-dt-from')?.value){applyAEPreset('today');}else{renderAllEntries();};}
@@ -2799,6 +2818,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   sv('asn-date',todayEAT());
   setTimeout(hideLoading,800);
   document.getElementById('login').classList.add('on');
+  const mf=document.getElementById('ms-month-filter');if(mf&&!mf.value)mf.value=todayEAT().slice(0,7);
   stxt('ver-current','v'+APP_VERSION);
 });
 </script>
