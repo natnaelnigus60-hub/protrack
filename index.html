@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="description" content="ProTrack MRO Production KPI System">
 <meta name="theme-color" content="#070c18">
-<title>ProTrack v1.2.3</title>
+<title>ProTrack v1.0.0</title>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -1080,7 +1080,7 @@ tbody tr:hover td{background:var(--card2);}
   <div class="modal msm">Change My Password
     <div class="mhd"><div class="mttl">Forgot Password</div><button class="mxb" onclick="closeModal('m-forgot')">✕</button></div>
     <div class="mbody">
-      <div class="al al-a"><span class="al-ico">💡</span><div>Contact your Developer/Admin to reset your password. Email:natnaelni@ethiopianairlines.com <a href="/cdn-cgi/l/" class="__cf_email__" data-cfemail="204e41544e41454c4e4960455448494f5049414e4149524c494e45530e434f4d">[email&#160;protected]</a></div></div>
+      <div class="al al-a"><span class="al-ico">💡</span><div>Contact your Developer/Admin to reset your password. Email:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b8d6d9ccd6d9ddd4d6d1f8ddccd0d1d7c8d1d9d6d9d1cad4d1d6ddcb96dbd7d5">[email&#160;protected]</a> <a href="/cdn-cgi/l/" class="__cf_email__" data-cfemail="204e41544e41454c4e4960455448494f5049414e4149524c494e45530e434f4d">[email&#160;protected]</a></div></div>
       <div style="margin-top:8px;">
         <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Developer Recovery</div>
         <div class="fg">
@@ -1248,13 +1248,13 @@ tbody tr:hover td{background:var(--card2);}
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 <script>
 'use strict';
 // ════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ════════════════════════════════════════════════
-const APP_VERSION = '1.2.3';
+const APP_VERSION = '1.0.0';
 const DEV_RECOVERY_CODE = 'PROTRACK-DEV-2025-RESET';
 const EAT_TZ='Africa/Addis_Ababa';
 const ROLES=['Technician','Under Supervision','Inspector','Preliminary Inspector'];
@@ -1479,12 +1479,17 @@ function getDividedHours(entry, allEntries) {
   const partObj = parts.find(p => p.num === entry.pnum);
   const stdHours = partObj ? partObj.hours : (entry.stdHours || 0);
   const ratios = getRatioForPart(entry.pnum);
+  const techEntries = taskEntries.filter(e => e.jobRole === 'Technician');
+  const supEntries = taskEntries.filter(e => e.jobRole === 'Under Supervision');
   if (role === 'Technician') {
-    const techEntries = taskEntries.filter(e => e.jobRole === 'Technician');
-    const techPool = stdHours * (ratios.tech / 100);
+    // If no Under Supervision exists for this task, technician(s) get 100%
+    // If Under Supervision is present, technician(s) share ratios.tech% (e.g. 25%)
+    const techPool = supEntries.length === 0
+      ? stdHours
+      : stdHours * (ratios.tech / 100);
     return techEntries.length ? techPool / techEntries.length : 0;
   } else { // Under Supervision
-    const supEntries = taskEntries.filter(e => e.jobRole === 'Under Supervision');
+    // Under Supervision always gets ratios.sup% (e.g. 75%), divided equally among all under supervision
     const supPool = stdHours * (ratios.sup / 100);
     return supEntries.length ? supPool / supEntries.length : 0;
   }
