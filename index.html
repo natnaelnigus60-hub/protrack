@@ -481,7 +481,7 @@ tbody tr:hover td{background:var(--card2);}
         <span id="lbtn-txt">Sign In →</span>
       </button>
       <div class="login-attempts" id="login-attempts"></div>
-      <div class="ql">Default Password: <a onclick="ql('T1001','tech')">demo tech</a> · <a onclick="ql('TL001','lead')">demo leader</a></div>
+      <div class="ql">Default Password: <a onclick="ql('T1001','tech')">demo</a>  <a onclick="ql('TL001','lead')"></a></div>
     </div>
     <div class="ver-badge">
       <div class="ver-pill" onclick="toggleVer()">
@@ -490,7 +490,7 @@ tbody tr:hover td{background:var(--card2);}
         <span style="color:var(--tx3);">Release Notes ▾</span>
       </div>
       <div class="ver-history" id="ver-history">
-        <div class="ver-item"><span class="ver-tag">v1.3.0</span><span class="ver-note">Technician page is now read-only, production controllers have a separate login, and controller management was added for developers.</span></div>
+        <div class="ver-item"><span class="ver-tag"></span><span class="ver-note"></span></div>
         <div class="ver-item"><span class="ver-tag">v1.2.0</span><span class="ver-note">SDT division fixed: Technician/Under Supervision shares based on configurable ratios, no duplicate overwrite, equal sharing within each role.</span></div>
         <div class="ver-item"><span class="ver-tag">v1.1.0</span><span class="ver-note">Under-Supervision auto 75% allocation · Date range pickers · Leader Tech Entry page · Duplicate overwrite · Entry form cleanup.</span></div>
         <div class="ver-item"><span class="ver-tag">v1.0.0</span><span class="ver-note">Initial release — Firebase backend, technician/leader/developer roles, monthly KPI targets.</span></div>
@@ -520,7 +520,7 @@ tbody tr:hover td{background:var(--card2);}
           <button class="lob" onclick="logout()" title="Sign out">Sign Out</button>
         </div>
         <div style="margin-top:6px;display:flex;gap:5px;">
-          <button class="btn bo bsm" onclick="openModal('m-password')" style="flex:1;font-size:11px;">🔐 Pwd</button>
+          <button class="btn bo bsm" onclick="openModal('m-password')" style="flex:1;font-size:11px;">🔐 change password</button>
           <button class="btn bo bsm" onclick="toggleTheme()" style="font-size:11px;">🌙</button>
         </div>
         <div class="sb-cred">Developed by <strong>NATNAEL N.</strong></div>
@@ -620,11 +620,11 @@ tbody tr:hover td{background:var(--card2);}
           <div class="kg k4" style="margin-bottom:5px;">
             <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Today SDT</div><div class="kv" id="ms-today" style="color:var(--blue)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-t-pb" style="background:var(--blue);width:0%"></div></div><div class="kpb-s"><span id="ms-dt">Daily: —</span><span id="ms-dpc">0%</span></div></div></div>
             <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">This Week</div><div class="kv" id="ms-week" style="color:var(--amber)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-w-pb" style="background:var(--amber);width:0%"></div></div><div class="kpb-s"><span id="ms-wt">Weekly: —</span><span id="ms-wpc">0%</span></div></div></div>
-            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Month SDT</div><div class="kv" id="ms-month" style="color:var(--green)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-m-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-mt">Month: —</span><span id="ms-mpc">0%</span></div></div></div>
+            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Monthly Achived Hour</div><div class="kv" id="ms-month" style="color:var(--green)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-m-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-mt">Month: —</span><span id="ms-mpc">0%</span></div></div></div>
           </div>
           <div class="kg k2" style="margin-bottom:14px;">
-            <div class="kc"><div class="kac" style="background:var(--cyan)"></div><div class="kl">Assignment Hrs (Month)</div><div class="kv" id="ms-asn" style="color:var(--cyan)">0h</div><div class="ks">counted in achieved hrs</div></div>
-            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Total Achieved (SDT+Asn)</div><div class="kv" id="ms-total" style="color:var(--green)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-tot-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-tot-tl">Target: —</span><span id="ms-tot-pc">0%</span></div></div></div>
+            <div class="kc"><div class="kac" style="background:var(--cyan)"></div><div class="kl">Additional Assignment Hrs (Month)</div><div class="kv" id="ms-asn" style="color:var(--cyan)">0h</div><div class="ks">Add to total achieved hrs</div></div>
+            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Total Achieved Hours</div><div class="kv" id="ms-total" style="color:var(--green)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-tot-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-tot-tl">Target: —</span><span id="ms-tot-pc">0%</span></div></div></div>
           </div>
           <div class="card">
             <div class="ch"><span class="ct">Production History</span><button class="btn bo bsm" onclick="exportMine()">⬇ Export</button></div>
@@ -641,9 +641,9 @@ tbody tr:hover td{background:var(--card2);}
         <div class="pg" id="pg-dashboard">
           <div class="kg k4" style="margin-bottom:16px;">
             <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Active Techs</div><div class="kv" id="d-act" style="color:var(--blue)">0</div><div class="ks" id="d-acts"></div></div>
-            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Shop SDT (Month)</div><div class="kv" id="d-sdt" style="color:var(--green)">0h</div><div class="ks">target: <span id="d-tgt">—</span>h</div></div>
+            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Shop achivement (Monthly)</div><div class="kv" id="d-sdt" style="color:var(--green)">0h</div><div class="ks">target: <span id="d-tgt">—</span>h</div></div>
             <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">Avg Hrs/Tech</div><div class="kv" id="d-avg" style="color:var(--amber)">0h</div><div class="ks">this month</div></div>
-            <div class="kc"><div class="kac" style="background:var(--violet)"></div><div class="kl">Shop Progress</div><div class="kv" id="d-prog" style="color:var(--violet)">0%</div><div class="ks">monthly SDT</div></div>
+            <div class="kc"><div class="kac" style="background:var(--violet)"></div><div class="kl">Shop Progress</div><div class="kv" id="d-prog" style="color:var(--violet)">0%</div><div class="ks">monthly</div></div>
           </div>
           <div class="card" style="margin-bottom:14px;">
             <div class="ch">
@@ -1045,10 +1045,10 @@ tbody tr:hover td{background:var(--card2);}
 </div>
 
 <div class="mbg" id="m-forgot">
-  <div class="modal msm">
+  <div class="modal msm">Change My Password
     <div class="mhd"><div class="mttl">Forgot Password</div><button class="mxb" onclick="closeModal('m-forgot')">✕</button></div>
     <div class="mbody">
-      <div class="al al-a"><span class="al-ico">💡</span><div>Contact your Developer/Admin to reset your password. Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="204e41544e41454c4e4960455448494f5049414e4149524c494e45530e434f4d">[email&#160;protected]</a></div></div>
+      <div class="al al-a"><span class="al-ico">💡</span><div>Contact your Developer/Admin to reset your password. Email:natnaelni@ethiopianairlines.com <a href="/cdn-cgi/l/" class="__cf_email__" data-cfemail="204e41544e41454c4e4960455448494f5049414e4149524c494e45530e434f4d">[email&#160;protected]</a></div></div>
       <div style="margin-top:8px;">
         <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Developer Recovery</div>
         <div class="fg">
@@ -2699,7 +2699,7 @@ const META={
   assignments:{t:'Assignments',d:'Assign tasks to technicians'},
   allentries:{t:'All Entries',d:'Complete production log'},
   controllerentry:{t:'Production Controller Entry',d:'Log entry on behalf of a technician'},
-  reports:{t:'Reports',d:'Monthly SDT summary'},
+  reports:{t:'Reports',d:'Monthly Target summary'},
   ratios:{t:'Hour Ratio Settings',d:'Set SDT % and inspector fixed hours'},
   taskgroups:{t:'Task Code Groups',d:'Personnel grouped by JIC task code'},
   techs:{t:'Manage Technicians',d:''},
