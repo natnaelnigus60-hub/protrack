@@ -641,13 +641,28 @@ tbody tr:hover td{background:var(--card2);}
         <div class="pg" id="pg-dashboard">
           <div class="kg k4" style="margin-bottom:16px;">
             <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Active Techs</div><div class="kv" id="d-act" style="color:var(--blue)">0</div><div class="ks" id="d-acts"></div></div>
-            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Shop achivement (Monthly)</div><div class="kv" id="d-sdt" style="color:var(--green)">0h</div><div class="ks">target: <span id="d-tgt">—</span>h</div></div>
-            <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">Avg Hrs/Tech</div><div class="kv" id="d-avg" style="color:var(--amber)">0h</div><div class="ks">this month</div></div>
-            <div class="kc"><div class="kac" style="background:var(--violet)"></div><div class="kl">Shop Progress</div><div class="kv" id="d-prog" style="color:var(--violet)">0%</div><div class="ks">monthly</div></div>
+            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Shop achievement (Selected Range)</div><div class="kv" id="d-sdt" style="color:var(--green)">0h</div><div class="ks">target: <span id="d-tgt">—</span>h</div></div>
+            <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">Avg Hrs/Tech</div><div class="kv" id="d-avg" style="color:var(--amber)">0h</div><div class="ks">selected range</div></div>
+            <div class="kc"><div class="kac" style="background:var(--violet)"></div><div class="kl">Shop Progress</div><div class="kv" id="d-prog" style="color:var(--violet)">0%</div><div class="ks">selected range</div></div>
           </div>
           <div class="card" style="margin-bottom:14px;">
             <div class="ch">
-              <span class="ct">📊 Target Achievement — Monthly</span>
+              <span class="ct">📅 Dashboard Date Range</span>
+              <div class="ach-filters">
+                <button class="btn bo bsm" onclick="applyDatePreset('db','today','renderDashboard')">Today</button>
+                <button class="btn bo bsm" onclick="applyDatePreset('db','week','renderDashboard')">Week</button>
+                <button class="btn bo bsm" onclick="applyDatePreset('db','month','renderDashboard')">Month</button>
+                <button class="btn bo bsm" onclick="applyDatePreset('db','all','renderDashboard')">All</button>
+              </div>
+            </div>
+            <div class="tbr" style="padding:10px 14px 14px;">
+              <input type="date" class="fsel" id="db-dt-from" onchange="renderDashboard();renderLB();" title="From date" style="color:var(--tx);">
+              <input type="date" class="fsel" id="db-dt-to" onchange="renderDashboard();renderLB();" title="To date" style="color:var(--tx);">
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:14px;">
+            <div class="ch">
+              <span class="ct">📊 Target Achievement — Selected Range</span>
               <div class="ach-filters">
                 <button class="af-btn sel" id="af-all" onclick="setAF('all',this)">All</button>
                 <button class="af-btn" id="af-top" onclick="setAF('top',this)">Top</button>
@@ -664,7 +679,7 @@ tbody tr:hover td{background:var(--card2);}
           </div>
           <div class="card tv-board" id="lb-card">
             <div class="ch">
-              <span class="ct">🏆 Monthly Leaderboard</span>
+              <span class="ct">🏆 Leaderboard — Selected Range</span>
               <div class="export-group">
                 <div class="sbx" style="max-width:200px;"><input type="text" id="lb-q" placeholder="Search..." oninput="renderLB()"></div>
                 <button class="btn bo bsm" onclick="exportLeaderboard('lb-card','image')">🖼 Image</button>
@@ -738,7 +753,24 @@ tbody tr:hover td{background:var(--card2);}
 
         <!-- REPORTS -->
         <div class="pg" id="pg-reports">
-          <div class="card"><div class="ch"><span class="ct">Monthly Target Summary</span><button class="btn bo bsm" onclick="exportAllEntries()">⬇ Export</button></div>
+          <div class="card" style="margin-bottom:14px;">
+            <div class="ch">
+              <span class="ct">📅 Report Date Range</span>
+              <div class="ach-filters">
+                <button class="btn bo bsm" onclick="applyDatePreset('rpt','today','renderReports')">Today</button>
+                <button class="btn bo bsm" onclick="applyDatePreset('rpt','week','renderReports')">Week</button>
+                <button class="btn bo bsm" onclick="applyDatePreset('rpt','month','renderReports')">Month</button>
+                <button class="btn bo bsm" onclick="applyDatePreset('rpt','all','renderReports')">All</button>
+              </div>
+            </div>
+            <div class="tbr" style="padding:10px 14px 14px;">
+              <input type="date" class="fsel" id="rpt-dt-from" onchange="renderReports()" title="From date" style="color:var(--tx);">
+              <input type="date" class="fsel" id="rpt-dt-to" onchange="renderReports()" title="To date" style="color:var(--tx);">
+              <button class="btn bo bsm" onclick="renderReports()">⟳ Apply</button>
+              <button class="btn bo bsm" onclick="exportAllEntries()">⬇ Export</button>
+            </div>
+          </div>
+          <div class="card"><div class="ch"><span class="ct">Selected Range Summary</span><button class="btn bo bsm" onclick="exportAllEntries()">⬇ Export</button></div>
             <div class="tw"><table><thead> <tr><th>Tech</th><th>SDT Target</th><th>SDT Actual</th><th>Asn Hrs</th><th>Total Achieved</th><th>Insp Hrs</th><th>Progress</th><th>Avg/Day</th><th>Status</th></tr> </thead>
             <tbody id="rpt-body"></tbody></table></div>
           </div>
@@ -940,7 +972,7 @@ tbody tr:hover td{background:var(--card2);}
           <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:14px;align-items:start;">
             <div>
               <div class="card">
-                <div class="ch"><span class="ct">📋 Production Controller Entry</span></div>
+                <div class="ch"><span class="ct">📋 Production Controller Entry</span><button class="btn bo bsm" onclick="openModal('m-import-entry')">⬆ Import Production Entries</button></div>
                 <div class="cb">
                   <div class="fg f2">
                     <div class="fgroup ff"><label class="flabel">🔧 Technician *</label>
@@ -1203,6 +1235,8 @@ tbody tr:hover td{background:var(--card2);}
 <div class="mbg" id="m-import-tech"><div class="modal msm"><div class="mhd"><div class="mttl">Import Technicians</div><button class="mxb" onclick="closeModal('m-import-tech')">✕</button></div><div class="mbody"><div style="border:2px dashed var(--bdr2);border-radius:8px;padding:24px;text-align:center;cursor:pointer;" onclick="document.getElementById('imp-tech-f').click()">📂 Upload CSV/Excel<input type="file" id="imp-tech-f" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleTechImport(this)"></div></div><div class="mfoot"><button class="btn bo" onclick="closeModal('m-import-tech')">Cancel</button></div></div></div>
 <div class="mbg" id="m-import-part"><div class="modal msm"><div class="mhd"><div class="mttl">Import Parts</div><button class="mxb" onclick="closeModal('m-import-part')">✕</button></div><div class="mbody"><div style="border:2px dashed var(--bdr2);border-radius:8px;padding:24px;text-align:center;cursor:pointer;" onclick="document.getElementById('imp-part-f').click()">📂 Upload CSV/Excel<input type="file" id="imp-part-f" accept=".csv,.xlsx,.xls" style="display:none" onchange="handlePartImport(this)"></div></div><div class="mfoot"><button class="btn bo" onclick="closeModal('m-import-part')">Cancel</button></div></div></div>
 
+<div class="mbg" id="m-import-entry"><div class="modal mlg"><div class="mhd"><div class="mttl">Import Production Entries</div><button class="mxb" onclick="closeModal('m-import-entry')">✕</button></div><div class="mbody"><div style="border:2px dashed var(--bdr2);border-radius:8px;padding:24px;text-align:center;cursor:pointer;" onclick="document.getElementById('imp-entry-f').click()">📂 Upload CSV/Excel<input type="file" id="imp-entry-f" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleEntryImport(this)"></div><div style="font-size:12px;color:var(--tx2);margin-top:10px;line-height:1.5;">This import will create one ProTrack entry per Excel row. Extra technician/inspector IDs are preserved in the record metadata.</div></div><div class="mfoot"><button class="btn bo" onclick="closeModal('m-import-entry')">Cancel</button></div></div></div>
+
 <div class="mbg" id="m-import-summary">
   <div class="modal mlg">
     <div class="mhd">
@@ -1240,6 +1274,7 @@ let loginAttempts=0;
 let pendingEntry=null;
 let lastImportedTechs=[];
 let lastImportedParts=[];
+let lastImportedEntries=[];
 
 // ════════════════════════════════════════════════
 //  THEME
@@ -1273,8 +1308,10 @@ function hideLoading(){const o=document.getElementById('loading-overlay');if(o)o
 function renderImportSummary(kind){
   const title=document.getElementById('imp-sum-title');
   const body=document.getElementById('imp-sum-body');
-  const rows = kind==='tech' ? lastImportedTechs : lastImportedParts;
-  if(title) title.textContent = kind==='tech' ? 'Imported Technicians' : 'Imported Parts';
+  const rows = kind==='tech' ? lastImportedTechs : kind==='part' ? lastImportedParts : lastImportedEntries;
+  if(title){
+    title.textContent = kind==='tech' ? 'Imported Technicians' : kind==='part' ? 'Imported Parts' : 'Imported Production Entries';
+  }
   if(!body) return;
   if(!rows.length){
     body.innerHTML = '<div class="empty"><div class="ei">📭</div><div class="et">No new rows were imported.</div></div>';
@@ -1284,9 +1321,13 @@ function renderImportSummary(kind){
     body.innerHTML = `<div class="tw"><table><thead> <tr><th>ID</th><th>Name</th><th>Monthly Target</th><th>Status</th></tr> </thead><tbody>` +
       rows.map(r=>`<tr><td class="mono">${sanitize(r.id)}</td><td>${sanitize(r.name)}</td><td class="mono">${sanitizeNum(r.monthlyTarget)}h</td><td><span class="bdg bgr">${sanitize(r.status||'active')}</span></td></tr>`).join('') +
       `</tbody></table></div>`;
-  } else {
+  } else if(kind==='part'){
     body.innerHTML = `<div class="tw"><table><thead> <tr><th>Part #</th><th>Name</th><th>Hours</th><th>ATA</th></tr> </thead><tbody>` +
       rows.map(r=>`<tr><td class="mono">${sanitize(r.num)}</td><td>${sanitize(r.name)}</td><td class="mono">${sanitizeNum(r.hours)}h</td><td class="mono">${sanitize(r.ata||'')}</td></tr>`).join('') +
+      `</tbody></table></div>`;
+  } else {
+    body.innerHTML = `<div class="tw"><table><thead> <tr><th>Date/Time (EAT)</th><th>Task Code</th><th>Tech</th><th>Role</th><th>Type</th><th>Part</th><th>Hours</th></tr> </thead><tbody>` +
+      rows.map(r=>`<tr><td>${sanitize(fmtEAT(r.time))}</td><td class="mono">${sanitize(r.taskCode||'')}</td><td>${sanitize(r.techName||r.techId||'')}</td><td>${sanitize(r.jobRole||'')}</td><td><span class="${r.jobType==='scrap'?'cp-scrap':'cp-comp'}">${r.jobType==='scrap'?'Scrap':'Completed'}</span></td><td>${sanitize(r.pname||'')}</td><td class="mono">${sanitizeNum(r.hours)}h</td></tr>`).join('') +
       `</tbody></table></div>`;
   }
   openModal('m-import-summary');
@@ -1345,6 +1386,10 @@ function getMonthRangeFromInput(v){
   return {start,end,label};
 }
 function dateInRange(iso,start,end){const d=(iso||'').slice(0,10);return !!d&&d>=start&&d<=end;}
+function setDateRange(prefix,fromV,toV){const f=document.getElementById(prefix+'-dt-from'),t=document.getElementById(prefix+'-dt-to');if(f)f.value=fromV||'';if(t)t.value=toV||'';}
+function getDateRange(prefix,fallback){const f=document.getElementById(prefix+'-dt-from')?.value||fallback.start;const t=document.getElementById(prefix+'-dt-to')?.value||fallback.end;return f<=t?{start:f,end:t}:{start:t,end:f};}
+function ensureDateRangeDefaults(prefix,fallback){const f=document.getElementById(prefix+'-dt-from'),t=document.getElementById(prefix+'-dt-to');if(f&&t&&!f.value&&!t.value)setDateRange(prefix,fallback.start,fallback.end);}
+function applyDatePreset(prefix,v,renderFn){const mr=getMR(),wr=getWR(),today=todayEAT();if(v==='today')setDateRange(prefix,today,today);else if(v==='week')setDateRange(prefix,wr.start,wr.end);else if(v==='month')setDateRange(prefix,mr.start,mr.end);else if(v==='all')setDateRange(prefix,'1900-01-01','9999-12-31');else return;const fn=window[renderFn];if(typeof fn==='function')fn();}
 function getDailyTgt(m){return parseFloat((m/22).toFixed(2));}
 function getWeeklyTgt(m){return parseFloat((getDailyTgt(m)*5).toFixed(2));}
 
@@ -1897,7 +1942,8 @@ window.renderMyStats=renderMyStats;
 //  DASHBOARD + ACHIEVEMENT GRAPH
 // ════════════════════════════════════════════════
 function renderDashboard(){
-  const mr=getMR();
+  ensureDateRangeDefaults('db',getMR());
+  const mr=getDateRange('db',getMR());
   const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
   const activeTechs=new Set(sdtEnt.map(e=>e.techId)).size;
   const totalSDT=sdtEnt.reduce((s,e)=>s+getDividedHours(e,entries),0);
@@ -1912,7 +1958,8 @@ function setAF(f,btn){achievFilter=f;document.querySelectorAll('.af-btn').forEac
 window.setAF=setAF;
 function renderAchievGraph(){
   const cont=document.getElementById('achiev-chart');if(!cont)return;
-  const mr=getMR();
+  ensureDateRangeDefaults('db',getMR());
+  const mr=getDateRange('db',getMR());
   const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
   let stats=techs.filter(t=>t.status==='active').map(t=>{
     const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
@@ -1937,7 +1984,8 @@ function renderAchievGraph(){
   }).join('');
 }
 function getLeaderboardStats(){
-  const mr=getMR();
+  ensureDateRangeDefaults('db',getMR());
+  const mr=getDateRange('db',getMR());
   const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
   return techs.filter(t=>t.status==='active').map(t=>{
     const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
@@ -2152,7 +2200,8 @@ function renderAllEntries(){
 //  REPORTS
 // ════════════════════════════════════════════════
 function renderReports(){
-  const mr=getMR();
+  ensureDateRangeDefaults('rpt',getMR());
+  const mr=getDateRange('rpt',getMR());
   const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
   const inspEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&!isSDT(e));
   const tbody=document.getElementById('rpt-body');if(!tbody)return;
@@ -2511,10 +2560,160 @@ window.openMonthTgtModal=function(){const sel=document.getElementById('tgt-sel')
 window.saveMonthTgt=async function(){const tid=document.getElementById('tgt-sel')?.value;const val=parseFloat(document.getElementById('tgt-val')?.value);if(!tid||!val){toast('Select tech and enter value','error');return;}const idx=techs.findIndex(t=>t.id===tid);if(idx>-1){techs[idx].monthlyTarget=val;await window.setDoc(window.doc(window.db,'technicians',tid),techs[idx]);}closeModal('m-monthtgt');toast('Target updated');if(CR==='lead')renderDashboard();else renderTechs();};
 
 // ════════════════════════════════════════════════
+//  IMPORT HELPERS
+// ════════════════════════════════════════════════
+function csvRowsToSheet(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=e=>{try{
+      const wb=XLSX.read(e.target.result,{type:'string',cellDates:true});
+      resolve(wb.Sheets[wb.SheetNames[0]]);
+    }catch(err){reject(err);}};
+    r.onerror=()=>reject(new Error('Failed to read file'));
+    r.readAsText(file);
+  });
+}
+function workbookRows(file){
+  return new Promise((resolve,reject)=>{
+    const isCsv=/\.csv$/i.test(file.name) || /text\/csv/i.test(file.type||'');
+    const r=new FileReader();
+    r.onload=e=>{try{
+      const wb=XLSX.read(e.target.result,{type:isCsv?'string':'array',cellDates:true});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      resolve(XLSX.utils.sheet_to_json(ws,{defval:''}));
+    }catch(err){reject(err);}};
+    r.onerror=()=>reject(new Error('Failed to read file'));
+    if(isCsv) r.readAsText(file); else r.readAsArrayBuffer(file);
+  });
+}
+function normHeader(v){return String(v||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'');}
+function getRowValue(row, keys){
+  const map={};
+  for(const k of Object.keys(row||{})) map[normHeader(k)] = row[k];
+  for(const key of keys){
+    const n = normHeader(key);
+    if(n in map) return map[n];
+  }
+  return '';
+}
+function splitIdList(v){
+  return String(v||'').split(',').map(s=>s.trim()).filter(s=>/^\d{4,}$/.test(s));
+}
+function cleanText(v){return String(v??'').replace(/\s+/g,' ').trim();}
+function toIsoTime(v){
+  if(!v && v!==0) return nowEAT();
+  if(v instanceof Date && !isNaN(v)) return v.toISOString();
+  if(typeof v === 'number' && isFinite(v)){
+    const parsed = XLSX.SSF.parse_date_code(v);
+    if(parsed){
+      const pad=n=>String(n).padStart(2,'0');
+      const ms = Math.floor((parsed.u || 0) * 1000);
+      return `${parsed.y}-${pad(parsed.m)}-${pad(parsed.d)}T${pad(parsed.H)}:${pad(parsed.M)}:${pad(parsed.S)}.${String(ms).padStart(3,'0')}`;
+    }
+  }
+  const s = String(v).trim();
+  if(!s) return nowEAT();
+  return s.length===10 ? `${s}T00:00:00` : s;
+}
+function findTechName(id){
+  const t=techs.find(x=>String(x.id).trim()===String(id).trim());
+  return t ? t.name : `Tech ${id}`;
+}
+function findPartByExcelRow(row){
+  const partNum = cleanText(getRowValue(row,['part number','partnumber','pnum','partnum']));
+  const partName = cleanText(getRowValue(row,['part name','partname','name','description']));
+  let part = parts.find(p=>String(p.num).trim().toLowerCase()===partNum.toLowerCase());
+  if(!part && partName) part = parts.find(p=>String(p.name).trim().toLowerCase()===partName.toLowerCase());
+  return {part, partNum, partName};
+}
+function mapExcelStatus(status){
+  const s = String(status||'').trim().toUpperCase();
+  if(s.includes('SCRAP')) return {jobType:'scrap', jobRole:'Inspector'};
+  return {jobType:'completed', jobRole:'Technician'};
+}
+function isSummaryRow(row){
+  const task = cleanText(getRowValue(row,['taskcode','task code']));
+  const status = cleanText(getRowValue(row,['status']));
+  return !task || /^(average\(tat\):|total count\(wp\):|total est\. mhr:|total act\. mhr:)/i.test(task) || /^(average\(tat\):|total count\(wp\):|total est\. mhr:|total act\. mhr:)/i.test(status);
+}
+function existsSimilarEntry(candidate){
+  return entries.some(e=>{
+    const sameCode=String(e.taskCode||'').trim().toUpperCase()===String(candidate.taskCode||'').trim().toUpperCase();
+    const sameTech=String(e.techId||'').trim()===String(candidate.techId||'').trim();
+    const sameTime=String(e.time||'').trim()===String(candidate.time||'').trim();
+    const samePart=String(e.pnum||'').trim().toLowerCase()===String(candidate.pnum||'').trim().toLowerCase();
+    return sameCode && sameTech && sameTime && samePart;
+  });
+}
+function refreshAfterImport(){
+  if(typeof renderEntry==='function') renderEntry();
+  if(typeof renderLeaderEntry==='function') renderLeaderEntry();
+  if(typeof renderAllEntries==='function') renderAllEntries();
+  if(typeof renderTG==='function') renderTG();
+  if(typeof renderMyStats==='function') renderMyStats();
+  if(typeof renderDashboard==='function') renderDashboard();
+  if(typeof renderReports==='function') renderReports();
+  if(typeof renderTechs==='function') renderTechs();
+  if(typeof renderParts==='function') renderParts();
+}
+
+// ════════════════════════════════════════════════
 //  IMPORT
 // ════════════════════════════════════════════════
-window.handleTechImport=function(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{lastImportedTechs=[];const wb=XLSX.read(e.target.result,{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);for(const row of rows){if(row.ID&&row.Name){const id=sanitize(row.ID.toString());if(!techs.find(t=>t.id===id)){const nt={id,name:sanitize(row.Name.toString()),monthlyTarget:parseFloat(row.MonthlyTarget)||settings.defaultMonthlyTarget||160,status:'active',password:settings.passwords?.tech||'demo',initials:row.Name.toString().slice(0,2).toUpperCase(),color:'#3b82f6'};await window.setDoc(window.doc(window.db,'technicians',id),nt);techs.push(nt);lastImportedTechs.push(nt);}}}renderTechs();toast('Import complete');closeModal('m-import-tech');renderImportSummary('tech');}catch(err){toast('Import failed','error');}};r.readAsArrayBuffer(f);};
-window.handlePartImport=function(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{lastImportedParts=[];const wb=XLSX.read(e.target.result,{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);for(const row of rows){if(row.Name&&row.Number){const np={id:Date.now().toString()+Math.random(),name:sanitize(row.Name.toString()),num:sanitize(row.Number.toString()),hours:parseFloat(row.Hours)||1,ata:sanitize(row.ATA||''),desc:sanitize(row.Description||row.Name.toString())};await window.setDoc(window.doc(window.db,'parts',np.id),np);parts.push(np);lastImportedParts.push(np);}}renderParts();toast('Import complete');closeModal('m-import-part');renderImportSummary('part');}catch(err){toast('Import failed','error');}};r.readAsArrayBuffer(f);};
+// ════════════════════════════════════════════════
+//  IMPORT
+// ════════════════════════════════════════════════
+window.handleTechImport=function(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{lastImportedTechs=[];const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});for(const row of rows){if(row.ID&&row.Name){const id=sanitize(row.ID.toString());if(!techs.find(t=>t.id===id)){const nt={id,name:sanitize(row.Name.toString()),monthlyTarget:parseFloat(row.MonthlyTarget)||settings.defaultMonthlyTarget||160,status:'active',password:settings.passwords?.tech||'demo',initials:row.Name.toString().slice(0,2).toUpperCase(),color:'#3b82f6'};await window.setDoc(window.doc(window.db,'technicians',id),nt);techs.push(nt);lastImportedTechs.push(nt);}}}renderTechs();toast('Import complete');closeModal('m-import-tech');renderImportSummary('tech');}catch(err){toast('Import failed','error');console.error(err);}};r.readAsArrayBuffer(f);};
+window.handlePartImport=function(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{lastImportedParts=[];const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});for(const row of rows){if(row.Name&&row.Number){const np={id:Date.now().toString()+Math.random(),name:sanitize(row.Name.toString()),num:sanitize(row.Number.toString()),hours:parseFloat(row.Hours)||1,ata:sanitize(row.ATA||''),desc:sanitize(row.Description||row.Name.toString())};await window.setDoc(window.doc(window.db,'parts',np.id),np);parts.push(np);lastImportedParts.push(np);}}renderParts();toast('Import complete');closeModal('m-import-part');renderImportSummary('part');}catch(err){toast('Import failed','error');console.error(err);}};r.readAsArrayBuffer(f);};
+
+window.handleEntryImport=function(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{lastImportedEntries=[];const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});let created=0,skipped=0;
+for(const row of rows){
+  if(isSummaryRow(row)) continue;
+  const taskCode=cleanText(getRowValue(row,['taskcode','task code'])).toUpperCase();
+  const status=cleanText(getRowValue(row,['status'])).toUpperCase();
+  const dtRaw=getRowValue(row,['date completed','datecompleted','completed date','date']);
+  const time=toIsoTime(dtRaw);
+  const hoursVal=parseFloat(getRowValue(row,['hour','hours','est man hr','estimated man hr','est man hours']))||0;
+  const partNum=cleanText(getRowValue(row,['part number','partnumber','part no','part no.','pnum']));
+  const partName=cleanText(getRowValue(row,['part name','partname','name','description']));
+  const techIds=splitIdList(getRowValue(row,['technician_id','technician id','tech_id','tech id']));
+  const inspIds=splitIdList(getRowValue(row,['inspector_id','inspector id','insp_id','insp id']));
+  if(!taskCode || !status || (!techIds.length && !inspIds.length)) { skipped++; continue; }
+
+  const mapped=mapExcelStatus(status);
+  const primaryTechId=techIds[0] || inspIds[0] || '';
+  const candidate={
+    techId:primaryTechId,
+    techName:findTechName(primaryTechId),
+    taskCode,
+    pname:partName || (findPartByExcelRow(row).part?.name || ''),
+    pnum:partNum || (findPartByExcelRow(row).part?.num || ''),
+    jobRole:mapped.jobRole,
+    jobType:mapped.jobType,
+    time,
+    hours:hoursVal,
+    stdHours:hoursVal,
+    ata:findPartByExcelRow(row).part?.ata || '',
+    desc:partName || '',
+    source:'excel-import',
+    sourceFile:f.name,
+    teamTechIds:techIds,
+    inspectorIds:inspIds,
+    inspectorId:inspIds[0] || '',
+    importedFrom:'ComponentTATStatus'
+  };
+  if(existsSimilarEntry(candidate)){ skipped++; continue; }
+  const ref=await window.addDoc(window.collection(window.db,'entries'),candidate);
+  candidate.id=ref.id;
+  entries.unshift(candidate);
+  lastImportedEntries.push(candidate);
+  created++;
+}
+closeModal('m-import-entry');
+toast(`Import complete: ${created} created, ${skipped} skipped`);
+renderImportSummary('entry');
+refreshAfterImport();
+}catch(err){toast('Import failed','error');console.error(err);}};r.readAsArrayBuffer(f);};
 
 // ════════════════════════════════════════════════
 //  EXPORT HELPERS
