@@ -1818,7 +1818,6 @@ function openReviewModal(){
   if(!partId){toast('Select a part','error');return;}
   if(!taskCode){toast('Enter a Task Code','error');return;}
   const part=parts.find(p=>p.id===partId);if(!part)return;
-  const taskCode=sanitize(document.getElementById('e-taskcode')?.value).toUpperCase();
   const pool=calcPoolHrs(part,selJobRole,taskCode);
   const insp=isInspRole(selJobRole);
   const scrapHrs=jobType==='scrap'?gv('e-scrap-hrs')||2:null;
@@ -2763,7 +2762,6 @@ function openLeReviewModal(){
   if(!taskCode){toast('Enter a Task Code','error');return;}
   const tech=techs.find(t=>t.id===techId);if(!tech)return;
   const part=parts.find(p=>p.id===partId);if(!part)return;
-  const taskCode=sanitize(document.getElementById('le-taskcode')?.value).toUpperCase();
   const pool=calcPoolHrs(part,leJobRole,taskCode);
   const insp=isInspRole(leJobRole);
   const scrapHrs=leJobType==='scrap'?gv('le-scrap-hrs')||2:null;
