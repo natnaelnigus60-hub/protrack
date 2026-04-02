@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="description" content="ProTrack MRO Production KPI System">
 <meta name="theme-color" content="#070c18">
-<title>ProTrack v1.2.3</title>
+<title>ProTrack v1.1.1</title>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -639,6 +639,24 @@ tbody tr:hover td{background:var(--card2);}
 
         <!-- LEADER: DASHBOARD -->
         <div class="pg" id="pg-dashboard">
+          <div class="tbr" style="margin-bottom:12px;">
+            <div class="fgroup" style="max-width:200px;min-width:160px;">
+              <label class="flabel">From Date</label>
+              <input type="date" class="fsel" id="dash-dt-from" onchange="renderDashboard();renderLB();" title="From date" style="color:var(--tx);">
+            </div>
+            <div class="fgroup" style="max-width:200px;min-width:160px;">
+              <label class="flabel">To Date</label>
+              <input type="date" class="fsel" id="dash-dt-to" onchange="renderDashboard();renderLB();" title="To date" style="color:var(--tx);">
+            </div>
+            <select class="fsel" id="dash-dt-preset" onchange="applyDashPreset(this.value)" title="Quick range">
+              <option value="">Quick Range…</option>
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="all">All Time</option>
+            </select>
+            <button class="btn bo bsm" onclick="renderDashboard();renderLB();">⟳</button>
+          </div>
           <div class="kg k4" style="margin-bottom:16px;">
             <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Active Techs</div><div class="kv" id="d-act" style="color:var(--blue)">0</div><div class="ks" id="d-acts"></div></div>
             <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Shop achivement (Monthly)</div><div class="kv" id="d-sdt" style="color:var(--green)">0h</div><div class="ks">target: <span id="d-tgt">—</span>h</div></div>
@@ -738,6 +756,24 @@ tbody tr:hover td{background:var(--card2);}
 
         <!-- REPORTS -->
         <div class="pg" id="pg-reports">
+          <div class="tbr" style="margin-bottom:12px;">
+            <div class="fgroup" style="max-width:200px;min-width:160px;">
+              <label class="flabel">From Date</label>
+              <input type="date" class="fsel" id="rpt-dt-from" onchange="renderReports()" title="From date" style="color:var(--tx);">
+            </div>
+            <div class="fgroup" style="max-width:200px;min-width:160px;">
+              <label class="flabel">To Date</label>
+              <input type="date" class="fsel" id="rpt-dt-to" onchange="renderReports()" title="To date" style="color:var(--tx);">
+            </div>
+            <select class="fsel" id="rpt-dt-preset" onchange="applyRptPreset(this.value)" title="Quick range">
+              <option value="">Quick Range…</option>
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="all">All Time</option>
+            </select>
+            <button class="btn bo bsm" onclick="renderReports()">⟳</button>
+          </div>
           <div class="card"><div class="ch"><span class="ct">Monthly Target Summary</span><button class="btn bo bsm" onclick="exportAllEntries()">⬇ Export</button></div>
             <div class="tw"><table><thead> <tr><th>Tech</th><th>SDT Target</th><th>SDT Actual</th><th>Asn Hrs</th><th>Total Achieved</th><th>Insp Hrs</th><th>Progress</th><th>Avg/Day</th><th>Status</th></tr> </thead>
             <tbody id="rpt-body"></tbody></table></div>
@@ -1221,7 +1257,7 @@ tbody tr:hover td{background:var(--card2);}
 // ════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ════════════════════════════════════════════════
-const APP_VERSION = '1.2.3';
+const APP_VERSION = '1.1.1';
 const DEV_RECOVERY_CODE = 'PROTRACK-DEV-2025-RESET';
 const EAT_TZ='Africa/Addis_Ababa';
 const ROLES=['Technician','Under Supervision','Inspector','Preliminary Inspector'];
@@ -1348,6 +1384,28 @@ function getMonthRangeFromInput(v){
 function dateInRange(iso,start,end){const d=(iso||'').slice(0,10);return !!d&&d>=start&&d<=end;}
 function getDailyTgt(m){return parseFloat((m/22).toFixed(2));}
 function getWeeklyTgt(m){return parseFloat((getDailyTgt(m)*5).toFixed(2));}
+
+function getUIRange(prefix){
+  const preset=(document.getElementById(`${prefix}-dt-preset`)?.value||'').trim();
+  const from=(document.getElementById(`${prefix}-dt-from`)?.value||'').trim();
+  const to=(document.getElementById(`${prefix}-dt-to`)?.value||'').trim();
+  if(preset==='all') return {start:'0000-01-01', end:'9999-12-31'};
+  let start=from||'0000-01-01';
+  let end=to||'9999-12-31';
+  if(start>end){const tmp=start;start=end;end=tmp;}
+  return {start,end};
+}
+function setUIRange(prefix,v){
+  const today=todayEAT(),wr=getWR(),mr=getMR();
+  const fromEl=document.getElementById(`${prefix}-dt-from`),toEl=document.getElementById(`${prefix}-dt-to`);
+  if(!fromEl||!toEl)return;
+  if(v==='today'){fromEl.value=today;toEl.value=today;}
+  else if(v==='week'){fromEl.value=wr.start;toEl.value=wr.end;}
+  else if(v==='month'){fromEl.value=mr.start;toEl.value=mr.end;}
+  else if(v==='all'){fromEl.value='';toEl.value='';}
+}
+function applyRptPreset(v){setUIRange('rpt',v);renderReports();}
+function applyDashPreset(v){setUIRange('dash',v);renderDashboard();renderLB();}
 
 // ════════════════════════════════════════════════
 //  SECURITY HELPERS
@@ -1931,35 +1989,34 @@ window.renderMyStats=renderMyStats;
 //  DASHBOARD + ACHIEVEMENT GRAPH
 // ════════════════════════════════════════════════
 function renderDashboard(){
-  const mr=getMR();
-  const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
+  const dr=getUIRange('dash');
+  const sdtEnt=entries.filter(e=>dateInRange(e.time,dr.start,dr.end)&&isSDT(e));
   const activeTechs=new Set(sdtEnt.map(e=>e.techId)).size;
   const totalSDT=sdtEnt.reduce((s,e)=>s+getDividedHours(e,entries),0);
   const totalTgt=techs.filter(t=>t.status==='active').reduce((s,t)=>s+(t.monthlyTarget||160),0);
   const avg=activeTechs?totalSDT/activeTechs:0;
-  const prog=totalTgt?Math.min(100,Math.round(totalSDT/totalTgt*100)):0;
+  const prog=totalTgt?Math.round(totalSDT/totalTgt*100):0;
   stxt('d-act',activeTechs);stxt('d-acts','of '+techs.filter(t=>t.status==='active').length+' active');
   stxt('d-sdt',totalSDT.toFixed(1)+'h');stxt('d-tgt',totalTgt);stxt('d-avg',avg.toFixed(1)+'h');stxt('d-prog',prog+'%');
-  renderAchievGraph();renderLB();
+  renderAchievGraph(dr);renderLB(dr);
 }
-function setAF(f,btn){achievFilter=f;document.querySelectorAll('.af-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');renderAchievGraph();}
+function setAF(f,btn){achievFilter=f;document.querySelectorAll('.af-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');renderAchievGraph(getUIRange('dash'));}
 window.setAF=setAF;
-function renderAchievGraph(){
+function renderAchievGraph(range=getUIRange('dash')){
   const cont=document.getElementById('achiev-chart');if(!cont)return;
-  const mr=getMR();
-  const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
+  const sdtEnt=entries.filter(e=>dateInRange(e.time,range.start,range.end)&&isSDT(e));
   let stats=techs.filter(t=>t.status==='active').map(t=>{
     const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
-    const asn=assignments.filter(a=>a.techId===t.id&&a.date>=mr.start&&a.date<=mr.end).reduce((s,a)=>s+(a.hrs||0),0);
+    const asn=assignments.filter(a=>a.techId===t.id&&a.date>=range.start&&a.date<=range.end).reduce((s,a)=>s+(a.hrs||0),0);
     const total=sdt+asn;const tgt=t.monthlyTarget||160;
-    return{...t,total,tgt,pct:tgt?Math.min(150,Math.round(total/tgt*100)):0};
+    return{...t,total,tgt,pct:tgt?Math.round(total/tgt*100):0};
   });
   if(achievFilter==='top')stats=stats.sort((a,b)=>b.pct-a.pct).slice(0,8);
   else if(achievFilter==='low')stats=stats.sort((a,b)=>a.pct-b.pct).slice(0,8);
   else stats=stats.sort((a,b)=>b.pct-a.pct);
   if(!stats.length){cont.innerHTML='<div class="empty" style="width:100%;">No data</div>';return;}
   cont.innerHTML=stats.map(t=>{
-    const bh=Math.max(4,Math.round(t.pct/150*90));
+    const bh=Math.max(4,Math.min(90,Math.round(Math.min(t.pct,150)/150*90)));
     const bc=t.pct>=100?'var(--green)':t.pct>=70?'var(--amber)':'var(--rose)';
     const nm=t.name.split(' ')[0];
     return`<div class="ach-col">
@@ -1970,20 +2027,19 @@ function renderAchievGraph(){
     </div>`;
   }).join('');
 }
-function getLeaderboardStats(){
-  const mr=getMR();
-  const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
+function getLeaderboardStats(range=getUIRange('dash')){
+  const sdtEnt=entries.filter(e=>dateInRange(e.time,range.start,range.end)&&isSDT(e));
   return techs.filter(t=>t.status==='active').map(t=>{
     const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
-    const insp=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&!isSDT(e)&&e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
-    const asn=assignments.filter(a=>a.techId===t.id&&a.date>=mr.start&&a.date<=mr.end).reduce((s,a)=>s+(a.hrs||0),0);
+    const insp=entries.filter(e=>dateInRange(e.time,range.start,range.end)&&!isSDT(e)&&e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
+    const asn=assignments.filter(a=>a.techId===t.id&&a.date>=range.start&&a.date<=range.end).reduce((s,a)=>s+(a.hrs||0),0);
     return{...t,total:sdt+asn+insp,tgt:t.monthlyTarget||160};
   });
 }
-function renderLeaderboardInto(bodyId,qId){
+function renderLeaderboardInto(bodyId,qId,range=getUIRange('dash')){
   const cont=document.getElementById(bodyId);if(!cont)return;
   const q=(document.getElementById(qId)?.value||'').toLowerCase();
-  const stats=getLeaderboardStats().filter(t=>!q||t.name.toLowerCase().includes(q)).sort((a,b)=>b.total-a.total);
+  const stats=getLeaderboardStats(range).filter(t=>!q||t.name.toLowerCase().includes(q)).sort((a,b)=>b.total-a.total);
   cont.innerHTML=stats.map((t,i)=>{
     const pct=t.tgt?Math.round(t.total/t.tgt*100):0;
     const col=pct>=100?'var(--green)':pct>=70?'var(--amber)':'var(--rose)';
@@ -1996,9 +2052,9 @@ function renderLeaderboardInto(bodyId,qId){
     </div>`;
   }).join('')||'<div class="empty">No data</div>';
 }
-function renderLB(){
-  renderLeaderboardInto('lb-body','lb-q');
-  renderLeaderboardInto('dev-lb-body','dev-lb-q');
+function renderLB(range=getUIRange('dash')){
+  renderLeaderboardInto('lb-body','lb-q',range);
+  renderLeaderboardInto('dev-lb-body','dev-lb-q',range);
 }
 window.renderLB=renderLB;
 function buildLeaderboardExportPanel(stats){
@@ -2287,16 +2343,16 @@ function renderAllEntries(){
 //  REPORTS
 // ════════════════════════════════════════════════
 function renderReports(){
-  const mr=getMR();
-  const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
-  const inspEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&!isSDT(e));
+  const rr=getUIRange('rpt');
+  const sdtEnt=entries.filter(e=>dateInRange(e.time,rr.start,rr.end)&&isSDT(e));
+  const inspEnt=entries.filter(e=>dateInRange(e.time,rr.start,rr.end)&&!isSDT(e));
   const tbody=document.getElementById('rpt-body');if(!tbody)return;
   tbody.innerHTML=techs.filter(t=>t.status==='active').map(t=>{
     const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
     const insp=inspEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
-    const asn=assignments.filter(a=>a.techId===t.id&&a.date>=mr.start&&a.date<=mr.end).reduce((s,a)=>s+(a.hrs||0),0);
+    const asn=assignments.filter(a=>a.techId===t.id&&a.date>=rr.start&&a.date<=rr.end).reduce((s,a)=>s+(a.hrs||0),0);
     const total=sdt+asn+insp;const tgt=t.monthlyTarget||160;
-    const pct=Math.round(total/tgt*100);
+    const pct=tgt?Math.round(total/tgt*100):0;
     const cls=pct>=100?'bgr':pct>=80?'bamb':pct>=60?'bblu':'bred';
     const status=pct>=100?'✅ Achieved':pct>=80?'⚠️ Near':pct>=60?'🟡 Progress':'🔴 Low';
     return`<tr>
@@ -2860,10 +2916,10 @@ window.navTo=function(page){
   const m=META[page]||{};stxt('pg-title',m.t||page);stxt('pg-desc',m.d||'');
   if(page==='entry')renderEntry();
   if(page==='mystats'){const mf=document.getElementById('ms-month-filter');if(mf&&!mf.value)mf.value=todayEAT().slice(0,7);renderMyStats();}
-  if(page==='dashboard'){populateTechFilter();renderDashboard();renderLB();}
+  if(page==='dashboard'){populateTechFilter();if(!document.getElementById('dash-dt-from')?.value && document.getElementById('dash-dt-preset')?.value!=='all'){applyDashPreset('month');}else{renderDashboard();renderLB();}}
   if(page==='assignments'){populateAsnSels();renderAssignments();}
   if(page==='allentries'){populateTechFilter();if(!document.getElementById('ae-dt-from')?.value){applyAEPreset('today');}else{renderAllEntries();};}
-  if(page==='reports')renderReports();
+  if(page==='reports'){if(!document.getElementById('rpt-dt-from')?.value && document.getElementById('rpt-dt-preset')?.value!=='all'){applyRptPreset('month');}else{renderReports();}}
   if(page==='ratios')renderRatios();
   if(page==='taskgroups'){if(!document.getElementById('tc-dt-from')?.value){applyTCPreset('today');}else{renderTG();}}
   if(page==='techs')renderTechs();
