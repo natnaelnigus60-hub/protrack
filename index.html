@@ -988,6 +988,7 @@ tbody tr:hover td{background:var(--card2);}
                       <span class="btn-label">✓ Review &amp; Submit</span>
                     </button>
                     <button class="btn bo" onclick="clearLeEntry()">✕ Clear</button>
+                    <button class="btn bo" onclick="location.reload()">↻ Refresh</button>
                   </div>
                 </div>
               </div>
@@ -1401,11 +1402,35 @@ function getRatioForPart(partNum){return(settings.partRatios||{})[partNum]||getD
 function isInspRole(role){return role==='Inspector'||role==='Preliminary Inspector';}
 function isSDT(e){if(e.jobType==='scrap')return true;return!isInspRole(e.jobRole);}
 
-function calcPoolHrs(part,role){
+function getTaskGroupEntries(taskCode, partNum){
+  const tc=sanitize(taskCode||'').toUpperCase();
+  if(!tc||!partNum)return [];
+  return entries.filter(e=>
+    (e.taskCode||'').toUpperCase()===tc &&
+    e.pnum===partNum &&
+    e.jobType!=='scrap' &&
+    (e.jobRole==='Technician' || e.jobRole==='Under Supervision')
+  );
+}
+function calcPoolHrs(part,role,taskCode=''){
   const r=getRatioForPart(part.num);
   if(isInspRole(role))return parseFloat((role==='Inspector'?r.inspHrs||1:r.prelimHrs||1).toFixed(3));
   if(role==='Under Supervision')return parseFloat((part.hours*(r.sup||0)/100).toFixed(3));
-  return parseFloat((part.hours*(r.tech||0)/100).toFixed(3));
+  const taskEntries=getTaskGroupEntries(taskCode,part.num);
+  const hasSup=taskEntries.some(e=>e.jobRole==='Under Supervision');
+  const techPool=hasSup ? (part.hours*(r.tech||0)/100) : part.hours;
+  return parseFloat(techPool.toFixed(3));
+}
+function getTaskSplitPools(taskCode, partNum, stdHrs){
+  const ratios=getRatioForPart(partNum);
+  const taskEntries=getTaskGroupEntries(taskCode, partNum);
+  const hasSup=taskEntries.some(e=>e.jobRole==='Under Supervision');
+  return {
+    Technician: parseFloat((hasSup ? stdHrs*(ratios.tech||0)/100 : stdHrs).toFixed(3)),
+    'Under Supervision': parseFloat((stdHrs*(ratios.sup||0)/100).toFixed(3)),
+    Inspector: parseFloat((ratios.inspHrs||0).toFixed(3)),
+    'Preliminary Inspector': parseFloat((ratios.prelim||ratios.prelimHrs||0).toFixed(3))
+  };
 }
 
 // NEW getDividedHours: correct SDT division per role, no duplicate overwrite
@@ -1426,7 +1451,7 @@ function getDividedHours(entry, allEntries) {
   }
   // Only Technician and Under Supervision are pooled for SDT
   const taskEntries = allEntries.filter(e =>
-    e.taskCode === entry.taskCode &&
+    (e.taskCode || '') === (entry.taskCode || '') &&
     e.pnum === entry.pnum &&
     e.jobType !== 'scrap' &&
     (e.jobRole === 'Technician' || e.jobRole === 'Under Supervision')
@@ -1434,12 +1459,14 @@ function getDividedHours(entry, allEntries) {
   const partObj = parts.find(p => p.num === entry.pnum);
   const stdHours = partObj ? partObj.hours : (entry.stdHours || 0);
   const ratios = getRatioForPart(entry.pnum);
+  const techEntries = taskEntries.filter(e => e.jobRole === 'Technician');
+  const supEntries = taskEntries.filter(e => e.jobRole === 'Under Supervision');
+  const hasSup = supEntries.length > 0;
+
   if (role === 'Technician') {
-    const techEntries = taskEntries.filter(e => e.jobRole === 'Technician');
-    const techPool = stdHours * (ratios.tech / 100);
+    const techPool = hasSup ? stdHours * (ratios.tech / 100) : stdHours;
     return techEntries.length ? techPool / techEntries.length : 0;
   } else { // Under Supervision
-    const supEntries = taskEntries.filter(e => e.jobRole === 'Under Supervision');
     const supPool = stdHours * (ratios.sup / 100);
     return supEntries.length ? supPool / supEntries.length : 0;
   }
@@ -1623,7 +1650,8 @@ function refreshAllocHrs(){
     return;
   }
   const part=parts.find(p=>p.id===partId);if(!part)return;
-  const pool=calcPoolHrs(part,selJobRole);
+  const taskCode=sanitize(document.getElementById('e-taskcode')?.value).toUpperCase();
+  const pool=calcPoolHrs(part,selJobRole,taskCode);
   const insp=isInspRole(selJobRole);
   if(jobType==='scrap'){
     if(hoursRow)hoursRow.style.display='none';
@@ -1790,7 +1818,8 @@ function openReviewModal(){
   if(!partId){toast('Select a part','error');return;}
   if(!taskCode){toast('Enter a Task Code','error');return;}
   const part=parts.find(p=>p.id===partId);if(!part)return;
-  const pool=calcPoolHrs(part,selJobRole);
+  const taskCode=sanitize(document.getElementById('e-taskcode')?.value).toUpperCase();
+  const pool=calcPoolHrs(part,selJobRole,taskCode);
   const insp=isInspRole(selJobRole);
   const scrapHrs=jobType==='scrap'?gv('e-scrap-hrs')||2:null;
   pendingEntry={
@@ -1865,7 +1894,8 @@ function renderMyStats(){
   const weekSDT=me.filter(e=>dateInRange(e.time,wr.start,wr.end)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
   const monthSDT=me.filter(e=>dateInRange(e.time,mrSel.start,mrSel.end)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
   const asnHrs=assignments.filter(a=>a.techId===CU.id&&a.date>=mrSel.start&&a.date<=mrSel.end).reduce((s,a)=>s+(a.hrs||0),0);
-  const totalAchieved=monthSDT+asnHrs;
+  const inspHrs=me.filter(e=>dateInRange(e.time,mrSel.start,mrSel.end)&&!isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
+  const totalAchieved=monthSDT+asnHrs+inspHrs;
   stxt('ms-today',todaySDT.toFixed(2)+'h');stxt('ms-week',weekSDT.toFixed(2)+'h');
   stxt('ms-month',monthSDT.toFixed(2)+'h');
   stxt('ms-asn',asnHrs.toFixed(2)+'h');stxt('ms-total',totalAchieved.toFixed(2)+'h');
@@ -1946,8 +1976,9 @@ function getLeaderboardStats(){
   const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
   return techs.filter(t=>t.status==='active').map(t=>{
     const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
+    const insp=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&!isSDT(e)&&e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
     const asn=assignments.filter(a=>a.techId===t.id&&a.date>=mr.start&&a.date<=mr.end).reduce((s,a)=>s+(a.hrs||0),0);
-    return{...t,total:sdt+asn,tgt:t.monthlyTarget||160};
+    return{...t,total:sdt+asn+insp,tgt:t.monthlyTarget||160};
   });
 }
 function renderLeaderboardInto(bodyId,qId){
@@ -1955,14 +1986,14 @@ function renderLeaderboardInto(bodyId,qId){
   const q=(document.getElementById(qId)?.value||'').toLowerCase();
   const stats=getLeaderboardStats().filter(t=>!q||t.name.toLowerCase().includes(q)).sort((a,b)=>b.total-a.total);
   cont.innerHTML=stats.map((t,i)=>{
-    const pct=Math.min(100,t.tgt?Math.round(t.total/t.tgt*100):0);
+    const pct=t.tgt?Math.round(t.total/t.tgt*100):0;
     const col=pct>=100?'var(--green)':pct>=70?'var(--amber)':'var(--rose)';
     return`<div class="lb-row">
       <div class="lb-rk">${i+1}</div>
       <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0;">${avatarHtml(t.id,t.name,30)}</div>
       <div class="lb-in"><div class="lb-nm">${t.name}</div><div class="lb-id">${t.id}</div></div>
-      <div class="lb-pb"><div class="lb-pbf" style="width:${pct}%;background:${col};"></div></div>
-      <div class="lb-hrs" style="color:${col}">${t.total.toFixed(1)}/${t.tgt}h</div>
+      <div class="lb-pb"><div class="lb-pbf" style="width:${Math.min(100,pct)}%;background:${col};"></div></div>
+      <div class="lb-hrs" style="color:${col}">${t.total.toFixed(1)}/${t.tgt}h · ${pct}%</div>
     </div>`;
   }).join('')||'<div class="empty">No data</div>';
 }
@@ -1993,17 +2024,16 @@ function buildLeaderboardExportPanel(stats){
       <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;background:#f43f5e;display:inline-block;border-radius:2px;"></span>TROUBLE</span>
     </div>
     <div style="padding:0 24px 20px;">
-      <div style="height:460px;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);display:grid;grid-template-columns:repeat(5,1fr);gap:16px;align-items:end;padding:18px 18px 16px;box-sizing:border-box;">
+      <div style="height:560px;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);display:grid;grid-template-columns:repeat(5,1fr);gap:16px;align-items:end;padding:18px 18px 16px;box-sizing:border-box;">
         ${stats.slice(0,5).map((t,i)=>{
-          const pct=Math.min(100,t.tgt?Math.round(t.total/t.tgt*100):0);
+          const pct=t.tgt?Math.round(t.total/t.tgt*100):0;
           const col=pct>=100?'#10b981':pct>=70?'#f59e0b':'#f43f5e';
-          const barH=Math.max(60,Math.round(pct/100*280));
-          return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
-            <div style="font-size:26px;font-weight:800;color:${col};margin-bottom:8px;">${pct}%</div>
-            <div style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;min-height:0;">
-              <div style="width:100%;max-width:180px;height:${barH}px;background:${col};border-radius:10px 10px 0 0;position:relative;display:flex;align-items:flex-end;justify-content:center;">
-                <div style="position:absolute;top:-56px;left:50%;transform:translateX(-50%);width:52px;height:52px;border-radius:50%;overflow:hidden;border:3px solid ${col};background:#fff;">${avatarHtml(t.id,t.name,52)}</div>
-              </div>
+          const barH=Math.max(90,Math.min(320,Math.round((pct/100)*280)));
+          return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative;padding-top:58px;">
+            <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);font-size:28px;font-weight:800;color:${col};line-height:1;">${pct}%</div>
+            <div style="position:absolute;top:32px;left:50%;transform:translateX(-50%);width:72px;height:72px;border-radius:50%;overflow:hidden;border:3px solid ${col};background:#fff;">${avatarHtml(t.id,t.name,72)}</div>
+            <div style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;min-height:0;margin-top:86px;">
+              <div style="width:100%;max-width:180px;height:${barH}px;background:${col};border-radius:10px 10px 0 0;position:relative;display:flex;align-items:flex-end;justify-content:center;"></div>
             </div>
             <div style="width:100%;max-width:180px;padding-top:10px;text-align:center;">
               <div style="font-size:18px;font-weight:800;line-height:1.15;">${sanitize(t.name)}</div>
@@ -2266,8 +2296,8 @@ function renderReports(){
     const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
     const insp=inspEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
     const asn=assignments.filter(a=>a.techId===t.id&&a.date>=mr.start&&a.date<=mr.end).reduce((s,a)=>s+(a.hrs||0),0);
-    const total=sdt+asn;const tgt=t.monthlyTarget||160;
-    const pct=Math.min(100,Math.round(total/tgt*100));
+    const total=sdt+asn+insp;const tgt=t.monthlyTarget||160;
+    const pct=Math.round(total/tgt*100);
     const cls=pct>=100?'bgr':pct>=80?'bamb':pct>=60?'bblu':'bred';
     const status=pct>=100?'✅ Achieved':pct>=80?'⚠️ Near':pct>=60?'🟡 Progress':'🔴 Low';
     return`<tr>
@@ -2329,12 +2359,7 @@ function renderTG(){
     const isOv=!!(settings.partRatios&&settings.partRatios[partNum]);
     const partName=g.entries[0]?.pname||'—';
     const lastT=fmtEAT(new Date(Math.max(...g.entries.map(e=>new Date(e.time||0)))).toISOString());
-    const pools={
-      Technician:parseFloat((stdHrs*(ratios.tech||0)/100).toFixed(3)),
-      'Under Supervision':parseFloat((stdHrs*(ratios.sup||0)/100).toFixed(3)),
-      Inspector:parseFloat((ratios.inspHrs||0).toFixed(3)),
-      'Preliminary Inspector':parseFloat((ratios.prelim||ratios.prelimHrs||0).toFixed(3))
-    };
+    const pools=getTaskSplitPools(code,partNum,stdHrs);
     const personRows=(arr,role,ri)=>{
       if(!arr.length)return`<div style="color:var(--tx3);font-size:12px;padding:6px 0;">No entries</div>`;
       const cnt=arr.length,each=cnt?pools[role]/cnt:0,insp=isInspRole(role);
@@ -2381,7 +2406,8 @@ function exportTG(){
     const ratios=getRatioForPart(pnum);
     ROLES.forEach(r=>{
       const ra=arr.filter(e=>(e.jobRole||'Technician')===r);if(!ra.length)return;
-      const pool=isInspRole(r)?(r==='Inspector'?ratios.inspHrs||1:ratios.prelim||1):stdHrs*(r==='Technician'?ratios.tech||0:ratios.sup||0)/100;
+      const pools=getTaskSplitPools(code,pnum,stdHrs);
+      const pool=isInspRole(r)?(r==='Inspector'?pools.Inspector:pools['Preliminary Inspector']):pools[r];
       const each=ra.length?pool/ra.length:0;
       ra.forEach(e=>csv+=`"${code}","${pnum}","${r}","${e.jobType||'completed'}","${e.techName}","${e.techId}",${pool.toFixed(3)},${each.toFixed(3)},${isInspRole(r)?'NOT_SDT':'SDT'},${stdHrs},"${fmtEAT(e.time)}"\n`);
     });
@@ -2683,7 +2709,8 @@ function refreshLeAllocHrs(){
     return;
   }
   const part=parts.find(p=>p.id===partId);if(!part)return;
-  const pool=calcPoolHrs(part,leJobRole);
+  const taskCode=sanitize(document.getElementById('le-taskcode')?.value).toUpperCase();
+  const pool=calcPoolHrs(part,leJobRole,taskCode);
   const insp=isInspRole(leJobRole);
   if(leJobType==='scrap'){if(hoursRow)hoursRow.style.display='none';if(hoursEl)hoursEl.value=pool;return;}
   if(hoursRow)hoursRow.style.display='';
@@ -2736,7 +2763,8 @@ function openLeReviewModal(){
   if(!taskCode){toast('Enter a Task Code','error');return;}
   const tech=techs.find(t=>t.id===techId);if(!tech)return;
   const part=parts.find(p=>p.id===partId);if(!part)return;
-  const pool=calcPoolHrs(part,leJobRole);
+  const taskCode=sanitize(document.getElementById('le-taskcode')?.value).toUpperCase();
+  const pool=calcPoolHrs(part,leJobRole,taskCode);
   const insp=isInspRole(leJobRole);
   const scrapHrs=leJobType==='scrap'?gv('le-scrap-hrs')||2:null;
   lePendingEntry={
