@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="description" content="ProTrack MRO Production KPI System">
 <meta name="theme-color" content="#070c18">
-<title>ProTrack v1.0.0</title>
+<title>ProTrack v1.1.0</title>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -600,7 +600,7 @@ tbody tr:hover td{background:var(--card2);}
                 <div class="ch"><span class="ct">Today's Submissions</span></div>
                 <div style="max-height:380px;overflow-y:auto;">
                    <table>
-                    <thead> <tr><th>Time</th><th>Task Code</th><th>Role</th><th>Part</th><th>Hrs</th><th>Type</th></tr> </thead>
+                    <thead> <tr><th>Time</th><th>Task Code</th><th>Role</th><th>Part</th><th>Hrs</th><th>Type</th><th>Actions</th> </tr> </thead>
                     <tbody id="e-today-list"></tbody>
                    </table>
                 </div>
@@ -628,7 +628,7 @@ tbody tr:hover td{background:var(--card2);}
           </div>
           <div class="card">
             <div class="ch"><span class="ct">Production History</span><button class="btn bo bsm" onclick="exportMine()">⬇ Export</button></div>
-            <div class="tw"><table><thead> <tr><th>Date/Time (EAT)</th><th>Task Code</th><th>Role</th><th>Part</th><th>ATA</th><th>Part #</th><th>Hrs (÷peers)</th><th>Type</th></tr> </thead>
+            <div class="tw"><table><thead> <tr><th>Date/Time (EAT)</th><th>Task Code</th><th>Role</th><th>Part</th><th>ATA</th><th>Part #</th><th>Hrs (÷peers)</th><th>Type</th> </tr> </thead>
             <tbody id="ms-hist"></tbody></table></div>
           </div>
           <div class="card">
@@ -746,7 +746,7 @@ tbody tr:hover td{background:var(--card2);}
             <button class="btn bo bsm" onclick="exportAllEntries()">⬇ CSV</button>
           </div>
           <div class="card"><div class="tw"><table>
-            <thead> <tr><th>Date/Time (EAT)</th><th>Tech</th><th>Task Code</th><th>Role</th><th>Type</th><th>Part</th><th>ATA</th><th>Part #</th><th>Hrs (÷peers)</th></tr> </thead>
+            <thead> <tr><th>Date/Time (EAT)</th><th>Tech</th><th>Task Code</th><th>Role</th><th>Type</th><th>Part</th><th>ATA</th><th>Part #</th><th>Hrs (÷peers)</th><th>Actions</th> </tr> </thead>
             <tbody id="ae-body"></tbody>
            </table></div></div>
         </div>
@@ -771,7 +771,7 @@ tbody tr:hover td{background:var(--card2);}
             </div>
           </div>
           <div class="card"><div class="ch"><span class="ct">Selected Range Summary</span><button class="btn bo bsm" onclick="exportAllEntries()">⬇ Export</button></div>
-            <div class="tw"><table><thead> <tr><th>Tech</th><th>SDT Target</th><th>SDT Actual</th><th>Asn Hrs</th><th>Total Achieved</th><th>Insp Hrs</th><th>Progress</th><th>Avg/Day</th><th>Status</th></tr> </thead>
+            <div class="tw"><td><thead> <tr><th>Tech</th><th>SDT Target</th><th>SDT Actual</th><th>Asn Hrs</th><th>Total Achieved</th><th>Insp Hrs</th><th>Progress</th><th>Avg/Day</th><th>Status</th> </tr> </thead>
             <tbody id="rpt-body"></tbody></table></div>
           </div>
         </div>
@@ -863,7 +863,7 @@ tbody tr:hover td{background:var(--card2);}
             <button class="btn bo" onclick="openModal('m-import-tech')">⬆ Import</button>
           </div>
           <div class="card"><div class="tw"><table>
-            <thead> <tr><th>Photo</th><th>ID</th><th>Name</th><th>Monthly Target</th><th>Weekly Target</th><th>Daily Target</th><th>Status</th><th>Actions</th></tr> </thead>
+            <thead> <tr><th>Photo</th><th>ID</th><th>Name</th><th>Monthly Target</th><th>Weekly Target</th><th>Daily Target</th><th>Status</th><th>Actions</th> </tr> </thead>
             <tbody id="at-body"></tbody>
            </table></div></div>
         </div>
@@ -875,8 +875,8 @@ tbody tr:hover td{background:var(--card2);}
             <button class="btn bp" onclick="openAddPart()">+ Add</button>
             <button class="btn bo" onclick="openModal('m-import-part')">⬆ Import</button>
           </div>
-          <div class="card"><div class="tw"><table>
-            <thead> <tr><th>Description</th><th>ATA</th><th>Part Number</th><th>Std Hours</th><th>Actions</th></tr> </thead>
+          <div class="card"><div class="tw"><tr>
+            <thead> <tr><th>Description</th><th>ATA</th><th>Part Number</th><th>Std Hours</th><th>Actions</th> </tr> </thead>
             <tbody id="ap-body"></tbody>
            </table></div></div>
         </div>
@@ -888,7 +888,7 @@ tbody tr:hover td{background:var(--card2);}
             <button class="btn bp" onclick="openAddLeader()">+ Add</button>
           </div>
           <div class="card"><div class="tw"><table>
-            <thead> <tr><th>Photo</th><th>ID</th><th>Name</th><th>Email</th><th>Status</th><th>Actions</th></tr> </thead>
+            <thead> <tr><th>Photo</th><th>ID</th><th>Name</th><th>Email</th><th>Status</th><th>Actions</th> </tr> </thead>
             <tbody id="al-body"></tbody>
            </table></div></div>
         </div>
@@ -901,7 +901,7 @@ tbody tr:hover td{background:var(--card2);}
             <button class="btn bp" onclick="openAddController()">+ Add</button>
           </div>
           <div class="card"><div class="tw"><table>
-            <thead> <tr><th>Photo</th><th>ID</th><th>Name</th><th>Email</th><th>Status</th><th>Actions</th></tr> </thead>
+            <thead> <tr><th>Photo</th><th>ID</th><th>Name</th><th>Email</th><th>Status</th><th>Actions</th> </tr> </thead>
             <tbody id="ac-body"></tbody>
            </table></div></div>
         </div>
@@ -972,7 +972,7 @@ tbody tr:hover td{background:var(--card2);}
           <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:14px;align-items:start;">
             <div>
               <div class="card">
-                <div class="ch"><span class="ct">📋 Production Controller Entry</span><button class="btn bo bsm" onclick="openModal('m-import-entry')">⬆ Import Production Entries</button></div>
+                <div class="ch"><span class="ct">📋 Production Controller Entry</span><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn bo bsm" onclick="openModal('m-import-entry')">⬆ Import Production Entries</button><button class="btn bo bsm" id="le-refresh-btn" onclick="refreshControllerEntry()">⟳ Refresh</button></div></div>
                 <div class="cb">
                   <div class="fg f2">
                     <div class="fgroup ff"><label class="flabel">🔧 Technician *</label>
@@ -1029,7 +1029,7 @@ tbody tr:hover td{background:var(--card2);}
                 <div class="ch"><span class="ct">Today's Entries</span></div>
                 <div style="max-height:330px;overflow-y:auto;">
                    <table>
-                    <thead> <tr><th>Tech</th><th>Task Code</th><th>Role</th><th>Part</th><th>Hrs</th><th>Type</th></tr> </thead>
+                    <thead> <tr><th>Tech</th><th>Task Code</th><th>Role</th><th>Part</th><th>Hrs</th><th>Type</th> </tr> </thead>
                     <tbody id="le-today-list"></tbody>
                    </table>
                 </div>
@@ -1080,7 +1080,7 @@ tbody tr:hover td{background:var(--card2);}
   <div class="modal msm">Change My Password
     <div class="mhd"><div class="mttl">Forgot Password</div><button class="mxb" onclick="closeModal('m-forgot')">✕</button></div>
     <div class="mbody">
-      <div class="al al-a"><span class="al-ico">💡</span><div>Contact your Developer/Admin to reset your password. Email:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b8d6d9ccd6d9ddd4d6d1f8ddccd0d1d7c8d1d9d6d9d1cad4d1d6ddcb96dbd7d5">[email&#160;protected]</a> <a href="/cdn-cgi/l/" class="__cf_email__" data-cfemail="204e41544e41454c4e4960455448494f5049414e4149524c494e45530e434f4d">[email&#160;protected]</a></div></div>
+      <div class="al al-a"><span class="al-ico">💡</span><div>Contact your Developer/Admin to reset your password. Email:natnaelni@ethiopianairlines.com <a href="/cdn-cgi/l/" class="__cf_email__" data-cfemail="204e41544e41454c4e4960455448494f5049414e4149524c494e45530e434f4d">[email&#160;protected]</a></div></div>
       <div style="margin-top:8px;">
         <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Developer Recovery</div>
         <div class="fg">
@@ -1248,13 +1248,12 @@ tbody tr:hover td{background:var(--card2);}
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 <script>
 'use strict';
 // ════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ════════════════════════════════════════════════
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.1.0';
 const DEV_RECOVERY_CODE = 'PROTRACK-DEV-2025-RESET';
 const EAT_TZ='Africa/Addis_Ababa';
 const ROLES=['Technician','Under Supervision','Inspector','Preliminary Inspector'];
@@ -1296,7 +1295,7 @@ window.toggleTheme=toggleTheme;
 //  SIDEBAR (mobile)
 // ════════════════════════════════════════════════
 function toggleSidebar(){const sb=document.getElementById('sb');const ov=document.getElementById('sb-overlay');sb.classList.toggle('open');ov.classList.toggle('on');}
-function closeSidebar(){document.getElementById('sb').classList.remove('open');document.getElementById('sb-overlay').classList.remove('on');}
+function closeSidebar(){document.getElementById('sb').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');}
 window.toggleSidebar=toggleSidebar;window.closeSidebar=closeSidebar;
 
 // ════════════════════════════════════════════════
@@ -1318,15 +1317,15 @@ function renderImportSummary(kind){
     return;
   }
   if(kind==='tech'){
-    body.innerHTML = `<div class="tw"><table><thead> <tr><th>ID</th><th>Name</th><th>Monthly Target</th><th>Status</th></tr> </thead><tbody>` +
+    body.innerHTML = `<div class="tw"><table><thead> <tr><th>ID</th><th>Name</th><th>Monthly Target</th><th>Status</th> </tr> </thead><tbody>` +
       rows.map(r=>`<tr><td class="mono">${sanitize(r.id)}</td><td>${sanitize(r.name)}</td><td class="mono">${sanitizeNum(r.monthlyTarget)}h</td><td><span class="bdg bgr">${sanitize(r.status||'active')}</span></td></tr>`).join('') +
       `</tbody></table></div>`;
   } else if(kind==='part'){
-    body.innerHTML = `<div class="tw"><table><thead> <tr><th>Part #</th><th>Name</th><th>Hours</th><th>ATA</th></tr> </thead><tbody>` +
+    body.innerHTML = `<div class="tw"><table><thead> <tr><th>Part #</th><th>Name</th><th>Hours</th><th>ATA</th> </tr> </thead><tbody>` +
       rows.map(r=>`<tr><td class="mono">${sanitize(r.num)}</td><td>${sanitize(r.name)}</td><td class="mono">${sanitizeNum(r.hours)}h</td><td class="mono">${sanitize(r.ata||'')}</td></tr>`).join('') +
       `</tbody></table></div>`;
   } else {
-    body.innerHTML = `<div class="tw"><table><thead> <tr><th>Date/Time (EAT)</th><th>Task Code</th><th>Tech</th><th>Role</th><th>Type</th><th>Part</th><th>Hours</th></tr> </thead><tbody>` +
+    body.innerHTML = `<div class="tw"><table><thead> <tr><th>Date/Time (EAT)</th><th>Task Code</th><th>Tech</th><th>Role</th><th>Type</th><th>Part</th><th>Hours</th> </tr> </thead><tbody>` +
       rows.map(r=>`<tr><td>${sanitize(fmtEAT(r.time))}</td><td class="mono">${sanitize(r.taskCode||'')}</td><td>${sanitize(r.techName||r.techId||'')}</td><td>${sanitize(r.jobRole||'')}</td><td><span class="${r.jobType==='scrap'?'cp-scrap':'cp-comp'}">${r.jobType==='scrap'?'Scrap':'Completed'}</span></td><td>${sanitize(r.pname||'')}</td><td class="mono">${sanitizeNum(r.hours)}h</td></tr>`).join('') +
       `</tbody></table></div>`;
   }
@@ -1392,6 +1391,13 @@ function ensureDateRangeDefaults(prefix,fallback){const f=document.getElementByI
 function applyDatePreset(prefix,v,renderFn){const mr=getMR(),wr=getWR(),today=todayEAT();if(v==='today')setDateRange(prefix,today,today);else if(v==='week')setDateRange(prefix,wr.start,wr.end);else if(v==='month')setDateRange(prefix,mr.start,mr.end);else if(v==='all')setDateRange(prefix,'1900-01-01','9999-12-31');else return;const fn=window[renderFn];if(typeof fn==='function')fn();}
 function getDailyTgt(m){return parseFloat((m/22).toFixed(2));}
 function getWeeklyTgt(m){return parseFloat((getDailyTgt(m)*5).toFixed(2));}
+function getTechRangeSummary(techId,start,end){
+  const rangeEntries=entries.filter(e=>e.techId===techId&&dateInRange(e.time,start,end));
+  const sdt=rangeEntries.filter(e=>isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
+  const insp=rangeEntries.filter(e=>!isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
+  const asn=assignments.filter(a=>a.techId===techId&&a.date>=start&&a.date<=end).reduce((s,a)=>s+(a.hrs||0),0);
+  return {sdt,insp,asn,total:sdt+insp+asn};
+}
 
 // ════════════════════════════════════════════════
 //  SECURITY HELPERS
@@ -1479,17 +1485,12 @@ function getDividedHours(entry, allEntries) {
   const partObj = parts.find(p => p.num === entry.pnum);
   const stdHours = partObj ? partObj.hours : (entry.stdHours || 0);
   const ratios = getRatioForPart(entry.pnum);
-  const techEntries = taskEntries.filter(e => e.jobRole === 'Technician');
-  const supEntries = taskEntries.filter(e => e.jobRole === 'Under Supervision');
   if (role === 'Technician') {
-    // If no Under Supervision exists for this task, technician(s) get 100%
-    // If Under Supervision is present, technician(s) share ratios.tech% (e.g. 25%)
-    const techPool = supEntries.length === 0
-      ? stdHours
-      : stdHours * (ratios.tech / 100);
+    const techEntries = taskEntries.filter(e => e.jobRole === 'Technician');
+    const techPool = stdHours * (ratios.tech / 100);
     return techEntries.length ? techPool / techEntries.length : 0;
   } else { // Under Supervision
-    // Under Supervision always gets ratios.sup% (e.g. 75%), divided equally among all under supervision
+    const supEntries = taskEntries.filter(e => e.jobRole === 'Under Supervision');
     const supPool = stdHours * (ratios.sup / 100);
     return supEntries.length ? supPool / supEntries.length : 0;
   }
@@ -1810,8 +1811,8 @@ function renderEntry(){
         <td style="font-size:12px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.pname}</td>
         <td class="mono">${div.toFixed(2)}h${insp?'<span class="not-sdt">!</span>':''}</td>
         <td><span class="${e.jobType==='scrap'?'cp-scrap':'cp-comp'}">${e.jobType==='scrap'?'Scrap':'Done'}</span></td>
-       </tr>`;
-    }).join(''):'<tr><td colspan="6" class="empty">No entries today</td></tr>';
+       <tr>`;
+    }).join(''):'<tr><td colspan="7" class="empty">No entries today</td></tr>';
   }
 }
 function populatePartSel(){
@@ -1863,6 +1864,13 @@ function openReviewModal(){
     fields.map(([l,v])=>`<div class="review-field"><div class="rf-label">${l}</div><div class="rf-val">${v}</div></div>`).join('')+
     `</div>
     <div class="al al-g"><span class="al-ico">✅</span><div>Confirm the details above are correct before saving. Click <strong>Go Back</strong> to make changes.</div></div>`;
+  const title=document.querySelector('#m-review .mttl');
+  const sub=document.querySelector('#m-review .msub');
+  const btnLabel=document.querySelector('#confirm-save-btn .btn-label');
+  if(title) title.textContent='✅ Confirm Entry';
+  if(sub) sub.textContent='Review your data before saving';
+  if(btnLabel) btnLabel.textContent='Confirm & Save →';
+  document.getElementById('confirm-save-btn').onclick=confirmSave;
   openModal('m-review');
 }
 window.openReviewModal=openReviewModal;
@@ -1881,7 +1889,7 @@ async function confirmSave(){
     clearEntry();
     renderEntry();
     toast(`✓ ${savedEntry.pname} — ${savedEntry.jobRole} — ${savedEntry.hours}h saved`);
-  }catch(err){toast('Save failed: '+err.message,'error');}
+  }catch(err){toast('Save failed: '+entryPermissionMessage(err),'error');}
   finally{if(btn){btn.classList.remove('saving');btn.disabled=false;}}
 }
 window.confirmSave=confirmSave;
@@ -1908,9 +1916,10 @@ function renderMyStats(){
   const dt=getDailyTgt(mt),wt=getWeeklyTgt(mt);
   const todaySDT=me.filter(e=>e.time?.startsWith(today)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
   const weekSDT=me.filter(e=>dateInRange(e.time,wr.start,wr.end)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const monthSDT=me.filter(e=>dateInRange(e.time,mrSel.start,mrSel.end)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const asnHrs=assignments.filter(a=>a.techId===CU.id&&a.date>=mrSel.start&&a.date<=mrSel.end).reduce((s,a)=>s+(a.hrs||0),0);
-  const totalAchieved=monthSDT+asnHrs;
+  const monthSummary=getTechRangeSummary(CU.id,mrSel.start,mrSel.end);
+  const monthSDT=monthSummary.sdt;
+  const asnHrs=monthSummary.asn;
+  const totalAchieved=monthSummary.total;
   stxt('ms-today',todaySDT.toFixed(2)+'h');stxt('ms-week',weekSDT.toFixed(2)+'h');
   stxt('ms-month',monthSDT.toFixed(2)+'h');
   stxt('ms-asn',asnHrs.toFixed(2)+'h');stxt('ms-total',totalAchieved.toFixed(2)+'h');
@@ -1920,7 +1929,7 @@ function renderMyStats(){
   const dpc=Math.min(100,dt?Math.round(todaySDT/dt*100):0);
   const wpc=Math.min(100,wt?Math.round(weekSDT/wt*100):0);
   const mpc=Math.min(100,mt?Math.round(monthSDT/mt*100):0);
-  const tpc=Math.min(100,mt?Math.round(totalAchieved/mt*100):0);
+  const tpc=mt?Math.round(totalAchieved/mt*100):0;
   stxt('ms-dpc',dpc+'%');stxt('ms-wpc',wpc+'%');stxt('ms-mpc',mpc+'%');stxt('ms-tot-pc',tpc+'%');
   const tbody=document.getElementById('ms-hist');
   if(tbody){tbody.innerHTML=me.slice(0,60).map(e=>{
@@ -1952,11 +1961,12 @@ function renderDashboard(){
   const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
   const activeTechs=new Set(sdtEnt.map(e=>e.techId)).size;
   const totalSDT=sdtEnt.reduce((s,e)=>s+getDividedHours(e,entries),0);
+  const totalAchieved=techs.filter(t=>t.status==='active').reduce((s,t)=>s+getTechRangeSummary(t.id,mr.start,mr.end).total,0);
   const totalTgt=techs.filter(t=>t.status==='active').reduce((s,t)=>s+(t.monthlyTarget||160),0);
-  const avg=activeTechs?totalSDT/activeTechs:0;
-  const prog=totalTgt?Math.min(100,Math.round(totalSDT/totalTgt*100)):0;
+  const avg=activeTechs?totalAchieved/activeTechs:0;
+  const prog=totalTgt?Math.round(totalAchieved/totalTgt*100):0;
   stxt('d-act',activeTechs);stxt('d-acts','of '+techs.filter(t=>t.status==='active').length+' active');
-  stxt('d-sdt',totalSDT.toFixed(1)+'h');stxt('d-tgt',totalTgt);stxt('d-avg',avg.toFixed(1)+'h');stxt('d-prog',prog+'%');
+  stxt('d-sdt',totalAchieved.toFixed(1)+'h');stxt('d-tgt',totalTgt);stxt('d-avg',avg.toFixed(1)+'h');stxt('d-prog',prog+'%');
   renderAchievGraph();renderLB();
 }
 function setAF(f,btn){achievFilter=f;document.querySelectorAll('.af-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');renderAchievGraph();}
@@ -1967,10 +1977,9 @@ function renderAchievGraph(){
   const mr=getDateRange('db',getMR());
   const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
   let stats=techs.filter(t=>t.status==='active').map(t=>{
-    const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
-    const asn=assignments.filter(a=>a.techId===t.id&&a.date>=mr.start&&a.date<=mr.end).reduce((s,a)=>s+(a.hrs||0),0);
-    const total=sdt+asn;const tgt=t.monthlyTarget||160;
-    return{...t,total,tgt,pct:tgt?Math.min(150,Math.round(total/tgt*100)):0};
+    const summary=getTechRangeSummary(t.id,mr.start,mr.end);
+    const tgt=t.monthlyTarget||160;
+    return{...t,total:summary.total,tgt,pct:tgt?Math.min(150,Math.round(summary.total/tgt*100)):0};
   });
   if(achievFilter==='top')stats=stats.sort((a,b)=>b.pct-a.pct).slice(0,8);
   else if(achievFilter==='low')stats=stats.sort((a,b)=>a.pct-b.pct).slice(0,8);
@@ -1991,26 +2000,25 @@ function renderAchievGraph(){
 function getLeaderboardStats(){
   ensureDateRangeDefaults('db',getMR());
   const mr=getDateRange('db',getMR());
-  const sdtEnt=entries.filter(e=>dateInRange(e.time,mr.start,mr.end)&&isSDT(e));
   return techs.filter(t=>t.status==='active').map(t=>{
-    const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
-    const asn=assignments.filter(a=>a.techId===t.id&&a.date>=mr.start&&a.date<=mr.end).reduce((s,a)=>s+(a.hrs||0),0);
-    return{...t,total:sdt+asn,tgt:t.monthlyTarget||160};
+    const summary=getTechRangeSummary(t.id,mr.start,mr.end);
+    return{...t,total:summary.total,tgt:t.monthlyTarget||160};
   });
 }
+
 function renderLeaderboardInto(bodyId,qId){
   const cont=document.getElementById(bodyId);if(!cont)return;
   const q=(document.getElementById(qId)?.value||'').toLowerCase();
   const stats=getLeaderboardStats().filter(t=>!q||t.name.toLowerCase().includes(q)).sort((a,b)=>b.total-a.total);
   cont.innerHTML=stats.map((t,i)=>{
-    const pct=Math.min(100,t.tgt?Math.round(t.total/t.tgt*100):0);
+    const pct=t.tgt?Math.round(t.total/t.tgt*100):0;
     const col=pct>=100?'var(--green)':pct>=70?'var(--amber)':'var(--rose)';
     return`<div class="lb-row">
       <div class="lb-rk">${i+1}</div>
       <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0;">${avatarHtml(t.id,t.name,30)}</div>
       <div class="lb-in"><div class="lb-nm">${t.name}</div><div class="lb-id">${t.id}</div></div>
       <div class="lb-pb"><div class="lb-pbf" style="width:${pct}%;background:${col};"></div></div>
-      <div class="lb-hrs" style="color:${col}">${t.total.toFixed(1)}/${t.tgt}h</div>
+      <div class="lb-hrs" style="color:${col}">${t.total.toFixed(1)}/${t.tgt}h (${pct}%)</div>
     </div>`;
   }).join('')||'<div class="empty">No data</div>';
 }
@@ -2030,6 +2038,8 @@ function buildLeaderboardExportPanel(stats){
   panel.style.color='#0f172a';
   panel.style.border='1px solid #e2e8f0';
   panel.style.fontFamily="'Plus Jakarta Sans', sans-serif";
+  const top5=stats.slice(0,5);
+  const maxPct=Math.max(100,...top5.map(t=>Math.round((t.total/(t.tgt||1))*100)));
   panel.innerHTML=`
     <div style="background:#c1121f;color:#fff;padding:18px 26px 14px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
       <div style="font-size:40px;font-weight:800;letter-spacing:-1px;line-height:1;">LEADERBOARD</div>
@@ -2041,19 +2051,19 @@ function buildLeaderboardExportPanel(stats){
       <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;background:#f43f5e;display:inline-block;border-radius:2px;"></span>TROUBLE</span>
     </div>
     <div style="padding:0 24px 20px;">
-      <div style="height:460px;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);display:grid;grid-template-columns:repeat(5,1fr);gap:16px;align-items:end;padding:18px 18px 16px;box-sizing:border-box;">
-        ${stats.slice(0,5).map((t,i)=>{
-          const pct=Math.min(100,t.tgt?Math.round(t.total/t.tgt*100):0);
+      <div style="height:540px;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);display:grid;grid-template-columns:repeat(5,1fr);gap:16px;align-items:end;padding:18px 18px 16px;box-sizing:border-box;">
+        ${top5.map((t,i)=>{
+          const pct=Math.round(t.total/(t.tgt||1)*100);
           const col=pct>=100?'#10b981':pct>=70?'#f59e0b':'#f43f5e';
-          const barH=Math.max(60,Math.round(pct/100*280));
+          const barH=Math.max(80,Math.round(pct/maxPct*320));
           return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
-            <div style="font-size:26px;font-weight:800;color:${col};margin-bottom:8px;">${pct}%</div>
-            <div style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;min-height:0;">
-              <div style="width:100%;max-width:180px;height:${barH}px;background:${col};border-radius:10px 10px 0 0;position:relative;display:flex;align-items:flex-end;justify-content:center;">
-                <div style="position:absolute;top:-56px;left:50%;transform:translateX(-50%);width:52px;height:52px;border-radius:50%;overflow:hidden;border:3px solid ${col};background:#fff;">${avatarHtml(t.id,t.name,52)}</div>
+            <div style="font-size:30px;font-weight:900;color:${col};margin-bottom:8px;line-height:1;">${pct}%</div>
+            <div style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;min-height:0;position:relative;overflow:visible;">
+              <div style="position:relative;width:100%;max-width:180px;height:${barH}px;background:${col};border-radius:10px 10px 0 0;display:flex;align-items:flex-start;justify-content:center;overflow:visible;">
+                <div style="position:absolute;top:-76px;left:50%;transform:translateX(-50%);width:72px;height:72px;border-radius:50%;overflow:hidden;border:5px solid ${col};background:#fff;box-shadow:0 8px 18px rgba(0,0,0,.12);">${avatarHtml(t.id,t.name,72,24)}</div>
               </div>
             </div>
-            <div style="width:100%;max-width:180px;padding-top:10px;text-align:center;">
+            <div style="width:100%;max-width:180px;padding-top:14px;text-align:center;">
               <div style="font-size:18px;font-weight:800;line-height:1.15;">${sanitize(t.name)}</div>
               <div style="font-size:12px;color:#64748b;margin-top:3px;">${sanitize(t.id)} · ${t.total.toFixed(1)}/${t.tgt}h</div>
               <div style="font-size:11px;color:${col};font-weight:700;margin-top:4px;">Rank ${i+1}</div>
@@ -2197,8 +2207,9 @@ function renderAllEntries(){
       <td><span class="${e.jobType==='scrap'?'cp-scrap':'cp-comp'}">${e.jobType==='scrap'?'Scrap':'Done'}</span></td>
       <td>${e.pname}</td><td class="mono">${e.ata||'—'}</td><td class="mono">${e.pnum||'—'}</td>
       <td class="mono">${div.toFixed(2)}h${insp?' <span class="not-sdt">!</span>':''}</td>
+      <td>${entryActionButtons(e, "flex-start")}</td>
      </tr>`;
-  }).join('')||'<tr><td colspan="9" class="empty">No entries</td></tr>';}
+  }).join('')||'<tr><td colspan="10" class="empty">No entries</td></tr>';}
 }
 
 // ════════════════════════════════════════════════
@@ -2214,8 +2225,8 @@ function renderReports(){
     const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
     const insp=inspEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
     const asn=assignments.filter(a=>a.techId===t.id&&a.date>=mr.start&&a.date<=mr.end).reduce((s,a)=>s+(a.hrs||0),0);
-    const total=sdt+asn;const tgt=t.monthlyTarget||160;
-    const pct=Math.min(100,Math.round(total/tgt*100));
+    const total=sdt+asn+insp;const tgt=t.monthlyTarget||160;
+    const pct=Math.round(total/tgt*100);
     const cls=pct>=100?'bgr':pct>=80?'bamb':pct>=60?'bblu':'bred';
     const status=pct>=100?'✅ Achieved':pct>=80?'⚠️ Near':pct>=60?'🟡 Progress':'🔴 Low';
     return`<tr>
@@ -2230,7 +2241,6 @@ function renderReports(){
      </tr>`;
   }).join('')||'<tr><td colspan="9" class="empty">No data</td></tr>';
 }
-
 // ════════════════════════════════════════════════
 //  TASK CODE GROUPS
 // ════════════════════════════════════════════════
@@ -2739,6 +2749,7 @@ window.openModal=openModal;window.closeModal=closeModal;
 //  LEADER: TECHNICIAN ENTRY
 // ════════════════════════════════════════════════
 let leJobType='completed',leJobRole='Technician',leJobRoleIdx=0,lePendingEntry=null;
+let editingEntryId=null;
 function populateLeaderEntryTechs(){
   const sel=document.getElementById('le-tech-sel');if(!sel)return;
   const cur=sel.value;
@@ -2814,12 +2825,152 @@ function renderLeaderEntry(){
         <td style="font-size:11px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.pname}</td>
         <td class="mono">${div.toFixed(2)}h</td>
         <td><span class="${e.jobType==='scrap'?'cp-scrap':'cp-comp'}">${e.jobType==='scrap'?'Scrap':'Done'}</span></td>
+        <td>${entryActionButtons(e)}</td>
        </tr>`;
-    }).join(''):'<tr><td colspan="6" class="empty">No leader entries today</td></tr>';
+    }).join(''):'<tr><td colspan="7" class="empty">No leader entries today</td></tr>';
   }
   if(!document.getElementById('le-time')?.value)sv('le-time',nowEAT());
+  updateLeSubmitLabel();
   renderLB();
 }
+async function refreshControllerEntry(){
+  const btn=document.getElementById('le-refresh-btn');
+  if(btn){btn.classList.add('saving');btn.disabled=true;}
+  showLoading('Refreshing controller entry…');
+  try{
+    const ts=await window.getDocs(window.collection(window.db,'technicians'));techs=ts.docs.map(d=>({id:d.id,...d.data()}));
+    const ps=await window.getDocs(window.collection(window.db,'parts'));parts=ps.docs.map(d=>({id:d.id,...d.data()}));
+    const es=await window.getDocs(window.collection(window.db,'entries'));entries=es.docs.map(d=>({id:d.id,...d.data()}));
+    const as_=await window.getDocs(window.collection(window.db,'assignments'));assignments=as_.docs.map(d=>({id:d.id,...d.data()}));
+    await loadPics();
+    populateLeaderEntryTechs();
+    if(document.getElementById('le-tech-sel')?.value) onLeaderTechSel();
+    else refreshLeAllocHrs();
+    renderLeaderEntry();
+    toast('Controller entry refreshed');
+  }catch(err){
+    console.error(err);
+    toast('Refresh failed','error');
+  }finally{
+    hideLoading();
+    if(btn){btn.classList.remove('saving');btn.disabled=false;}
+  }
+}
+window.refreshControllerEntry=refreshControllerEntry;
+
+function formatEntryDateTime(v) {
+  if (!v) return nowEAT();
+  const s = String(v).trim();
+  if (!s) return nowEAT();
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(s)) return s.slice(0,16);
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return nowEAT();
+  const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0,16);
+}
+
+function canManageEntryRecord(entry){
+  if(CR==='dev' || CR==='lead' || CR==='ctrl') return true;
+  if(CR==='tech' && CU && entry && entry.techId===CU.id) return true;
+  return false;
+}
+function entryPermissionMessage(err){
+  const msg=String(err?.message||err||'');
+  if(/permission|denied|insufficient/i.test(msg)) return 'Permission denied. Check Firestore rules for update/delete on entries.';
+  return msg || 'Operation failed';
+}
+function entryActionButtons(entry, align = 'flex-end') {
+  if (!canManageEntryRecord(entry)) {
+    return `<span style="font-size:11px;color:var(--tx3);font-weight:600;">No access</span>`;
+  }
+  const id = entry.id;
+  // Use data-id and a CSS class instead of inline onclick
+  return `<div style="display:flex;gap:6px;justify-content:${align};">
+    <button class="btn bo bsm edit-entry-btn" data-id="${id}" title="Edit">✎</button>
+    <button class="btn bd bsm delete-entry-btn" data-id="${id}" title="Delete">🗑</button>
+  </div>`;
+}
+function updateLeSubmitLabel(){
+  const el=document.querySelector('#le-submit-btn .btn-label');
+  if(el) el.textContent=editingEntryId?'✎ Review & Update':'✓ Review & Submit';
+}
+function findPartForEntry(entry){
+  return parts.find(p=>String(p.num||'').trim().toLowerCase()===String(entry?.pnum||'').trim().toLowerCase())
+    || parts.find(p=>String(p.name||'').trim().toLowerCase()===String(entry?.pname||'').trim().toLowerCase())
+    || null;
+}
+function loadEntryIntoLeaderForm(entry){
+  if(!entry) return;
+  populateLeaderEntryTechs();
+  sv('le-tech-sel',entry.techId||'');
+  onLeaderTechSel();
+  sv('le-taskcode',entry.taskCode||'');
+  sv('le-time',formatEntryDateTime(entry.time));
+  const part=findPartForEntry(entry);
+  if(part){
+    sv('le-part-sel',part.id);
+    onLePartSel();
+  }else{
+    sv('le-desc',entry.pname||'');
+    sv('le-ata',entry.ata||'');
+    sv('le-pnum',entry.pnum||'');
+    sv('le-hours',entry.hours ?? '');
+  }
+  if(entry.jobType==='scrap') setLeJobType('scrap');
+  else setLeJobType('completed');
+  const idx=Math.max(0,ROLES.indexOf(entry.jobRole||'Technician'));
+  pickLeJobRole(entry.jobRole||'Technician',idx);
+  if(entry.scrapHrs!=null){
+    sv('le-scrap-hrs',entry.scrapHrs);
+  }else{
+    const shi=document.getElementById('le-scrap-hrs');
+    if(shi && !shi.value) shi.value='2';
+  }
+  updateLeSubmitLabel();
+}
+window.openEntryEditor = function(id) {
+  const entry = entries.find(e => e.id === id);
+  if (!entry) {
+    toast('Entry not found', 'error');
+    return;
+  }
+  if (!canManageEntryRecord(entry)) {
+    toast('You do not have permission to edit this entry', 'error');
+    return;
+  }
+  editingEntryId = id;
+  navTo('controllerentry');
+  setTimeout(() => {
+    loadEntryIntoLeaderForm(entry);
+    const title = document.querySelector('#m-review .mttl');
+    const sub = document.querySelector('#m-review .msub');
+    if (title) title.textContent = '✎ Update Entry';
+    if (sub) sub.textContent = 'Review your changes before saving';
+  }, 0);
+};
+window.deleteEntryRecord = async function(id) {
+  const entry = entries.find(e => e.id === id);
+  if (entry && !canManageEntryRecord(entry)) {
+    toast('You do not have permission to delete this entry', 'error');
+    return;
+  }
+  if (!confirm('Delete this entry?')) return;
+  try {
+    await window.deleteDoc(window.doc(window.db, 'entries', id));
+    entries = entries.filter(e => e.id !== id);
+    if (editingEntryId === id) {
+      editingEntryId = null;
+      updateLeSubmitLabel();
+      clearLeEntry();
+    }
+    refreshAfterImport();
+    toast('Entry deleted');
+  } catch (err) {
+    console.error(err);
+    toast('Delete failed: ' + entryPermissionMessage(err), 'error');
+  }
+};
+
 function openLeReviewModal(){
   const techId=document.getElementById('le-tech-sel')?.value;
   const partId=document.getElementById('le-part-sel')?.value;
@@ -2856,6 +3007,12 @@ function openLeReviewModal(){
     `<div class="al al-a"><span class="al-ico">⚠️</span><div>You are submitting on behalf of <strong>${tech.name}</strong>. Verify all details below.</div></div>`+
     `<div style="background:var(--card2);border-radius:8px;padding:12px 14px;margin-top:8px;">`+
     fields.map(([l,v])=>`<div class="review-field"><div class="rf-label">${l}</div><div class="rf-val">${v}</div></div>`).join('')+`</div>`;
+  const title=document.querySelector('#m-review .mttl');
+  const sub=document.querySelector('#m-review .msub');
+  const btnLabel=document.querySelector('#confirm-save-btn .btn-label');
+  if(title) title.textContent=editingEntryId?'✎ Update Entry':'✅ Confirm Entry';
+  if(sub) sub.textContent=editingEntryId?'Review your changes before saving':'Review your data before saving';
+  if(btnLabel) btnLabel.textContent=editingEntryId?'Confirm & Update →':'Confirm & Save →';
   document.getElementById('confirm-save-btn').onclick=confirmLeSave;
   openModal('m-review');
 }
@@ -2864,26 +3021,44 @@ async function confirmLeSave(){
   if(!lePendingEntry){toast('No pending entry','error');return;}
   const btn=document.getElementById('confirm-save-btn');
   if(btn){btn.classList.add('saving');btn.disabled=true;}
-  const savedEntry={...lePendingEntry};
+  const wasEdit=!!editingEntryId;
+  let savedEntry={...lePendingEntry};
   try{
-    // Always create a new entry – no overwrite
-    const ref=await window.addDoc(window.collection(window.db,'entries'),savedEntry);
-    savedEntry.id=ref.id;
-    entries.unshift(savedEntry);
+    if(wasEdit){
+      const existing=entries.find(e=>e.id===editingEntryId)||{};
+      savedEntry={...existing,...savedEntry,id:editingEntryId};
+      await window.setDoc(window.doc(window.db,'entries',editingEntryId),savedEntry);
+      const idx=entries.findIndex(e=>e.id===editingEntryId);
+      if(idx>-1) entries[idx]=savedEntry;
+    }else{
+      const ref=await window.addDoc(window.collection(window.db,'entries'),savedEntry);
+      savedEntry.id=ref.id;
+      entries.unshift(savedEntry);
+    }
     closeModal('m-review');
+    editingEntryId=null;
+    updateLeSubmitLabel();
     clearLeEntry();
     renderLeaderEntry();
-    toast(`✓ ${savedEntry.pname} — ${savedEntry.jobRole} — ${savedEntry.hours}h saved`);
-  }catch(err){toast('Save failed: '+err.message,'error');}
-  finally{if(btn){btn.classList.remove('saving');btn.disabled=false;}
-  document.getElementById('confirm-save-btn').onclick=confirmSave;}
+    toast(`✓ ${savedEntry.pname} — ${savedEntry.jobRole} — ${savedEntry.hours}h ${wasEdit?'updated':'saved'}`);
+  }catch(err){toast('Save failed: '+entryPermissionMessage(err),'error');}
+  finally{
+    if(btn){btn.classList.remove('saving');btn.disabled=false;}
+    document.getElementById('confirm-save-btn').onclick=confirmSave;
+    const title=document.querySelector('#m-review .mttl');
+    const sub=document.querySelector('#m-review .msub');
+    const btnLabel=document.querySelector('#confirm-save-btn .btn-label');
+    if(title) title.textContent='✅ Confirm Entry';
+    if(sub) sub.textContent='Review your data before saving';
+    if(btnLabel) btnLabel.textContent='Confirm & Save →';
+  }
 }
 window.confirmLeSave=confirmLeSave;
 function clearLeEntry(){
   clearPartSearch('le');
   ['le-part-sel','le-desc','le-ata','le-pnum','le-hours','le-taskcode'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   const shi=document.getElementById('le-scrap-hrs');if(shi)shi.value='2';
-  sv('le-time',nowEAT());setLeJobType('completed');pickLeJobRole('Technician',0);lePendingEntry=null;
+  sv('le-time',nowEAT());setLeJobType('completed');pickLeJobRole('Technician',0);lePendingEntry=null;editingEntryId=null;updateLeSubmitLabel();
 }
 window.clearLeEntry=clearLeEntry;
 
@@ -2894,7 +3069,7 @@ const NAV={
   tech:['mystats','taskgroups'],
   lead:['dashboard','controllerentry','assignments','allentries','reports','ratios','taskgroups'],
   ctrl:['controllerentry','allentries','taskgroups'],
-  dev:['techs','parts','leaders','controllers','pwmgmt','ratios','taskgroups','system']
+  dev:['techs','parts','leaders','controllers','allentries','pwmgmt','ratios','taskgroups','system']
 };
 const META={
   entry:{t:'Production Entry',d:'Log completed or scrap work'},
@@ -3024,6 +3199,20 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('login').classList.add('on');
   const mf=document.getElementById('ms-month-filter');if(mf&&!mf.value)mf.value=todayEAT().slice(0,7);
   stxt('ver-current','v'+APP_VERSION);
+});// Delegated event handlers for edit/delete buttons (works for dynamically added rows)
+document.body.addEventListener('click', function(e) {
+  if (e.target.classList.contains('edit-entry-btn') || e.target.closest('.edit-entry-btn')) {
+    const btn = e.target.classList.contains('edit-entry-btn') ? e.target : e.target.closest('.edit-entry-btn');
+    const id = btn.getAttribute('data-id');
+    if (id) window.openEntryEditor(id);
+    e.preventDefault();
+  }
+  if (e.target.classList.contains('delete-entry-btn') || e.target.closest('.delete-entry-btn')) {
+    const btn = e.target.classList.contains('delete-entry-btn') ? e.target : e.target.closest('.delete-entry-btn');
+    const id = btn.getAttribute('data-id');
+    if (id) window.deleteEntryRecord(id);
+    e.preventDefault();
+  }
 });
 </script>
 </body>
