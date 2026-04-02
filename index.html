@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="description" content="ProTrack MRO Production KPI System">
 <meta name="theme-color" content="#070c18">
-<title>ProTrack v1.0.0</title>
+<title>ProTrack v1.2.2</title>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -470,12 +470,6 @@ tbody tr:hover td{background:var(--card2);}
       <label class="fl">Password</label>
       <input class="fi" id="li-pw" type="password" autocomplete="new-password" value="">
       <span class="forgot-link" onclick="openForgot()">Forgot password?</span>
-      <div class="fl" style="margin-bottom:8px;">Access Level</div>
-      <div class="rg" id="rg" style="grid-template-columns:repeat(3,1fr);">
-        <div class="ro sel" data-r="tech" onclick="pickR(this)"><span class="ri">🔧</span><span class="rl">TECHNICIAN</span></div>
-        <div class="ro" data-r="lead" onclick="pickR(this)"><span class="ri">📊</span><span class="rl">TEAM LEADER</span></div>
-        <div class="ro" data-r="ctrl" onclick="pickR(this)"><span class="ri">🏭</span><span class="rl">PROD. CTRL</span></div>
-      </div>
       <button class="lbtn" id="sign-in-btn" onclick="doLogin()">
         <span class="lbtn-spinner"></span>
         <span id="lbtn-txt">Sign In →</span>
@@ -624,7 +618,6 @@ tbody tr:hover td{background:var(--card2);}
           </div>
           <div class="kg k2" style="margin-bottom:14px;">
             <div class="kc"><div class="kac" style="background:var(--cyan)"></div><div class="kl">Additional Assignment Hrs (Month)</div><div class="kv" id="ms-asn" style="color:var(--cyan)">0h</div><div class="ks">Add to total achieved hrs</div></div>
-            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Total Achieved Hours</div><div class="kv" id="ms-total" style="color:var(--green)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-tot-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-tot-tl">Target: —</span><span id="ms-tot-pc">0%</span></div></div></div>
           </div>
           <div class="card">
             <div class="ch"><span class="ct">Production History</span><button class="btn bo bsm" onclick="exportMine()">⬇ Export</button></div>
@@ -659,7 +652,7 @@ tbody tr:hover td{background:var(--card2);}
           </div>
           <div class="kg k4" style="margin-bottom:16px;">
             <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Active Techs</div><div class="kv" id="d-act" style="color:var(--blue)">0</div><div class="ks" id="d-acts"></div></div>
-            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Total Achieved Hours</div><div class="kv" id="d-sdt" style="color:var(--green)">0h</div><div class="ks">target: <span id="d-tgt">—</span>h</div></div>
+            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Shop achivement (Monthly)</div><div class="kv" id="d-sdt" style="color:var(--green)">0h</div><div class="ks">target: <span id="d-tgt">—</span>h</div></div>
             <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">Avg Hrs/Tech</div><div class="kv" id="d-avg" style="color:var(--amber)">0h</div><div class="ks">this month</div></div>
             <div class="kc"><div class="kac" style="background:var(--violet)"></div><div class="kl">Shop Progress</div><div class="kv" id="d-prog" style="color:var(--violet)">0%</div><div class="ks">monthly</div></div>
           </div>
@@ -1257,7 +1250,7 @@ tbody tr:hover td{background:var(--card2);}
 // ════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ════════════════════════════════════════════════
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.2.2';
 const DEV_RECOVERY_CODE = 'PROTRACK-DEV-2025-RESET';
 const EAT_TZ='Africa/Addis_Ababa';
 const ROLES=['Technician','Under Supervision','Inspector','Preliminary Inspector'];
@@ -1942,6 +1935,7 @@ function stxt(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 //  MY STATS
 // ════════════════════════════════════════════════
 function renderMyStats(){
+  if(!CU) return;
   const me=entries.filter(e=>e.techId===CU.id);
   const mrSel=getMonthRangeFromInput(document.getElementById('ms-month-filter')?.value);
   const today=todayEAT(),wr=getWR();
@@ -1953,37 +1947,50 @@ function renderMyStats(){
   const asnHrs=assignments.filter(a=>a.techId===CU.id&&a.date>=mrSel.start&&a.date<=mrSel.end).reduce((s,a)=>s+(a.hrs||0),0);
   const inspHrs=me.filter(e=>dateInRange(e.time,mrSel.start,mrSel.end)&&!isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
   const totalAchieved=monthSDT+asnHrs+inspHrs;
-  stxt('ms-today',todaySDT.toFixed(2)+'h');stxt('ms-week',weekSDT.toFixed(2)+'h');
+
+  stxt('ms-today',todaySDT.toFixed(2)+'h');
+  stxt('ms-week',weekSDT.toFixed(2)+'h');
   stxt('ms-month',totalAchieved.toFixed(2)+'h');
-  stxt('ms-asn',asnHrs.toFixed(2)+'h');stxt('ms-total',totalAchieved.toFixed(2)+'h');
-  stxt('ms-dt',`Daily: ${dt.toFixed(1)}h`);stxt('ms-wt',`Weekly: ${wt.toFixed(1)}h`);stxt('ms-mt',`Month: ${mrSel.label}`);
-  stxt('ms-tot-tl',`Target: ${mt}h`);
-  pb('ms-t-pb',todaySDT,dt);pb('ms-w-pb',weekSDT,wt);pb('ms-m-pb',totalAchieved,mt);pb('ms-tot-pb',totalAchieved,mt);
-  const dpc=Math.min(100,dt?Math.round(todaySDT/dt*100):0);
-  const wpc=Math.min(100,wt?Math.round(weekSDT/wt*100):0);
+  stxt('ms-asn',asnHrs.toFixed(2)+'h');
+  stxt('ms-dt',`Daily: ${dt.toFixed(1)}h`);
+  stxt('ms-wt',`Weekly: ${wt.toFixed(1)}h`);
+  stxt('ms-mt',`Month: ${mrSel.label}`);
+
+  pb('ms-t-pb',todaySDT,dt);
+  pb('ms-w-pb',weekSDT,wt);
+  pb('ms-m-pb',totalAchieved,mt);
+
+  const dpc=dt?Math.round(todaySDT/dt*100):0;
+  const wpc=wt?Math.round(weekSDT/wt*100):0;
   const mpc=mt?Math.round(totalAchieved/mt*100):0;
-  const tpc=mt?Math.round(totalAchieved/mt*100):0;
-  stxt('ms-dpc',dpc+'%');stxt('ms-wpc',wpc+'%');stxt('ms-mpc',mpc+'%');stxt('ms-tot-pc',tpc+'%');
+  stxt('ms-dpc',dpc+'%');
+  stxt('ms-wpc',wpc+'%');
+  stxt('ms-mpc',mpc+'%');
+
   const tbody=document.getElementById('ms-hist');
-  if(tbody){tbody.innerHTML=me.slice(0,60).map(e=>{
-    const div=getDividedHours(e,entries),insp=!isSDT(e);
-    const rc=ROLE_COLORS[ROLES.indexOf(e.jobRole||'Technician')]||'var(--blue)';
-    return`<tr><td class="mono">${fmtEAT(e.time)}</td><td class="mono" style="color:var(--blue);">${e.taskCode||'—'}</td>
+  if(tbody){
+    tbody.innerHTML=me.slice(0,60).map(e=>{
+      const div=getDividedHours(e,entries),insp=!isSDT(e);
+      const rc=ROLE_COLORS[ROLES.indexOf(e.jobRole||'Technician')]||'var(--blue)';
+      return`<tr><td class="mono">${fmtEAT(e.time)}</td><td class="mono" style="color:var(--blue);">${e.taskCode||'—'}</td>
       <td style="font-size:11px;font-weight:700;color:${rc}">${e.jobRole||'Tech'}</td>
       <td>${e.pname}</td><td class="mono">${e.ata||'—'}</td><td class="mono">${e.pnum||'—'}</td>
-      <td class="mono">${div.toFixed(2)}h${insp?' <span class="not-sdt">INSP</span>':''}</td>
-      <td><span class="${e.jobType==='scrap'?'cp-scrap':'cp-comp'}">${e.jobType==='scrap'?'Scrap':'Done'}</span></td>
-     </tr>`;
-  }).join('')||'<tr><td colspan="8" class="empty">No entries</td></tr>';}
-  const myAsn=assignments.filter(a=>a.techId===CU.id&&a.date>=mrSel.start&&a.date<=mrSel.end).sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
-  const asnEl=document.getElementById('ms-asn-list');
-  if(asnEl){asnEl.innerHTML=myAsn.length?myAsn.map(a=>`<div class="asn-card">
-    <div class="asn-hd"><span class="asn-nm">📌 ${sanitize(a.desc)}</span></div>
-    <div class="asn-meta"><span class="asn-hrs">⏱ ${a.hrs}h</span><span>${fmtEAT(a.date,'date')}</span><span style="color:var(--tx3);">by ${sanitize(a.assignedBy||'Leader')}</span></div>
-    ${a.comment?`<div style="font-size:11.5px;color:var(--tx3);margin-top:5px;">💬 ${sanitize(a.comment)}</div>`:''}
-  </div>`).join(''):'<div class="empty"><div class="ei">📌</div><div class="et">No assignments</div></div>';}
+      <td class="mono">${div.toFixed(2)}h${insp?' <span class="not-sdt">NOT SDT</span>':''}</td>
+      <td><span class="${e.jobType==='scrap'?'cp-scrap':'cp-comp'}">${e.jobType==='scrap'?'Scrap':'Done'}</span></td></tr>`;
+    }).join('')||'<tr><td colspan="8" class="empty">No history</td></tr>';
+  }
+
+  const al=document.getElementById('ms-asn-list');
+  if(al){
+    const list=assignments.filter(a=>a.techId===CU.id&&a.date>=mrSel.start&&a.date<=mrSel.end);
+    al.innerHTML=list.length?list.sort((a,b)=>new Date(b.date||0)-new Date(a.date||0)).map(a=>`
+      <div class="asn-card">
+        <div class="asn-hd"><div style="width:24px;height:24px;border-radius:50%;overflow:hidden;">${avatarHtml(a.techId,a.techName,24)}</div><span class="asn-nm">${sanitize(a.desc)}</span></div>
+        <div class="asn-meta"><span class="asn-hrs">⏱ ${a.hrs}h</span><span>${fmtEAT(a.date,'date')}</span><span>by ${sanitize(a.assignedBy||'')}</span></div>
+        ${a.comment?`<div style="font-size:11px;color:var(--tx3);margin-top:4px;">💬 ${sanitize(a.comment)}</div>`:''}
+      </div>`).join(''):'<div class="empty"><div class="ei">📌</div><div class="et">No Additional assignments</div></div>';
+  }
 }
-function pb(id,val,max){const e=document.getElementById(id);if(e)e.style.width=Math.min(100,max?Math.round(val/max*100):0)+'%';}
 window.renderMyStats=renderMyStats;
 // ════════════════════════════════════════════════
 //  DASHBOARD + ACHIEVEMENT GRAPH
@@ -1991,18 +1998,13 @@ window.renderMyStats=renderMyStats;
 function renderDashboard(){
   const dr=getUIRange('dash');
   const sdtEnt=entries.filter(e=>dateInRange(e.time,dr.start,dr.end)&&isSDT(e));
-  const inspEnt=entries.filter(e=>dateInRange(e.time,dr.start,dr.end)&&!isSDT(e));
-  const asnEnt=assignments.filter(a=>a.date>=dr.start&&a.date<=dr.end);
-  const activeTechs=new Set([...sdtEnt.map(e=>e.techId),...inspEnt.map(e=>e.techId),...asnEnt.map(a=>a.techId)]).size;
+  const activeTechs=new Set(sdtEnt.map(e=>e.techId)).size;
   const totalSDT=sdtEnt.reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const totalInsp=inspEnt.reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const totalAsn=asnEnt.reduce((s,a)=>s+(a.hrs||0),0);
-  const totalAchieved=totalSDT+totalInsp+totalAsn;
   const totalTgt=techs.filter(t=>t.status==='active').reduce((s,t)=>s+(t.monthlyTarget||160),0);
-  const avg=activeTechs?totalAchieved/activeTechs:0;
-  const prog=totalTgt?Math.round(totalAchieved/totalTgt*100):0;
+  const avg=activeTechs?totalSDT/activeTechs:0;
+  const prog=totalTgt?Math.round(totalSDT/totalTgt*100):0;
   stxt('d-act',activeTechs);stxt('d-acts','of '+techs.filter(t=>t.status==='active').length+' active');
-  stxt('d-sdt',totalAchieved.toFixed(1)+'h');stxt('d-tgt',totalTgt);stxt('d-avg',avg.toFixed(1)+'h');stxt('d-prog',prog+'%');
+  stxt('d-sdt',totalSDT.toFixed(1)+'h');stxt('d-tgt',totalTgt);stxt('d-avg',avg.toFixed(1)+'h');stxt('d-prog',prog+'%');
   renderAchievGraph(dr);renderLB(dr);
 }
 function setAF(f,btn){achievFilter=f;document.querySelectorAll('.af-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');renderAchievGraph(getUIRange('dash'));}
@@ -2015,7 +2017,8 @@ function renderAchievGraph(range=getUIRange('dash')){
     const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
     const insp=inspEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
     const asn=assignments.filter(a=>a.techId===t.id&&a.date>=range.start&&a.date<=range.end).reduce((s,a)=>s+(a.hrs||0),0);
-    const total=sdt+insp+asn;const tgt=t.monthlyTarget||160;
+    const total=sdt+insp+asn;
+    const tgt=t.monthlyTarget||160;
     return{...t,total,tgt,pct:tgt?Math.round(total/tgt*100):0};
   });
   if(achievFilter==='top')stats=stats.sort((a,b)=>b.pct-a.pct).slice(0,8);
@@ -2941,9 +2944,8 @@ window.navTo=function(page){
 // ════════════════════════════════════════════════
 //  LOGIN
 // ════════════════════════════════════════════════
-function pickR(el){selRole=el.dataset.r;document.querySelectorAll('.ro').forEach(r=>r.classList.remove('sel'));el.classList.add('sel');}
-function ql(id,role){sv('li-id',id);selRole=role;document.querySelectorAll('.ro').forEach(r=>r.classList.toggle('sel',r.dataset.r===role));doLogin();}
-window.pickR=pickR;window.ql=ql;
+function ql(id,role){sv('li-id',id);sv('li-pw',role==='dev'? (settings.passwords?.dev||'dev123') : 'demo');doLogin();}
+window.ql=ql;
 
 async function doLogin(){
   if(loginAttempts>=5){
@@ -2971,11 +2973,21 @@ async function doLogin(){
     const as_=await window.getDocs(window.collection(window.db,'assignments'));assignments=as_.docs.map(d=>({id:d.id,...d.data()}));
     await loadPics();
   }catch(e){console.warn('Load:',e);}
-  let user=null,role=selRole;
+  let user=null,role='';
+
   if(id==='DEV001'&&pwd===(settings.passwords?.dev||'dev123')){user={id:'DEV001',name:'Developer Admin',initials:'DA',color:'#8b5cf6'};role='dev';}
-  else if(selRole==='tech')user=techs.find(t=>t.id===id&&t.password===pwd);
-  else if(selRole==='lead')user=leaders.find(l=>l.id===id&&l.password===pwd);
-  else if(selRole==='ctrl')user=controllers.find(c=>c.id===id&&c.password===pwd);
+  else {
+    user=techs.find(t=>t.id===id&&t.password===pwd);
+    if(user) role='tech';
+    else {
+      user=leaders.find(l=>l.id===id&&l.password===pwd);
+      if(user) role='lead';
+      else {
+        user=controllers.find(c=>c.id===id&&c.password===pwd);
+        if(user) role='ctrl';
+      }
+    }
+  }
   if(btn){btn.classList.remove('loading');btn.disabled=false;}
   if(lbtxt)lbtxt.textContent='Sign In →';
   if(!user){
@@ -3015,6 +3027,11 @@ window.toggleVer=toggleVer;
 // ════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('sign-in-btn')?.addEventListener('click',doLogin);
+  ['li-id','li-pw'].forEach(id=>{
+    document.getElementById(id)?.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){e.preventDefault();doLogin();}
+    });
+  });
   sv('asn-date',todayEAT());
   setTimeout(hideLoading,800);
   document.getElementById('login').classList.add('on');
