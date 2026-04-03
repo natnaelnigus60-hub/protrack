@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="description" content="ProTrack MRO Production KPI System">
 <meta name="theme-color" content="#070c18">
-<title>ProTrack v1.3.0</title>
+<title>ProTrack v1.3.1</title>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -568,7 +568,7 @@ tbody tr:hover td{background:var(--card2);}
                     <div class="fgroup"><label class="flabel">ATA Chapter</label><input class="finput" id="e-ata" readonly></div>
                     <div class="fgroup"><label class="flabel">Part Number</label><input class="finput" id="e-pnum" readonly></div>
                     <div class="fgroup" id="e-hours-row"><label class="flabel" id="e-hrs-lbl">Allocated Hours</label><input class="finput" id="e-hours" readonly></div>
-                    <div class="fgroup"><label class="flabel">Date &amp; Time</label><input class="finput" id="e-time" type="datetime-local"></div>
+                    <div class="fgroup"><label class="flabel">Date &amp; Time</label><input class="finput" id="e-time" type="date"></div>
                     <div class="fgroup ff scrap-hrs-row" id="scrap-hrs-row">
                       <label class="flabel" style="color:var(--rose);" id="scrap-hrs-lbl">🗑 Scrap Inspector Hours <span id="scrap-hrs-note" style="font-size:9.5px;color:var(--tx3);font-weight:400;">(Default: 2h — Team Leader can adjust)</span></label>
                       <input class="finput" id="e-scrap-hrs" type="number" step="0.5" min="0" placeholder="2.0" value="2">
@@ -1005,7 +1005,7 @@ tbody tr:hover td{background:var(--card2);}
                     <div class="fgroup"><label class="flabel">ATA Chapter</label><input class="finput" id="le-ata" readonly></div>
                     <div class="fgroup"><label class="flabel">Part Number</label><input class="finput" id="le-pnum" readonly></div>
                     <div class="fgroup" id="le-hours-row"><label class="flabel" id="le-hrs-lbl">Allocated Hours</label><input class="finput" id="le-hours" readonly></div>
-                    <div class="fgroup"><label class="flabel">Date &amp; Time</label><input class="finput" id="le-time" type="datetime-local"></div>
+                    <div class="fgroup"><label class="flabel">Date &amp; Time</label><input class="finput" id="le-time" type="date"></div>
                     <div class="fgroup ff scrap-hrs-row" id="le-scrap-hrs-row">
                       <label class="flabel" style="color:var(--rose);">🗑 Scrap Inspector Hours</label>
                       <input class="finput" id="le-scrap-hrs" type="number" step="0.5" min="0" placeholder="2.0" value="2">
@@ -1250,7 +1250,7 @@ tbody tr:hover td{background:var(--card2);}
 // ════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ════════════════════════════════════════════════
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.3.1';
 const DEV_RECOVERY_CODE = 'PROTRACK-DEV-2025-RESET';
 const EAT_TZ='Africa/Addis_Ababa';
 const ROLES=['Technician','Under Supervision','Inspector','Preliminary Inspector'];
@@ -1405,6 +1405,13 @@ function applyDashPreset(v){setUIRange('dash',v);renderDashboard();renderLB();}
 // ════════════════════════════════════════════════
 function sanitize(s){return typeof s==='string'?s.replace(/[<>"'&]/g,'').trim().slice(0,500):'';}
 function sanitizeNum(v){const n=parseFloat(v);return isNaN(n)?0:Math.max(0,Math.min(n,9999));}
+function isDuplicateEntry(candidate){
+  const code=(candidate.taskCode||'').trim().toUpperCase();
+  const id=(candidate.techId||'').trim();
+  const name=(candidate.techName||'').trim();
+  const role=(candidate.jobRole||'').trim();
+  return entries.some(e=>(e.techId||'').trim()===id&&(e.techName||'').trim()===name&&(e.taskCode||'').trim().toUpperCase()===code&&(e.jobRole||'').trim()===role);
+}
 
 // ════════════════════════════════════════════════
 //  TOAST
@@ -1825,7 +1832,7 @@ function renderEntry(){
   stxt('e-daily-target',getDailyTgt(mt).toFixed(1));
   stxt('e-week-target',getWeeklyTgt(mt).toFixed(1));
   populatePartSel();
-  if(!document.getElementById('e-time')?.value)sv('e-time',nowEAT());
+  if(!document.getElementById('e-time')?.value)sv('e-time',todayEAT());
   const tbody=document.getElementById('e-today-list');
   if(tbody){
     const tod=me.filter(e=>e.time?.startsWith(today));
@@ -1837,7 +1844,7 @@ function renderEntry(){
           <button class="btn bo bsm" style="padding:4px 8px;" onclick="editEntryById('${e.id}')">✎</button>
           <button class="btn bd bsm" style="padding:4px 8px;" onclick="delEntryById('${e.id}')">🗑</button>
         </div>`:'—';
-      return`<tr><td class="mono">${fmtEAT(e.time,'time')}</td>
+      return`<tr><td class="mono">${fmtEAT(e.time,'date')}</td>
         <td class="mono" style="color:var(--blue);font-weight:600;">${e.taskCode||'—'}</td>
         <td style="font-size:11px;font-weight:700;color:${rc}">${e.jobRole||'Tech'}</td>
         <td style="font-size:12px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.pname}</td>
@@ -1875,7 +1882,7 @@ function openReviewModal(){
   pendingEntry={
     techId:CU.id,techName:CU.name,pname:part.name,pnum:part.num,
     taskCode,jobRole:selJobRole,jobType,
-    time:document.getElementById('e-time')?.value||nowEAT(),
+    time:document.getElementById('e-time')?.value||todayEAT(),
     hours:pool,stdHours:part.hours,
     isInspector:insp,ata:part.ata,desc:part.name,
     scrapHrs:scrapHrs||null
@@ -1889,7 +1896,7 @@ function openReviewModal(){
     ['Part Number',`<span class="mono">${part.num}</span>`],
     ['Std Hours (SDT)',`<span class="mono">${part.hours}h</span>`],
     ['Your Pool Hours',`<span class="mono" style="font-weight:700;">${pool}h</span>${insp?' <span class="not-sdt">NOT SDT</span>':''}`],
-    ['Date &amp; Time (EAT)',fmtEAT(pendingEntry.time)],
+    ['Date (EAT)',fmtEAT(pendingEntry.time,'date')],
   ];
   if(scrapHrs)fields.push(['Scrap Hrs (counts as Pool/SDT)',`<span class="mono" style="color:var(--green);font-weight:700;">${scrapHrs}h</span>`]);
   document.getElementById('m-review-body').innerHTML=
@@ -1906,6 +1913,11 @@ async function confirmSave(){
   const btn=document.getElementById('confirm-save-btn');
   if(btn){btn.classList.add('saving');btn.disabled=true;}
   const savedEntry={...pendingEntry};
+  if(isDuplicateEntry(savedEntry)){
+    toast('Duplicate entry blocked','error');
+    if(btn){btn.classList.remove('saving');btn.disabled=false;}
+    return;
+  }
   try{
     // Always create a new entry – no overwrite
     const ref=await window.addDoc(window.collection(window.db,'entries'),savedEntry);
@@ -1923,13 +1935,21 @@ window.confirmSave=confirmSave;
 function clearEntry(){
   clearPartSearch('e');
   ['e-part-sel','e-desc','e-ata','e-pnum','e-hours','e-taskcode'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});const scrapEl=document.getElementById('e-scrap-hrs');if(scrapEl)scrapEl.value='2';;
-  sv('e-time',nowEAT());
+  sv('e-time',todayEAT());
   setJobType('completed');pickJobRole('Technician',0);
   pendingEntry=null;
 }
 window.clearEntry=clearEntry;
 
 function stxt(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function pb(id,val,max){
+  const e=document.getElementById(id);
+  if(!e) return;
+  const n=Number(val)||0;
+  const m=Number(max)||0;
+  const pct=m>0 ? (n/m)*100 : 0;
+  e.style.width=Math.max(0,Math.min(100,pct))+'%';
+}
 
 // ════════════════════════════════════════════════
 //  MY STATS
@@ -1960,9 +1980,9 @@ function renderMyStats(){
   pb('ms-w-pb',weekSDT,wt);
   pb('ms-m-pb',totalAchieved,mt);
 
-  const dpc=dt?Math.round(todaySDT/dt*100):0;
-  const wpc=wt?Math.round(weekSDT/wt*100):0;
-  const mpc=mt?Math.round(totalAchieved/mt*100):0;
+  const dpc = dt > 0 ? Math.round((todaySDT / dt) * 100) : 0;
+  const wpc = wt > 0 ? Math.round((weekSDT / wt) * 100) : 0;
+  const mpc = mt > 0 ? Math.round((totalAchieved / mt) * 100) : 0;
   stxt('ms-dpc',dpc+'%');
   stxt('ms-wpc',wpc+'%');
   stxt('ms-mpc',mpc+'%');
@@ -1972,7 +1992,7 @@ function renderMyStats(){
     tbody.innerHTML=me.slice(0,60).map(e=>{
       const div=getDividedHours(e,entries),insp=!isSDT(e);
       const rc=ROLE_COLORS[ROLES.indexOf(e.jobRole||'Technician')]||'var(--blue)';
-      return`<tr><td class="mono">${fmtEAT(e.time)}</td><td class="mono" style="color:var(--blue);">${e.taskCode||'—'}</td>
+      return`<tr><td class="mono">${fmtEAT(e.time,'date')}</td><td class="mono" style="color:var(--blue);">${e.taskCode||'—'}</td>
       <td style="font-size:11px;font-weight:700;color:${rc}">${e.jobRole||'Tech'}</td>
       <td>${e.pname}</td><td class="mono">${e.ata||'—'}</td><td class="mono">${e.pnum||'—'}</td>
       <td class="mono">${div.toFixed(2)}h${insp?' <span class="not-sdt">NOT SDT</span>':''}</td>
@@ -2049,7 +2069,13 @@ function getLeaderboardStats(range=getUIRange('dash')){
 function renderLeaderboardInto(bodyId,qId,range=getUIRange('dash')){
   const cont=document.getElementById(bodyId);if(!cont)return;
   const q=(document.getElementById(qId)?.value||'').toLowerCase();
-  const stats=getLeaderboardStats(range).filter(t=>!q||t.name.toLowerCase().includes(q)).sort((a,b)=>b.total-a.total);
+  const stats = getLeaderboardStats(range)
+    .filter(t => !q || t.name.toLowerCase().includes(q))
+    .map(t => ({
+      ...t,
+      pct: t.tgt ? Math.round((t.total / t.tgt) * 100) : 0
+    }))
+    .sort((a, b) => b.pct - a.pct || b.total - a.total);
   cont.innerHTML=stats.map((t,i)=>{
     const pct=t.tgt?Math.round(t.total/t.tgt*100):0;
     const col=pct>=100?'var(--green)':pct>=70?'var(--amber)':'var(--rose)';
@@ -2081,31 +2107,40 @@ function buildLeaderboardExportPanel(stats){
   panel.innerHTML=`
     <div style="background:#c1121f;color:#fff;padding:18px 26px 14px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
       <div style="font-size:40px;font-weight:800;letter-spacing:-1px;line-height:1;">LEADERBOARD</div>
-      <div style="font-size:14px;font-weight:700;opacity:.95;">TOP 5 MONTHLY</div>
+      <div style="font-size:14px;font-weight:700;opacity:.95;">GRAPH VIEW • SORTED BY %</div>
     </div>
-    <div style="padding:12px 26px 8px;display:flex;justify-content:flex-end;align-items:center;gap:10px;font-size:14px;font-weight:700;">
-      <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;background:#10b981;display:inline-block;border-radius:2px;"></span>SAFE</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;background:#f59e0b;display:inline-block;border-radius:2px;"></span>NEUTRAL</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;background:#f43f5e;display:inline-block;border-radius:2px;"></span>TROUBLE</span>
+    <div style="padding:12px 26px 8px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;font-weight:700;">
+      <div style="color:#64748b;font-weight:600;">All active technicians arranged by achievement percentage.</div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+        <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;background:#10b981;display:inline-block;border-radius:2px;"></span>≥100%</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;background:#f59e0b;display:inline-block;border-radius:2px;"></span>70–99%</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;background:#f43f5e;display:inline-block;border-radius:2px;"></span>&lt;70%</span>
+      </div>
     </div>
-    <div style="padding:0 24px 20px;">
-      <div style="height:560px;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);display:grid;grid-template-columns:repeat(5,1fr);gap:16px;align-items:end;padding:18px 18px 16px;box-sizing:border-box;">
-        ${stats.slice(0,5).map((t,i)=>{
-          const pct=t.tgt?Math.round(t.total/t.tgt*100):0;
-          const col=pct>=100?'#10b981':pct>=70?'#f59e0b':'#f43f5e';
-          const barH=Math.max(90,Math.min(320,Math.round((pct/100)*280)));
-          return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative;padding-top:58px;">
-            <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);font-size:28px;font-weight:800;color:${col};line-height:1;">${pct}%</div>
-            <div style="position:absolute;top:32px;left:50%;transform:translateX(-50%);width:72px;height:72px;border-radius:50%;overflow:hidden;border:3px solid ${col};background:#fff;">${avatarHtml(t.id,t.name,72)}</div>
-            <div style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;min-height:0;margin-top:86px;">
-              <div style="width:100%;max-width:180px;height:${barH}px;background:${col};border-radius:10px 10px 0 0;position:relative;display:flex;align-items:flex-end;justify-content:center;"></div>
-            </div>
-            <div style="width:100%;max-width:180px;padding-top:10px;text-align:center;">
-              <div style="font-size:18px;font-weight:800;line-height:1.15;">${sanitize(t.name)}</div>
-              <div style="font-size:12px;color:#64748b;margin-top:3px;">${sanitize(t.id)} · ${t.total.toFixed(1)}/${t.tgt}h</div>
-              <div style="font-size:11px;color:${col};font-weight:700;margin-top:4px;">Rank ${i+1}</div>
-            </div>
-          </div>`;
+    <div style="padding:8px 24px 22px;">
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;padding:8px 0;">
+        ${stats.map((t,i)=>{
+          const pct = t.tgt ? Math.round((t.total / t.tgt) * 100) : 0;
+          const col = pct >= 100 ? '#10b981' : pct >= 70 ? '#f59e0b' : '#f43f5e';
+          const fill = Math.max(0, Math.min(100, Math.round(Math.min(pct, 150) / 150 * 100)));
+          return `
+            <div style="display:grid;grid-template-columns:32px 250px 1fr 86px;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #e2e8f0;">
+              <div style="font-size:15px;font-weight:800;text-align:center;color:#334155;">${i+1}</div>
+              <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+                <div style="width:42px;height:42px;border-radius:50%;overflow:hidden;border:2px solid ${col};flex-shrink:0;">${avatarHtml(t.id,t.name,42)}</div>
+                <div style="min-width:0;">
+                  <div style="font-size:15px;font-weight:800;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${sanitize(t.name)}</div>
+                  <div style="font-size:12px;color:#64748b;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${sanitize(t.id)} · ${t.total.toFixed(1)}/${t.tgt}h</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="flex:1;height:18px;background:#e2e8f0;border-radius:999px;overflow:hidden;position:relative;">
+                  <div style="height:100%;width:${fill}%;background:${col};border-radius:999px;"></div>
+                </div>
+                <div style="font-size:12px;font-weight:800;color:#64748b;min-width:44px;text-align:right;">${Math.min(pct,150)}%</div>
+              </div>
+              <div style="font-size:24px;font-weight:800;color:${col};min-width:86px;text-align:right;">${pct}%</div>
+            </div>`;
         }).join('')}
       </div>
     </div>`;
@@ -2113,7 +2148,7 @@ function buildLeaderboardExportPanel(stats){
 }
 async function exportLeaderboard(panelId,format='image'){
   if(!window.html2canvas){toast('Export library not loaded','error');return;}
-  const stats=getLeaderboardStats().sort((a,b)=>b.total-a.total);
+  const stats=getLeaderboardStats().map(t=>({...t,pct:t.tgt?Math.round((t.total/t.tgt)*100):0})).sort((a,b)=>b.pct-a.pct||b.total-a.total);
   const exportPanel=buildLeaderboardExportPanel(stats);
   document.body.appendChild(exportPanel);
   try{
@@ -2256,7 +2291,7 @@ function editEntryById(id){
   const ataRaw=prompt('ATA Chapter',e.ata||'');
   if(ataRaw===null)return;
   const ata=ataRaw.trim();
-  const timeRaw=prompt('Date & Time (EAT)',e.time||nowEAT());
+  const timeRaw=prompt('Date (EAT)',e.time?.slice(0,10)||todayEAT());
   if(timeRaw===null)return;
   const time=timeRaw.trim();
   const hoursRaw=prompt('Hours',String(e.hours ?? ''));
@@ -2273,7 +2308,7 @@ function editEntryById(id){
     pname:pname || e.pname || '',
     pnum:pnum || e.pnum || '',
     ata:ata || e.ata || '',
-    time:time || e.time || nowEAT(),
+    time:time || e.time || todayEAT(),
     hours:Number(hoursRaw),
   };
 
@@ -2337,7 +2372,7 @@ function renderAllEntries(){
         <button class="btn bd bsm" style="padding:4px 8px;" onclick="delEntryById('${e.id}')">🗑</button>
       </div>`:'—';
     return`<tr>
-      <td class="mono">${fmtEAT(e.time)}</td>
+      <td class="mono">${fmtEAT(e.time,'date')}</td>
       <td>${e.techName}</td>
       <td class="mono" style="color:var(--blue);">${e.taskCode||'—'}</td>
       <td style="font-size:11px;font-weight:700;color:${rc}">${e.jobRole||'Tech'}</td>
@@ -2423,7 +2458,7 @@ function renderTG(){
     const ratios=getRatioForPart(partNum);
     const isOv=!!(settings.partRatios&&settings.partRatios[partNum]);
     const partName=g.entries[0]?.pname||'—';
-    const lastT=fmtEAT(new Date(Math.max(...g.entries.map(e=>new Date(e.time||0)))).toISOString());
+    const lastT=fmtEAT(new Date(Math.max(...g.entries.map(e=>new Date(e.time||0)))).toISOString(),'date');
     const pools=getTaskSplitPools(code,partNum,stdHrs);
     const personRows=(arr,role,ri)=>{
       if(!arr.length)return`<div style="color:var(--tx3);font-size:12px;padding:6px 0;">No entries</div>`;
@@ -2433,7 +2468,7 @@ function renderTG(){
         return`<div class="tg-p" style="${isMy?'background:var(--bdim);border-radius:5px;padding:5px 6px;':''}">
           <div style="width:24px;height:24px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1px solid var(--bdr);">${avatarHtml(e.techId,e.techName,24)}</div>
           <div><div class="tg-pn">${sanitize(e.techName)}${isMy?' <span style="font-size:9px;color:var(--blue);">(you)</span>':''} <span class="alloc-bdg ${['ab-b','ab-g','ab-v','ab-c'][ri]}">⏱${each.toFixed(2)}h</span>${insp?' <span class="not-sdt">NOT SDT</span>':''}</div>
-          <div class="tg-pt">${fmtEAT(e.time)} · <span class="${e.jobType==='scrap'?'cp-scrap':'cp-comp'}">${e.jobType==='scrap'?'Scrap':'Done'}</span></div></div>
+          <div class="tg-pt">${fmtEAT(e.time,'date')} · <span class="${e.jobType==='scrap'?'cp-scrap':'cp-comp'}">${e.jobType==='scrap'?'Scrap':'Done'}</span></div></div>
         </div>`;
       }).join('');
     };
@@ -2465,7 +2500,7 @@ window.renderTG=renderTG;
 function exportTG(){
   const f=getTGFiltered();const g={};
   f.forEach(e=>{const c=(e.taskCode||'NO CODE').toUpperCase();if(!g[c])g[c]=[];g[c].push(e);});
-  let csv='TaskCode,PartNum,Role,Type,Name,TechID,Pool,DividedHrs,HoursType,StdHrs,DateTime(EAT)\n';
+  let csv='TaskCode,PartNum,Role,Type,Name,TechID,Pool,DividedHrs,HoursType,StdHrs,Date(EAT)\n';
   Object.keys(g).sort().forEach(code=>{
     const arr=g[code];const pnum=arr[0]?.pnum||'';const stdHrs=arr[0]?.stdHours||0;
     const ratios=getRatioForPart(pnum);
@@ -2474,7 +2509,7 @@ function exportTG(){
       const pools=getTaskSplitPools(code,pnum,stdHrs);
       const pool=isInspRole(r)?(r==='Inspector'?pools.Inspector:pools['Preliminary Inspector']):pools[r];
       const each=ra.length?pool/ra.length:0;
-      ra.forEach(e=>csv+=`"${code}","${pnum}","${r}","${e.jobType||'completed'}","${e.techName}","${e.techId}",${pool.toFixed(3)},${each.toFixed(3)},${isInspRole(r)?'NOT_SDT':'SDT'},${stdHrs},"${fmtEAT(e.time)}"\n`);
+      ra.forEach(e=>csv+=`"${code}","${pnum}","${r}","${e.jobType||'completed'}","${e.techName}","${e.techId}",${pool.toFixed(3)},${each.toFixed(3)},${isInspRole(r)?'NOT_SDT':'SDT'},${stdHrs},"${fmtEAT(e.time,'date')}"\n`);
     });
   });
   dlFile(csv,`task_groups_${todayEAT()}.csv`,'text/csv');toast('Exported');
@@ -2717,8 +2752,8 @@ window.handlePartImport=function(input){const f=input.files[0];if(!f)return;cons
 //  EXPORT HELPERS
 // ════════════════════════════════════════════════
 function dlFile(c,fn,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=fn;a.click();URL.revokeObjectURL(a.href);}
-window.exportMine=function(){let csv='Date(EAT),TaskCode,Role,Type,Part,ATA,PartNum,Hrs(÷peers)\n';entries.filter(e=>e.techId===CU.id).forEach(e=>{const d=getDividedHours(e,entries);csv+=`"${fmtEAT(e.time)}","${e.taskCode||''}","${e.jobRole||''}","${e.jobType||'completed'}","${e.pname}","${e.ata||''}","${e.pnum}",${d.toFixed(3)}\n`;});dlFile(csv,'my_production_'+todayEAT()+'.csv','text/csv');toast('Exported');};
-window.exportAllEntries=function(){let csv='Date(EAT),Tech,TechID,TaskCode,Role,Type,Part,ATA,PartNum,Hrs(÷peers),HoursType\n';entries.forEach(e=>{const d=getDividedHours(e,entries),ht=isSDT(e)?'SDT':'NOT_SDT';csv+=`"${fmtEAT(e.time)}","${e.techName}","${e.techId}","${e.taskCode||''}","${e.jobRole||''}","${e.jobType||'completed'}","${e.pname}","${e.ata||''}","${e.pnum}",${d.toFixed(3)},${ht}\n`;});dlFile(csv,'all_entries_'+todayEAT()+'.csv','text/csv');toast('Exported');};
+window.exportMine=function(){let csv='Date(EAT),TaskCode,Role,Type,Part,ATA,PartNum,Hrs(÷peers)\n';entries.filter(e=>e.techId===CU.id).forEach(e=>{const d=getDividedHours(e,entries);csv+=`"${fmtEAT(e.time,'date')}","${e.taskCode||''}","${e.jobRole||''}","${e.jobType||'completed'}","${e.pname}","${e.ata||''}","${e.pnum}",${d.toFixed(3)}\n`;});dlFile(csv,'my_production_'+todayEAT()+'.csv','text/csv');toast('Exported');};
+window.exportAllEntries=function(){let csv='Date(EAT),Tech,TechID,TaskCode,Role,Type,Part,ATA,PartNum,Hrs(÷peers),HoursType\n';entries.forEach(e=>{const d=getDividedHours(e,entries),ht=isSDT(e)?'SDT':'NOT_SDT';csv+=`"${fmtEAT(e.time,'date')}","${e.techName}","${e.techId}","${e.taskCode||''}","${e.jobRole||''}","${e.jobType||'completed'}","${e.pname}","${e.ata||''}","${e.pnum}",${d.toFixed(3)},${ht}\n`;});dlFile(csv,'all_entries_'+todayEAT()+'.csv','text/csv');toast('Exported');};
 
 // ════════════════════════════════════════════════
 //  MODAL
@@ -2816,7 +2851,7 @@ function renderLeaderEntry(){
        </tr>`;
     }).join(''):'<tr><td colspan="7" class="empty">No leader entries today</td></tr>';
   }
-  if(!document.getElementById('le-time')?.value)sv('le-time',nowEAT());
+  if(!document.getElementById('le-time')?.value)sv('le-time',todayEAT());
   renderLB();
 }
 function openLeReviewModal(){
@@ -2834,7 +2869,7 @@ function openLeReviewModal(){
   lePendingEntry={
     techId:tech.id,techName:tech.name,pname:part.name,pnum:part.num,
     taskCode,jobRole:leJobRole,jobType:leJobType,
-    time:document.getElementById('le-time')?.value||nowEAT(),
+    time:document.getElementById('le-time')?.value||todayEAT(),
     hours:pool,stdHours:part.hours,
     isInspector:insp,ata:part.ata,desc:part.name,
     scrapHrs:scrapHrs||null,
@@ -2848,7 +2883,7 @@ function openLeReviewModal(){
     ['Part',part.name],['ATA Chapter',part.ata||'—'],['Part Number',`<span class="mono">${part.num}</span>`],
     ['Std Hours (SDT)',`<span class="mono">${part.hours}h</span>`],
     ['Pool Hours',`<span class="mono" style="font-weight:700;">${pool}h</span>${insp?' <span class="not-sdt">NOT SDT</span>':''}`],
-    ['Date &amp; Time (EAT)',fmtEAT(lePendingEntry.time)],
+    ['Date (EAT)',fmtEAT(lePendingEntry.time,'date')],
   ];
   if(scrapHrs)fields.push(['Scrap Hrs',`<span class="mono" style="color:var(--rose);font-weight:700;">${scrapHrs}h</span>`]);
   document.getElementById('m-review-body').innerHTML=
@@ -2864,6 +2899,11 @@ async function confirmLeSave(){
   const btn=document.getElementById('confirm-save-btn');
   if(btn){btn.classList.add('saving');btn.disabled=true;}
   const savedEntry={...lePendingEntry};
+  if(isDuplicateEntry(savedEntry)){
+    toast('Duplicate entry blocked','error');
+    if(btn){btn.classList.remove('saving');btn.disabled=false;}
+    return;
+  }
   try{
     // Always create a new entry – no overwrite
     const ref=await window.addDoc(window.collection(window.db,'entries'),savedEntry);
@@ -2882,7 +2922,7 @@ function clearLeEntry(){
   clearPartSearch('le');
   ['le-part-sel','le-desc','le-ata','le-pnum','le-hours','le-taskcode'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   const shi=document.getElementById('le-scrap-hrs');if(shi)shi.value='2';
-  sv('le-time',nowEAT());setLeJobType('completed');pickLeJobRole('Technician',0);lePendingEntry=null;
+  sv('le-time',todayEAT());setLeJobType('completed');pickLeJobRole('Technician',0);lePendingEntry=null;
 }
 window.clearLeEntry=clearLeEntry;
 
