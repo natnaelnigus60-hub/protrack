@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="description" content="ProTrack MRO Production KPI System">
 <meta name="theme-color" content="#070c18">
-<title>ProTrack v1.3.1</title>
+<title>ProTrack v1.3.0</title>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -1101,11 +1101,13 @@ tbody tr:hover td{background:var(--card2);}
       <div class="fgroup"><label class="flabel">Status</label><select class="fselect" id="mt-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
       <div class="fgroup"><label class="flabel">Password</label><input class="finput" id="mt-pwd" type="text" value="demo"></div>
       <div class="fgroup ff" style="grid-column:1/-1;">
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 12px;background:var(--gdim);border:1px solid rgba(16,185,129,.2);border-radius:8px;">
-          <input type="checkbox" id="mt-unsup" style="width:16px;height:16px;accent-color:var(--green);flex-shrink:0;">
-          <div><div style="font-size:13px;font-weight:700;color:var(--green);">👁 Under Supervision</div>
-          <div style="font-size:11px;color:var(--tx3);margin-top:2px;">Allocation hours auto-set to 75% of SDT on every entry</div></div>
-        </label>
+        <label class="flabel">Fixed Role *</label>
+        <select class="fselect" id="mt-fixed-role">
+          <option value="Technician">Technician</option>
+          <option value="Under Supervision">Under Supervision</option>
+          <option value="Inspector / Preliminary Inspector">Inspector / Preliminary Inspector</option>
+        </select>
+        <div style="font-size:11px;color:var(--tx3);margin-top:4px;">The selected technician can use only this role during data entry.</div>
       </div>
       <div class="fgroup"><label class="flabel">Profile Photo</label>
         <div class="pic-up" onclick="document.getElementById('mt-pic').click()">
@@ -1250,13 +1252,79 @@ tbody tr:hover td{background:var(--card2);}
 // ════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ════════════════════════════════════════════════
-const APP_VERSION = '1.3.1';
+const APP_VERSION = '1.3.0';
 const DEV_RECOVERY_CODE = 'PROTRACK-DEV-2025-RESET';
 const EAT_TZ='Africa/Addis_Ababa';
 const ROLES=['Technician','Under Supervision','Inspector','Preliminary Inspector'];
 const ROLE_COLORS=['var(--blue)','var(--green)','var(--violet)','var(--cyan)'];
 const ROLE_SEL=['sel0','sel1','sel2','sel3'];
 const AV_COLORS=['#3b82f6','#10b981','#f59e0b','#f43f5e','#8b5cf6','#06b6d4','#ec4899','#84cc16'];
+
+const FIXED_ROLE_OPTIONS=['Technician','Under Supervision','Inspector / Preliminary Inspector'];
+
+function getFixedRoleGroup(tech){
+  const raw=(tech?.fixedRole||'').trim();
+  if(raw==='Under Supervision')return 'Under Supervision';
+  if(raw==='Inspector / Preliminary Inspector'||raw==='Inspector & Preliminary Inspector'||raw==='Inspector and Preliminary Inspector')return 'Inspector / Preliminary Inspector';
+  if(tech?.underSupervision)return 'Under Supervision';
+  return 'Technician';
+}
+function getFixedRoleLabel(tech){
+  const group=getFixedRoleGroup(tech);
+  return group==='Inspector / Preliminary Inspector'?'Inspector + Preliminary Inspector':group;
+}
+function getAllowedRolesForTech(tech){
+  const group=getFixedRoleGroup(tech);
+  if(group==='Under Supervision')return ['Under Supervision'];
+  if(group==='Inspector / Preliminary Inspector')return ['Inspector','Preliminary Inspector'];
+  return ['Technician'];
+}
+function getEntryTech(prefix){
+  if(prefix==='le'){
+    const id=document.getElementById('le-tech-sel')?.value||'';
+    return techs.find(t=>t.id===id)||null;
+  }
+  return CU;
+}
+function applyRoleLock(prefix){
+  const tech=getEntryTech(prefix);
+  const allowed=getAllowedRolesForTech(tech);
+  const ids=prefix==='le' ? ['le-jr0','le-jr1','le-jr2','le-jr3'] : ['jr0','jr1','jr2','jr3'];
+  ids.forEach((id,i)=>{
+    const el=document.getElementById(id); if(!el) return;
+    const role=ROLES[i];
+    if(allowed.length && !allowed.includes(role)) el.classList.add('disabled');
+    else el.classList.remove('disabled');
+  });
+  const currentRole=prefix==='le'?leJobRole:selJobRole;
+  const currentIdx=prefix==='le'?leJobRoleIdx:selJobRoleIdx;
+  if(prefix==='e' && jobType==='scrap' && !allowed.includes('Inspector')){
+    jobType='completed';
+    const comp=document.getElementById('cs-comp');
+    const scrap=document.getElementById('cs-scrap');
+    if(comp) comp.className='cs-opt sel-comp';
+    if(scrap) scrap.className='cs-opt';
+    const row=document.getElementById('scrap-hrs-row');
+    if(row) row.classList.remove('show');
+  }
+  if(prefix==='le' && leJobType==='scrap' && !allowed.includes('Inspector')){
+    leJobType='completed';
+    const comp=document.getElementById('le-cs-comp');
+    const scrap=document.getElementById('le-cs-scrap');
+    if(comp) comp.className='cs-opt sel-comp';
+    if(scrap) scrap.className='cs-opt';
+    const row=document.getElementById('le-scrap-hrs-row');
+    if(row) row.classList.remove('show');
+  }
+  const desired=allowed.includes(currentRole)?currentRole:allowed[0];
+  if(desired && desired!==currentRole){
+    if(prefix==='le') pickLeJobRole(desired,ROLES.indexOf(desired));
+    else pickJobRole(desired,ROLES.indexOf(desired));
+  } else if(desired && currentIdx!==ROLES.indexOf(desired)) {
+    if(prefix==='le') leJobRoleIdx=ROLES.indexOf(desired);
+    else selJobRoleIdx=ROLES.indexOf(desired);
+  }
+}
 
 let CU=null,CR=null,selRole='tech';
 let techs=[],parts=[],leaders=[],controllers=[],entries=[],assignments=[];
@@ -1429,19 +1497,71 @@ function toast(msg,type='success'){
 //  PROFILE PICTURES
 // ════════════════════════════════════════════════
 async function loadPics(){
-  try{const s=await window.getDocs(window.collection(window.db,'profilePics'));profilePics={};s.docs.forEach(d=>{profilePics[d.id]=d.data().data||'';});}
+  try{
+    const s=await window.getDocs(window.collection(window.db,'profilePics'));
+    profilePics={};
+    s.docs.forEach(d=>{
+      const data=d.data()||{};
+      profilePics[d.id]=data.data||data.photo||data.photoURL||'';
+    });
+  }
   catch(e){console.warn('Pics:',e);}
 }
+
+async function compressImageDataUrl(dataUrl,maxSide=512,quality=0.82){
+  if(!/^data:image\//i.test(dataUrl))return dataUrl;
+  return await new Promise(resolve=>{
+    try{
+      const img=new Image();
+      img.onload=()=>{
+        try{
+          const scale=Math.min(1,maxSide/Math.max(img.width||1,img.height||1));
+          const w=Math.max(1,Math.round((img.width||1)*scale));
+          const h=Math.max(1,Math.round((img.height||1)*scale));
+          const canvas=document.createElement('canvas');
+          canvas.width=w;canvas.height=h;
+          const ctx=canvas.getContext('2d');
+          ctx.drawImage(img,0,0,w,h);
+          resolve(canvas.toDataURL('image/jpeg',quality));
+        }catch(err){resolve(dataUrl);}
+      };
+      img.onerror=()=>resolve(dataUrl);
+      img.src=dataUrl;
+    }catch(err){resolve(dataUrl);}
+  });
+}
 async function savePic(uid,b64){
-  try{await window.setDoc(window.doc(window.db,'profilePics',uid),{data:b64});}
+  const dataUrl=await compressImageDataUrl(b64);
+  try{
+    await window.setDoc(window.doc(window.db,'profilePics',uid),{data:dataUrl});
+    const ti=techs.findIndex(t=>t.id===uid);
+    if(ti>-1){techs[ti]={...techs[ti],photo:dataUrl};await window.setDoc(window.doc(window.db,'technicians',uid),techs[ti]);}
+    const li=leaders.findIndex(l=>l.id===uid);
+    if(li>-1){leaders[li]={...leaders[li],photo:dataUrl};await window.setDoc(window.doc(window.db,'leaders',uid),leaders[li]);}
+    const ci=controllers.findIndex(c=>c.id===uid);
+    if(ci>-1){controllers[ci]={...controllers[ci],photo:dataUrl};await window.setDoc(window.doc(window.db,'controllers',uid),controllers[ci]);}
+  }
   catch(e){console.warn('savePic:',e);}
-  profilePics[uid]=b64;
+  profilePics[uid]=dataUrl;
+}
+function getUserPhoto(uid){
+  return profilePics[uid]
+    || techs.find(t=>t.id===uid)?.photo
+    || techs.find(t=>t.id===uid)?.photoURL
+    || leaders.find(l=>l.id===uid)?.photo
+    || leaders.find(l=>l.id===uid)?.photoURL
+    || controllers.find(c=>c.id===uid)?.photo
+    || controllers.find(c=>c.id===uid)?.photoURL
+    || '';
 }
 function avatarHtml(uid,name,size=32,fs=11){
-  const pic=profilePics[uid];
+  const pic=getUserPhoto(uid);
   const ini=(name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   const idx=(uid||'').charCodeAt(0)%AV_COLORS.length||0;
-  if(pic)return`<img src="${pic}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;display:block;" alt="${ini}">`;
+  if(pic){
+    const safePic=String(pic).replace(/'/g,'%27');
+    return`<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;display:block;background-image:url('${safePic}');background-size:cover;background-position:center center;background-repeat:no-repeat;" aria-label="${ini}"></div>`;
+  }
   return`<div class="av-i" style="width:${size}px;height:${size}px;font-size:${fs}px;background:${AV_COLORS[idx]};color:#fff;">${ini}</div>`;
 }
 function previewPic(input,prevId,phId){
@@ -1667,6 +1787,7 @@ async function persistSettings(){
 //  ENTRY FORM
 // ════════════════════════════════════════════════
 function setJobType(type){
+  if(type==='scrap' && !getAllowedRolesForTech(getEntryTech('e')).includes('Inspector')) type='completed';
   jobType=type;
   document.getElementById('cs-comp').className='cs-opt'+(type==='completed'?' sel-comp':'');
   document.getElementById('cs-scrap').className='cs-opt'+(type==='scrap'?' sel-scrap':'');
@@ -1684,11 +1805,14 @@ function setJobType(type){
     const shi=document.getElementById('e-scrap-hrs');
     if(shi){shi.readOnly=(CR!=='lead');shi.style.opacity=(CR!=='lead'?'0.6':'1');}
   }
+  applyRoleLock('e');
   refreshAllocHrs();
 }
 window.setJobType=setJobType;
 
 function pickJobRole(role,idx){
+  const allowed=getAllowedRolesForTech(getEntryTech('e'));
+  if(allowed.length && !allowed.includes(role)) { role=allowed[0]; idx=ROLES.indexOf(role); }
   selJobRole=role;selJobRoleIdx=idx;
   for(let i=0;i<4;i++){const el=document.getElementById('jr'+i);if(!el)continue;const d=el.classList.contains('disabled');el.className='jro'+(d?' disabled':'');}
   const el=document.getElementById('jr'+idx);if(el)el.classList.add(ROLE_SEL[idx]);
@@ -1821,7 +1945,7 @@ document.addEventListener('click',function(e){
 });
 
 function renderEntry(){
-  if(CR==='tech'&&CU&&CU.underSupervision&&selJobRole!=='Under Supervision'){pickJobRole('Under Supervision',1);}
+  applyRoleLock('e');
   const today=todayEAT(),wr=getWR();
   const me=entries.filter(e=>e.techId===CU.id);
   const todaySDT=me.filter(e=>e.time?.startsWith(today)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
@@ -2093,59 +2217,105 @@ function renderLB(range=getUIRange('dash')){
   renderLeaderboardInto('dev-lb-body','dev-lb-q',range);
 }
 window.renderLB=renderLB;
+
 function buildLeaderboardExportPanel(stats){
-  const panel=document.createElement('div');
-  panel.id='lb-export-panel';
-  panel.style.position='fixed';
-  panel.style.left='-99999px';
-  panel.style.top='0';
-  panel.style.width='1280px';
-  panel.style.background='#f0f4f8';
-  panel.style.color='#0f172a';
-  panel.style.border='1px solid #e2e8f0';
-  panel.style.fontFamily="'Plus Jakarta Sans', sans-serif";
-  panel.innerHTML=`
-    <div style="background:#c1121f;color:#fff;padding:18px 26px 14px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+  const sorted=[...stats]
+    .map(t=>({...t,pct:t.tgt?Math.round((t.total/t.tgt)*100):0}))
+    .sort((a,b)=>b.pct-a.pct||b.total-a.total);
+
+  const maxPct = Math.max(150, ...sorted.map(t => t.pct || 0));
+  const chartH = 640;
+  const plotH = 430;
+  const footerH = 118;
+  const scaleMax = Math.ceil(maxPct / 10) * 10 || 100;
+  const panel = document.createElement('div');
+  panel.id = 'lb-export-panel';
+  panel.style.position = 'fixed';
+  panel.style.left = '-99999px';
+  panel.style.top = '0';
+  panel.style.width = '1920px';
+  panel.style.height = '1080px';
+  panel.style.minWidth = '1920px';
+  panel.style.background = '#f0f4f8';
+  panel.style.color = '#0f172a';
+  panel.style.border = '1px solid #e2e8f0';
+  panel.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
+  panel.style.boxSizing = 'border-box';
+
+  function exportAvatar(uid,name,size,col){
+    const pic=getUserPhoto(uid);
+    const ini=(name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const safePic=String(pic||'').replace(/'/g,'%27');
+    if(pic){
+      return `
+        <div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;border:4px solid ${col};background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.10);flex-shrink:0;">
+          <img src="${safePic}" alt="${ini}" style="width:100%;height:100%;display:block;object-fit:cover;object-position:center center;border-radius:50%;background:#fff;" crossorigin="anonymous">
+        </div>`;
+    }
+    const idx=(uid||'').charCodeAt(0)%AV_COLORS.length||0;
+    return `
+      <div style="width:${size}px;height:${size}px;border-radius:50%;border:4px solid ${col};background:${AV_COLORS[idx]};color:#fff;display:flex;align-items:center;justify-content:center;font-size:${Math.max(18, Math.round(size*0.30))}px;font-weight:900;box-shadow:0 2px 8px rgba(15,23,42,.10);flex-shrink:0;">
+        ${ini}
+      </div>`;
+  }
+
+  panel.innerHTML = `
+    <div style="background:#c1121f;color:#fff;padding:20px 28px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
       <div style="font-size:40px;font-weight:800;letter-spacing:-1px;line-height:1;">LEADERBOARD</div>
-      <div style="font-size:14px;font-weight:700;opacity:.95;">GRAPH VIEW • SORTED BY %</div>
+      <div style="font-size:14px;font-weight:700;opacity:.95;">VERTICAL GRAPH • SORTED BY %</div>
     </div>
-    <div style="padding:12px 26px 8px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;font-weight:700;">
+
+    <div style="padding:12px 28px 8px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;font-weight:700;">
       <div style="color:#64748b;font-weight:600;">All active technicians arranged by achievement percentage.</div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
-        <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;background:#10b981;display:inline-block;border-radius:2px;"></span>≥100%</span>
-        <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;background:#f59e0b;display:inline-block;border-radius:2px;"></span>70–99%</span>
-        <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;background:#f43f5e;display:inline-block;border-radius:2px;"></span>&lt;70%</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#10b981;display:inline-block;border-radius:2px;"></span>≥100%</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#f59e0b;display:inline-block;border-radius:2px;"></span>70–99%</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#f43f5e;display:inline-block;border-radius:2px;"></span>&lt;70%</span>
       </div>
     </div>
-    <div style="padding:8px 24px 22px;">
-      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;padding:8px 0;">
-        ${stats.map((t,i)=>{
-          const pct = t.tgt ? Math.round((t.total / t.tgt) * 100) : 0;
-          const col = pct >= 100 ? '#10b981' : pct >= 70 ? '#f59e0b' : '#f43f5e';
-          const fill = Math.max(0, Math.min(100, Math.round(Math.min(pct, 150) / 150 * 100)));
-          return `
-            <div style="display:grid;grid-template-columns:32px 250px 1fr 86px;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #e2e8f0;">
-              <div style="font-size:15px;font-weight:800;text-align:center;color:#334155;">${i+1}</div>
-              <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-                <div style="width:42px;height:42px;border-radius:50%;overflow:hidden;border:2px solid ${col};flex-shrink:0;">${avatarHtml(t.id,t.name,42)}</div>
-                <div style="min-width:0;">
-                  <div style="font-size:15px;font-weight:800;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${sanitize(t.name)}</div>
-                  <div style="font-size:12px;color:#64748b;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${sanitize(t.id)} · ${t.total.toFixed(1)}/${t.tgt}h</div>
+
+    <div style="position:relative;padding:6px 22px 14px;">
+      <div style="position:relative;height:${chartH}px;background:#fff;border:1px solid #dbe3ee;border-radius:18px;box-shadow:0 2px 10px rgba(15,23,42,.05);overflow:hidden;padding:18px 16px 14px 16px;box-sizing:border-box;display:flex;flex-direction:column;">
+
+        <div style="flex:1;position:relative;overflow:hidden;">
+          <div style="position:absolute;left:0;right:0;bottom:${Math.round((plotH * (100 / scaleMax))) + 2}px;height:2px;background:#ef4444;opacity:.95;"></div>
+          <div style="position:absolute;right:4px;bottom:${Math.round((plotH * (100 / scaleMax))) + 8}px;font-size:12px;font-weight:800;color:#ef4444;">100%</div>
+
+          <div style="position:absolute;left:0;right:0;bottom:0;top:0;display:grid;grid-template-columns:repeat(${sorted.length}, minmax(0, 1fr));gap:8px;align-items:end;padding-bottom:20px;">
+            ${sorted.map((t)=>{
+              const pct=t.pct;
+              const col=pct>=100?'#10b981':pct>=70?'#f59e0b':'#f43f5e';
+              const fill=Math.max(8, Math.round((pct/scaleMax)*plotH));
+              const avatarSize = 72;
+              return `
+                <div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:10px;">
+                  <div style="font-size:13px;font-weight:900;color:${col};line-height:1;white-space:nowrap;text-align:center;transform:translateY(-2px);">${pct}%</div>
+
+                  <div style="display:flex;align-items:center;justify-content:center;">
+                    ${exportAvatar(t.id,t.name,avatarSize,col)}
+                  </div>
+
+                  <div style="position:relative;width:22px;height:${fill}px;background:${col};border-radius:999px;box-shadow:0 2px 6px rgba(15,23,42,.12);margin-top:2px;"></div>
                 </div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;">
-                <div style="flex:1;height:18px;background:#e2e8f0;border-radius:999px;overflow:hidden;position:relative;">
-                  <div style="height:100%;width:${fill}%;background:${col};border-radius:999px;"></div>
-                </div>
-                <div style="font-size:12px;font-weight:800;color:#64748b;min-width:44px;text-align:right;">${Math.min(pct,150)}%</div>
-              </div>
-              <div style="font-size:24px;font-weight:800;color:${col};min-width:86px;text-align:right;">${pct}%</div>
-            </div>`;
-        }).join('')}
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <div style="height:${footerH}px;flex-shrink:0;padding-top:10px;border-top:1px solid #e2e8f0;display:grid;grid-template-columns:repeat(${sorted.length}, minmax(0, 1fr));gap:8px;align-items:center;">
+          ${sorted.map(t=>`
+            <div style="text-align:center;line-height:1.1;padding-top:2px;">
+              <div style="font-size:10px;font-weight:800;color:#64748b;letter-spacing:.5px;">TECH ID</div>
+              <div style="font-size:13px;font-weight:900;color:#0f172a;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${sanitize(t.id)}</div>
+            </div>
+          `).join('')}
+        </div>
       </div>
-    </div>`;
+    </div>
+  `;
   return panel;
 }
+
 async function exportLeaderboard(panelId,format='image'){
   if(!window.html2canvas){toast('Export library not loaded','error');return;}
   const stats=getLeaderboardStats().map(t=>({...t,pct:t.tgt?Math.round((t.total/t.tgt)*100):0})).sort((a,b)=>b.pct-a.pct||b.total-a.total);
@@ -2532,7 +2702,7 @@ function renderTechs(){
       <td class="mono"><span class="bdg bblu">${mt}h</span></td>
       <td class="mono">${getWeeklyTgt(mt).toFixed(1)}h/wk</td>
       <td class="mono">${getDailyTgt(mt).toFixed(1)}h/day</td>
-      <td><span class="bdg ${t.status==='active'?'bgr':'bgray'}">${t.status}</span>${t.underSupervision?'<span class="bdg bgr" style="margin-left:4px;font-size:9px;">👁 UnderSup</span>':''}</td>
+      <td><span class="bdg ${t.status==='active'?'bgr':'bgray'}">${t.status}</span><span class="bdg bvio" style="margin-left:4px;font-size:9px;">${getFixedRoleLabel(t)}</span></td>
       <td><div style="display:flex;gap:5px;">
         <button class="btn bo bsm" onclick="openEditTech('${t.id}')">✏️</button>
         <button class="btn bd bsm" onclick="delTech('${t.id}')">🗑</button>
@@ -2545,21 +2715,22 @@ window.openEditTech=function(id){
   const t=techs.find(x=>x.id===id);if(!t)return;editTechId=id;
   sv('mt-id',t.id);sv('mt-name',t.name);sv('mt-target',t.monthlyTarget||160);sv('mt-pwd',t.password||'demo');
   document.getElementById('mt-status').value=t.status||'active';
-  const usEl=document.getElementById('mt-unsup');if(usEl)usEl.checked=!!t.underSupervision;
-  const pic=profilePics[id];const pm=document.getElementById('mt-pic-prev'),pp=document.getElementById('mt-pic-ph');
+  const frEl=document.getElementById('mt-fixed-role');if(frEl)frEl.value=getFixedRoleGroup(t);
+  const pic=getUserPhoto(id);const pm=document.getElementById('mt-pic-prev'),pp=document.getElementById('mt-pic-ph');
   if(pic&&pm){pm.src=pic;pm.style.display='block';}if(pp)pp.style.display=pic?'none':'block';
   stxt('mt-title','Edit Technician');openModal('m-tech');
 };
-function clearTechForm(){['mt-id','mt-name','mt-target','mt-pwd'].forEach(id=>sv(id,''));document.getElementById('mt-status').value='active';const _us=document.getElementById('mt-unsup');if(_us)_us.checked=false;const pm=document.getElementById('mt-pic-prev'),pp=document.getElementById('mt-pic-ph');if(pm){pm.src='';pm.style.display='none';}if(pp)pp.style.display='block';}
+function clearTechForm(){['mt-id','mt-name','mt-target','mt-pwd'].forEach(id=>sv(id,''));document.getElementById('mt-status').value='active';const frEl=document.getElementById('mt-fixed-role');if(frEl)frEl.value='Technician';const pm=document.getElementById('mt-pic-prev'),pp=document.getElementById('mt-pic-ph');if(pm){pm.src='';pm.style.display='none';}if(pp)pp.style.display='block';}
 window.saveTech=async function(){
   const id=sanitize(document.getElementById('mt-id')?.value);const name=sanitize(document.getElementById('mt-name')?.value);
   if(!id||!name){toast('ID and Name required','error');return;}
   const target=sanitizeNum(document.getElementById('mt-target')?.value)||160;
   const status=document.getElementById('mt-status')?.value;const pwd=sanitize(document.getElementById('mt-pwd')?.value)||'demo';
-  const underSupervision=!!(document.getElementById('mt-unsup')?.checked);
+  const fixedRole=document.getElementById('mt-fixed-role')?.value||'Technician';
+  const underSupervision=(fixedRole==='Under Supervision');
   const colors=['#3b82f6','#10b981','#f59e0b','#f43f5e','#8b5cf6'];
-  if(editTechId){const idx=techs.findIndex(t=>t.id===editTechId);if(idx>-1){const u={...techs[idx],id,name,monthlyTarget:target,status,password:pwd,underSupervision};await window.setDoc(window.doc(window.db,'technicians',editTechId),u);techs[idx]=u;if(CU&&CU.id===editTechId)CU=u;}toast('Updated');}
-  else{if(techs.find(t=>t.id===id)){toast('ID exists','error');return;}const nt={id,name,monthlyTarget:target,status,password:pwd,underSupervision,initials:name.slice(0,2).toUpperCase(),color:colors[techs.length%colors.length]};await window.setDoc(window.doc(window.db,'technicians',id),nt);techs.push(nt);toast('Added');}
+  if(editTechId){const idx=techs.findIndex(t=>t.id===editTechId);if(idx>-1){const u={...techs[idx],id,name,monthlyTarget:target,status,password:pwd,underSupervision,fixedRole};await window.setDoc(window.doc(window.db,'technicians',editTechId),u);techs[idx]=u;if(CU&&CU.id===editTechId)CU=u;}toast('Updated');}
+  else{if(techs.find(t=>t.id===id)){toast('ID exists','error');return;}const nt={id,name,monthlyTarget:target,status,password:pwd,underSupervision,fixedRole,initials:name.slice(0,2).toUpperCase(),color:colors[techs.length%colors.length]};await window.setDoc(window.doc(window.db,'technicians',id),nt);techs.push(nt);toast('Added');}
   const pf=document.getElementById('mt-pic')?.files[0];if(pf){const r=new FileReader();r.onload=async e=>await savePic(id,e.target.result);r.readAsDataURL(pf);}
   closeModal('m-tech');renderTechs();
 };
@@ -2614,7 +2785,7 @@ function renderLeaders(){
    </tr>`).join('')||'<tr><td colspan="6" class="empty">No leaders</td></tr>';}
 }
 window.openAddLeader=function(){editLeaderId=null;['ml-id','ml-name','ml-email'].forEach(id=>sv(id,''));sv('ml-pwd','demo');document.getElementById('ml-status').value='active';stxt('ml-title','Add Team Leader');const pm=document.getElementById('ml-pic-prev'),pp=document.getElementById('ml-pic-ph');if(pm){pm.src='';pm.style.display='none';}if(pp)pp.style.display='block';openModal('m-leader');};
-window.openEditLeader=function(id){const l=leaders.find(x=>x.id===id);if(!l)return;editLeaderId=id;sv('ml-id',l.id);sv('ml-name',l.name);sv('ml-email',l.email||'');sv('ml-pwd',l.password||'demo');document.getElementById('ml-status').value=l.status||'active';stxt('ml-title','Edit Leader');const pic=profilePics[id];const pm=document.getElementById('ml-pic-prev'),pp=document.getElementById('ml-pic-ph');if(pic&&pm){pm.src=pic;pm.style.display='block';}if(pp)pp.style.display=pic?'none':'block';openModal('m-leader');};
+window.openEditLeader=function(id){const l=leaders.find(x=>x.id===id);if(!l)return;editLeaderId=id;sv('ml-id',l.id);sv('ml-name',l.name);sv('ml-email',l.email||'');sv('ml-pwd',l.password||'demo');document.getElementById('ml-status').value=l.status||'active';stxt('ml-title','Edit Leader');const pic=getUserPhoto(id);const pm=document.getElementById('ml-pic-prev'),pp=document.getElementById('ml-pic-ph');if(pic&&pm){pm.src=pic;pm.style.display='block';}if(pp)pp.style.display=pic?'none':'block';openModal('m-leader');};
 window.saveLeader=async function(){
   const id=sanitize(document.getElementById('ml-id')?.value);const name=sanitize(document.getElementById('ml-name')?.value);
   if(!id||!name){toast('ID and Name required','error');return;}
@@ -2642,7 +2813,7 @@ function renderControllers(){
    </tr>`).join('')||'<tr><td colspan="6" class="empty">No production controllers</td></tr>';}
 }
 window.openAddController=function(){editControllerId=null;['mc-id','mc-name','mc-email'].forEach(id=>sv(id,''));sv('mc-pwd','demo');document.getElementById('mc-status').value='active';stxt('mc-title','Add Production Controller');const pm=document.getElementById('mc-pic-prev'),pp=document.getElementById('mc-pic-ph');if(pm){pm.src='';pm.style.display='none';}if(pp)pp.style.display='block';openModal('m-controller');};
-window.openEditController=function(id){const c=controllers.find(x=>x.id===id);if(!c)return;editControllerId=id;sv('mc-id',c.id);sv('mc-name',c.name);sv('mc-email',c.email||'');sv('mc-pwd',c.password||'demo');document.getElementById('mc-status').value=c.status||'active';stxt('mc-title','Edit Production Controller');const pic=profilePics[id];const pm=document.getElementById('mc-pic-prev'),pp=document.getElementById('mc-pic-ph');if(pic&&pm){pm.src=pic;pm.style.display='block';}if(pp)pp.style.display=pic?'none':'block';openModal('m-controller');};
+window.openEditController=function(id){const c=controllers.find(x=>x.id===id);if(!c)return;editControllerId=id;sv('mc-id',c.id);sv('mc-name',c.name);sv('mc-email',c.email||'');sv('mc-pwd',c.password||'demo');document.getElementById('mc-status').value=c.status||'active';stxt('mc-title','Edit Production Controller');const pic=getUserPhoto(id);const pm=document.getElementById('mc-pic-prev'),pp=document.getElementById('mc-pic-ph');if(pic&&pm){pm.src=pic;pm.style.display='block';}if(pp)pp.style.display=pic?'none':'block';openModal('m-controller');};
 window.saveController=async function(){
   const id=sanitize(document.getElementById('mc-id')?.value);const name=sanitize(document.getElementById('mc-name')?.value);
   if(!id||!name){toast('ID and Name required','error');return;}
@@ -2775,22 +2946,24 @@ function populateLeaderEntryTechs(){
   populateLeaderPartSel();
 }
 function onLeaderTechSel(){
-  const techId=document.getElementById('le-tech-sel')?.value;
-  const tech=techs.find(t=>t.id===techId);
-  if(tech&&tech.underSupervision){pickLeJobRole('Under Supervision',1);}
+  applyRoleLock('le');
   refreshLeAllocHrs();
 }
 function setLeJobType(type){
+  if(type==='scrap' && !getAllowedRolesForTech(getEntryTech('le')).includes('Inspector')) type='completed';
   leJobType=type;
   document.getElementById('le-cs-comp').className='cs-opt'+(type==='completed'?' sel-comp':'');
   document.getElementById('le-cs-scrap').className='cs-opt'+(type==='scrap'?' sel-scrap':'');
   for(let i=0;i<4;i++){const el=document.getElementById('le-jr'+i);if(!el)continue;if(type==='scrap'&&i!==2)el.classList.add('disabled');else el.classList.remove('disabled');}
   if(type==='scrap'){pickLeJobRole('Inspector',2);const shi=document.getElementById('le-scrap-hrs');if(shi)shi.value=String(settings.scrapDefaultHrs||2);}
   const shr=document.getElementById('le-scrap-hrs-row');if(shr){if(type==='scrap')shr.classList.add('show');else shr.classList.remove('show');}
+  applyRoleLock('le');
   refreshLeAllocHrs();
 }
 window.setLeJobType=setLeJobType;
 function pickLeJobRole(role,idx){
+  const allowed=getAllowedRolesForTech(getEntryTech('le'));
+  if(allowed.length && !allowed.includes(role)) { role=allowed[0]; idx=ROLES.indexOf(role); }
   leJobRole=role;leJobRoleIdx=idx;
   for(let i=0;i<4;i++){const el=document.getElementById('le-jr'+i);if(!el)continue;const d=el.classList.contains('disabled');el.className='jro'+(d?' disabled':'');}
   const el=document.getElementById('le-jr'+idx);if(el)el.classList.add(ROLE_SEL[idx]);
@@ -2830,6 +3003,7 @@ function onLePartSel(){
 }
 window.onLePartSel=onLePartSel;
 function renderLeaderEntry(){
+  applyRoleLock('le');
   const today=todayEAT();
   const tbody=document.getElementById('le-today-list');
   if(tbody){
