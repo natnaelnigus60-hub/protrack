@@ -570,7 +570,7 @@ tbody tr:hover td{background:var(--card2);}
                     <div class="fgroup" id="e-hours-row"><label class="flabel" id="e-hrs-lbl">Allocated Hours</label><input class="finput" id="e-hours" readonly></div>
                     <div class="fgroup"><label class="flabel">Date &amp; Time</label><input class="finput" id="e-time" type="date"></div>
                     <div class="fgroup ff scrap-hrs-row" id="scrap-hrs-row">
-                      <label class="flabel" style="color:var(--rose);" id="scrap-hrs-lbl">🗑 Scrap Inspector Hours <span id="scrap-hrs-note" style="font-size:9.5px;color:var(--tx3);font-weight:400;">(Default: 2h — Team Leader can adjust)</span></label>
+                      <label class="flabel" style="color:var(--rose);" id="scrap-hrs-lbl">🗑 Scrap Inspector Hours <span id="scrap-hrs-note" style="font-size:9.5px;color:var(--tx3);font-weight:400;">(Default: 2Hrs — Team Leader can adjust)</span></label>
                       <input class="finput" id="e-scrap-hrs" type="number" step="0.5" min="0" placeholder="2.0" value="2">
                       <div style="font-size:11px;color:var(--tx3);margin-top:3px;">Inspector hours for this scrap task (separate from SDT)</div>
                     </div>
@@ -587,8 +587,8 @@ tbody tr:hover td{background:var(--card2);}
             </div>
             <div>
               <div class="kg k2" style="margin-bottom:12px;">
-                <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Today SDT</div><div class="kv" id="e-today-hrs" style="color:var(--blue)">0h</div><div class="ks">target: <span id="e-daily-target">—</span>h</div></div>
-                <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">This Week</div><div class="kv" id="e-week-hrs" style="color:var(--amber)">0h</div><div class="ks">target: <span id="e-week-target">—</span>h</div></div>
+                <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Today SDT</div><div class="kv" id="e-today-hrs" style="color:var(--blue)">0Hrs</div><div class="ks">target: <span id="e-daily-target">—</span>Hrs</div></div>
+                <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">This Week</div><div class="kv" id="e-week-hrs" style="color:var(--amber)">0Hrs</div><div class="ks">target: <span id="e-week-target">—</span>Hrs</div></div>
               </div>
               <div class="card">
                 <div class="ch"><span class="ct">Today's Submissions</span></div>
@@ -612,12 +612,12 @@ tbody tr:hover td{background:var(--card2);}
             </div>
           </div>
           <div class="kg k4" style="margin-bottom:5px;">
-            <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Today SDT</div><div class="kv" id="ms-today" style="color:var(--blue)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-t-pb" style="background:var(--blue);width:0%"></div></div><div class="kpb-s"><span id="ms-dt">Daily: —</span><span id="ms-dpc">0%</span></div></div></div>
-            <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">This Week</div><div class="kv" id="ms-week" style="color:var(--amber)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-w-pb" style="background:var(--amber);width:0%"></div></div><div class="kpb-s"><span id="ms-wt">Weekly: —</span><span id="ms-wpc">0%</span></div></div></div>
-            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Total Achieved Hours</div><div class="kv" id="ms-month" style="color:var(--green)">0h</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-m-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-mt">Month: —</span><span id="ms-mpc">0%</span></div></div></div>
+            <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Today SDT</div><div class="kv" id="ms-today" style="color:var(--blue)">0Hrs</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-t-pb" style="background:var(--blue);width:0%"></div></div><div class="kpb-s"><span id="ms-dt">Daily: —</span><span id="ms-dpc">0%</span></div></div></div>
+            <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">This Week</div><div class="kv" id="ms-week" style="color:var(--amber)">0Hrs</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-w-pb" style="background:var(--amber);width:0%"></div></div><div class="kpb-s"><span id="ms-wt">Weekly: —</span><span id="ms-wpc">0%</span></div></div></div>
+            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Total Achieved Hours</div><div class="kv" id="ms-month" style="color:var(--green)">0Hrs</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-m-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-mt">Month: —</span><span id="ms-mpc">0%</span></div></div></div>
           </div>
           <div class="kg k2" style="margin-bottom:14px;">
-            <div class="kc"><div class="kac" style="background:var(--cyan)"></div><div class="kl">Additional Assignment Hrs (Month)</div><div class="kv" id="ms-asn" style="color:var(--cyan)">0h</div><div class="ks">Add to total achieved hrs</div></div>
+            <div class="kc"><div class="kac" style="background:var(--cyan)"></div><div class="kl">Additional Assignment Hrs (Month)</div><div class="kv" id="ms-asn" style="color:var(--cyan)">0Hrs</div><div class="ks">Add to total achieved hrs</div></div>
           </div>
                     <div class="card">
             <div class="ch" style="align-items:flex-end;">
@@ -673,8 +673,8 @@ tbody tr:hover td{background:var(--card2);}
           </div>
           <div class="kg k4" style="margin-bottom:16px;">
             <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Active Techs</div><div class="kv" id="d-act" style="color:var(--blue)">0</div><div class="ks" id="d-acts"></div></div>
-            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Shop achivement (Monthly)</div><div class="kv" id="d-sdt" style="color:var(--green)">0h</div><div class="ks">target: <span id="d-tgt">—</span>h</div></div>
-            <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">Avg Hrs/Tech</div><div class="kv" id="d-avg" style="color:var(--amber)">0h</div><div class="ks">this month</div></div>
+            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Shop achivement (Monthly)</div><div class="kv" id="d-sdt" style="color:var(--green)">0Hrs</div><div class="ks">target: <span id="d-tgt">—</span>Hrs</div></div>
+            <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">Avg Hrs/Tech</div><div class="kv" id="d-avg" style="color:var(--amber)">0Hrs</div><div class="ks">this month</div></div>
             <div class="kc"><div class="kac" style="background:var(--violet)"></div><div class="kl">Shop Progress</div><div class="kv" id="d-prog" style="color:var(--violet)">0%</div><div class="ks">monthly</div></div>
           </div>
           <div class="card" style="margin-bottom:14px;">
@@ -1811,7 +1811,7 @@ window.saveScrapDefaultHrs=async function(){
   if(v<0.5){toast('Minimum 0.5 hours','error');return;}
   settings.scrapDefaultHrs=v;
   await persistSettings();
-  toast('Scrap default inspector hours set to '+v+'h');
+  toast('Scrap default inspector hours set to '+v+'Hrs');
 };
 async function persistSettings(){
   try{const r=window.collection(window.db,'settings');const s=await window.getDocs(r);if(!s.empty)await window.setDoc(window.doc(window.db,'settings',s.docs[0].id),settings);else await window.setDoc(window.doc(window.db,'settings','global'),settings);}
@@ -2096,8 +2096,8 @@ function renderEntry(){
   const todaySDT=approvedMe.filter(e=>e.time?.startsWith(today)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
   const weekSDT=approvedMe.filter(e=>e.time>=wr.start&&e.time<=wr.end&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
   const mt=CU.monthlyTarget||160;
-  stxt('e-today-hrs',todaySDT.toFixed(2)+'h');
-  stxt('e-week-hrs',weekSDT.toFixed(2)+'h');
+  stxt('e-today-hrs',todaySDT.toFixed(2)+'Hrs');
+  stxt('e-week-hrs',weekSDT.toFixed(2)+'Hrs');
   stxt('e-daily-target',getDailyTgt(mt).toFixed(1));
   stxt('e-week-target',getWeeklyTgt(mt).toFixed(1));
   populatePartSel();
@@ -2203,7 +2203,7 @@ async function confirmSave(){
     closeModal('m-review');
     clearEntry();
     renderEntry();
-    toast(`✓ ${savedEntry.pname} — ${savedEntry.jobRole} — ${savedEntry.hours}h saved`);
+    toast(`✓ ${savedEntry.pname} — ${savedEntry.jobRole} — ${savedEntry.hours}Hrs saved`);
   }catch(err){toast('Save failed: '+err.message,'error');}
   finally{if(btn){btn.classList.remove('saving');btn.disabled=false;}}
 }
@@ -2249,12 +2249,12 @@ function renderMyStats(){
   const inspHrs=approvedMe.filter(e=>dateInRange(e.time,mrSel.start,mrSel.end)&&!isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
   const totalAchieved=monthSDT+asnHrs+inspHrs;
 
-  stxt('ms-today',todaySDT.toFixed(2)+'h');
-  stxt('ms-week',weekSDT.toFixed(2)+'h');
-  stxt('ms-month',totalAchieved.toFixed(2)+'h');
-  stxt('ms-asn',asnHrs.toFixed(2)+'h');
-  stxt('ms-dt',`Daily: ${dt.toFixed(1)}h`);
-  stxt('ms-wt',`Weekly: ${wt.toFixed(1)}h`);
+  stxt('ms-today',todaySDT.toFixed(2)+'Hrs');
+  stxt('ms-week',weekSDT.toFixed(2)+'Hrs');
+  stxt('ms-month',totalAchieved.toFixed(2)+'Hrs');
+  stxt('ms-asn',asnHrs.toFixed(2)+'Hrs');
+  stxt('ms-dt',`Daily: ${dt.toFixed(1)}Hrs`);
+  stxt('ms-wt',`Weekly: ${wt.toFixed(1)}Hrs`);
   stxt('ms-mt',`Month: ${mrSel.label}`);
 
   pb('ms-t-pb',todaySDT,dt);
@@ -2309,7 +2309,7 @@ function renderDashboard(){
   const avg=activeTechs?totalSDT/activeTechs:0;
   const prog=totalTgt?Math.round(totalSDT/totalTgt*100):0;
   stxt('d-act',activeTechs);stxt('d-acts','of '+techs.filter(t=>t.status==='active').length+' active');
-  stxt('d-sdt',totalSDT.toFixed(1)+'h');stxt('d-tgt',totalTgt);stxt('d-avg',avg.toFixed(1)+'h');stxt('d-prog',prog+'%');
+  stxt('d-sdt',totalSDT.toFixed(1)+'Hrs');stxt('d-tgt',totalTgt);stxt('d-avg',avg.toFixed(1)+'Hrs');stxt('d-prog',prog+'%');
   renderAchievGraph(dr);renderLB(dr);
 }
 function setAF(f,btn){achievFilter=f;document.querySelectorAll('.af-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');renderAchievGraph(getUIRange('dash'));}
@@ -2369,7 +2369,7 @@ function renderLeaderboardInto(bodyId,qId,range=getUIRange('dash')){
       <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0;">${avatarHtml(t.id,t.name,30)}</div>
       <div class="lb-in"><div class="lb-nm">${t.name}</div><div class="lb-id">${t.id}</div></div>
       <div class="lb-pb"><div class="lb-pbf" style="width:${Math.min(100,pct)}%;background:${col};"></div></div>
-      <div class="lb-hrs" style="color:${col}">${t.total.toFixed(1)}/${t.tgt}h · ${pct}%</div>
+      <div class="lb-hrs" style="color:${col}">${t.total.toFixed(1)}/${t.tgt}Hrs · ${pct}%</div>
     </div>`;
   }).join('')||'<div class="empty">No data</div>';
 }
@@ -2381,7 +2381,7 @@ window.renderLB=renderLB;
 
 
 
-function buildLeaderboardExportPanel(stats){
+function buildLeaderboardExportPanel(stats,rangeHint=getUIRange('dash')){
   const sorted=[...stats]
     .map(t=>({...t,pct:t.tgt?Math.round((t.total/t.tgt)*100):0}))
     .sort((a,b)=>b.pct-a.pct);
@@ -2398,7 +2398,7 @@ function buildLeaderboardExportPanel(stats){
 
   const monthLabel = (() => {
     try{
-      const dStr = typeof todayEAT === 'function' ? todayEAT() : new Date().toISOString().slice(0,10);
+      const dStr = (rangeHint && rangeHint.start) ? String(rangeHint.start).slice(0,10) : (typeof todayEAT === 'function' ? todayEAT() : new Date().toISOString().slice(0,10));
       const d = new Date(dStr + 'T00:00:00');
       return d.toLocaleDateString('en-US', { month:'long', year:'numeric', timeZone:'Africa/Addis_Ababa' }).toUpperCase();
     }catch(e){
@@ -2441,7 +2441,7 @@ function buildLeaderboardExportPanel(stats){
   panel.innerHTML = `
     <div style="background:#c1121f;color:#fff;padding:20px 28px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;">
-        <div style="font-size:40px;font-weight:800;letter-spacing:-1px;line-height:1;">MOTHLY TARGET ACHIVEMENT LEADERBOARD</div>
+        <div style="font-size:40px;font-weight:800;letter-spacing:-1px;line-height:1;">Monthly Productivity Report</div>
         <div style="font-size:24px;font-weight:900;letter-spacing:1px;line-height:1;text-transform:uppercase;">${monthLabel}</div>
       </div>
       <div style="font-size:14px;font-weight:700;opacity:.95;text-align:right;">VERTICAL GRAPH • SORTED BY %</div>
@@ -2481,7 +2481,7 @@ function buildLeaderboardExportPanel(stats){
               <div style="position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px;min-width:0;padding:2px 0 0;">
                 <div style="position:absolute;left:50%;transform:translateX(-50%);bottom:${Math.max(0, fill + 8)}px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;z-index:2;pointer-events:none;">
                   <div style="font-size:18px;font-weight:900;color:${col};line-height:1;white-space:nowrap;text-align:center;">${pct}%</div>
-                  <div style="font-size:15px;font-weight:900;color:#475569;line-height:1;white-space:nowrap;text-align:center;">${Number(t.total||0).toFixed(1)}h</div>
+                  <div style="font-size:15px;font-weight:900;color:#475569;line-height:1;white-space:nowrap;text-align:center;">${Number(t.total||0).toFixed(1)}Hrs</div>
                   ${exportAvatar(t.id,t.name,avatarSize,col)}
                 </div>
 
@@ -2509,8 +2509,9 @@ function buildLeaderboardExportPanel(stats){
 }
 async function exportLeaderboard(panelId,format='image'){
   if(!window.html2canvas){toast('Export library not loaded','error');return;}
-  const stats=getLeaderboardStats().map(t=>({...t,pct:t.tgt?Math.round((t.total/t.tgt)*100):0})).sort((a,b)=>b.pct-a.pct);
-  const exportPanel=buildLeaderboardExportPanel(stats);
+  const range=getUIRange('dash');
+  const stats=getLeaderboardStats(range).map(t=>({...t,pct:t.tgt?Math.round((t.total/t.tgt)*100):0})).sort((a,b)=>b.pct-a.pct);
+  const exportPanel=buildLeaderboardExportPanel(stats,range);
   document.body.appendChild(exportPanel);
   try{
     const canvas=await html2canvas(exportPanel,{scale:2,backgroundColor:'#f0f4f8',useCORS:true});
@@ -2897,7 +2898,7 @@ function renderTG(){
       <div class="tg-body">
         ${ROLES.map((r,i)=>`<div class="tg-col">
           <div class="tg-rh" style="color:${ROLE_COLORS[i]}">${['🔧','👁','🔍','🔎'][i]} ${r.split(' ')[0].toUpperCase()}
-            <span style="margin-left:auto;font-size:9px;font-family:'JetBrains Mono',monospace;">${isInspRole(r)?pools[r].toFixed(2)+'h fixed':pools[r].toFixed(2)+'h pool'}</span>
+            <span style="margin-left:auto;font-size:9px;font-family:'JetBrains Mono',monospace;">${isInspRole(r)?pools[r].toFixed(2)+'Hrs fixed':pools[r].toFixed(2)+'Hrs pool'}</span>
           </div>
           ${personRows(byRole[r],r,i)}
         </div>`).join('')}
@@ -2939,8 +2940,8 @@ function renderTechs(){
       <td class="mono" style="color:var(--blue);">${t.id}</td>
       <td style="font-weight:600;">${sanitize(t.name)}</td>
       <td class="mono"><span class="bdg bblu">${mt}h</span></td>
-      <td class="mono">${getWeeklyTgt(mt).toFixed(1)}h/wk</td>
-      <td class="mono">${getDailyTgt(mt).toFixed(1)}h/day</td>
+      <td class="mono">${getWeeklyTgt(mt).toFixed(1)}Hrs/wk</td>
+      <td class="mono">${getDailyTgt(mt).toFixed(1)}Hrs/day</td>
       <td><span class="bdg ${t.status==='active'?'bgr':'bgray'}">${t.status}</span>${t.underSupervision?'<span class="bdg bgr" style="margin-left:4px;font-size:9px;">👁 UnderSup</span>':''}</td>
       <td><div style="display:flex;gap:5px;">
         <button class="btn bo bsm" onclick="openEditTech('${t.id}')">✏️</button>
@@ -3343,7 +3344,7 @@ async function confirmLeSave(){
     closeModal('m-review');
     clearLeEntry();
     renderLeaderEntry();
-    toast(`✓ ${savedEntry.pname} — ${savedEntry.jobRole} — ${savedEntry.hours}h saved`);
+    toast(`✓ ${savedEntry.pname} — ${savedEntry.jobRole} — ${savedEntry.hours}Hrs saved`);
   }catch(err){toast('Save failed: '+err.message,'error');}
   finally{if(btn){btn.classList.remove('saving');btn.disabled=false;}
   document.getElementById('confirm-save-btn').onclick=confirmSave;}
