@@ -576,7 +576,7 @@ tbody tr:hover td{background:var(--card2);}
                     </div>
                   </div>
                   <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
-                    <button class="btn bp" id="submit-btn" onclick="openReviewModal()">
+                    <button type="button" class="btn bp" id="submit-btn" onclick="openReviewModal()">
                       <span class="btn-spinner"></span>
                       <span class="btn-label">✓ Review &amp; Submit</span>
                     </button>
@@ -594,7 +594,7 @@ tbody tr:hover td{background:var(--card2);}
                 <div class="ch"><span class="ct">Today's Submissions</span></div>
                 <div style="max-height:380px;overflow-y:auto;">
                    <table>
-                    <thead> <tr><th>Time</th><th>Task Code</th><th>Role</th><th>Part</th><th>Hrs</th><th>Type</th><th>Action</th></tr> </thead>
+                    <thead> <tr><th>Time</th><th>Task Code</th><th>Role</th><th>Part</th><th>Hrs</th><th>Status</th><th>Type</th><th>Action</th></tr> </thead>
                     <tbody id="e-today-list"></tbody>
                    </table>
                 </div>
@@ -605,7 +605,7 @@ tbody tr:hover td{background:var(--card2);}
 
         <!-- TECH: MY STATS -->
         <div class="pg" id="pg-mystats">
-          <div class="tbr" style="margin-bottom:12px;">
+          <div class="tbr" style="margin-bottom:12px;gap:12px;flex-wrap:wrap;">
             <div class="fgroup" style="max-width:240px;">
               <label class="flabel">Month Filter</label>
               <input type="month" class="finput" id="ms-month-filter" onchange="renderMyStats()">
@@ -619,12 +619,33 @@ tbody tr:hover td{background:var(--card2);}
           <div class="kg k2" style="margin-bottom:14px;">
             <div class="kc"><div class="kac" style="background:var(--cyan)"></div><div class="kl">Additional Assignment Hrs (Month)</div><div class="kv" id="ms-asn" style="color:var(--cyan)">0h</div><div class="ks">Add to total achieved hrs</div></div>
           </div>
-          <div class="card">
-            <div class="ch"><span class="ct">Production History</span><button class="btn bo bsm" onclick="exportMine()">⬇ Export</button></div>
-            <div class="tw"><table><thead> <tr><th>Date/Time (EAT)</th><th>Task Code</th><th>Role</th><th>Part</th><th>ATA</th><th>Part #</th><th>Hrs (÷peers)</th><th>Type</th></tr> </thead>
+                    <div class="card">
+            <div class="ch" style="align-items:flex-end;">
+              <span class="ct">Production History</span>
+              <div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;margin-left:auto;">
+                <div class="fgroup" style="min-width:150px;">
+                  <label class="flabel">From Date</label>
+                  <input type="date" class="finput" id="ms-hist-from" onchange="renderMyStats()">
+                </div>
+                <div class="fgroup" style="min-width:150px;">
+                  <label class="flabel">To Date</label>
+                  <input type="date" class="finput" id="ms-hist-to" onchange="renderMyStats()">
+                </div>
+                <div class="fgroup" style="min-width:160px;">
+                  <label class="flabel">Status Filter</label>
+                  <select class="fselect" id="ms-status-filter" onchange="renderMyStats()">
+                    <option value="all">All</option>
+                    <option value="accepted">Accepted</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="pending">Pending</option>
+                  </select>
+                </div>
+                <button class="btn bo bsm" onclick="exportMine()">⬇ Export</button>
+              </div>
+            </div>
+            <div class="tw"><table><thead> <tr><th>Date/Time (EAT)</th><th>Task Code</th><th>Role</th><th>Part</th><th>ATA</th><th>Part #</th><th>Hrs (÷peers)</th><th>Type</th><th>Status</th></tr> </thead>
             <tbody id="ms-hist"></tbody></table></div>
-          </div>
-          <div class="card">
+          </div>          <div class="card">
             <div class="ch"><span class="ct">📌 My Additional Assignments</span></div>
             <div id="ms-asn-list"><div class="empty"><div class="ei">📌</div><div class="et">No Additional assignments</div></div></div>
           </div>
@@ -730,6 +751,12 @@ tbody tr:hover td{background:var(--card2);}
           <div class="tbr">
             <div class="sbx"><input type="text" id="ae-q" placeholder="Search name, task code, part..." oninput="renderAllEntries()"></div>
             <select class="fsel" id="ae-tech" onchange="renderAllEntries()"><option value="">All Techs</option></select>
+            <select class="fsel" id="ae-st" onchange="renderAllEntries()">
+              <option value="all">All Status</option>
+              <option value="accepted">Accepted</option>
+              <option value="rejected">Rejected</option>
+              <option value="pending">Pending</option>
+            </select>
             <input type="date" class="fsel" id="ae-dt-from" onchange="renderAllEntries()" title="From date" style="color:var(--tx);">
             <input type="date" class="fsel" id="ae-dt-to" onchange="renderAllEntries()" title="To date" style="color:var(--tx);">
             <select class="fsel" id="ae-dt-preset" onchange="applyAEPreset(this.value)" title="Quick range">
@@ -742,7 +769,7 @@ tbody tr:hover td{background:var(--card2);}
             <button class="btn bo bsm" onclick="exportAllEntries()">⬇ CSV</button>
           </div>
           <div class="card"><div class="tw"><table>
-            <thead> <tr><th>Date/Time (EAT)</th><th>Tech</th><th>Task Code</th><th>Role</th><th>Type</th><th>Part</th><th>ATA</th><th>Part #</th><th>Hrs (÷peers)</th><th>Action</th></tr> </thead>
+            <thead> <tr><th>Date/Time (EAT)</th><th>Tech</th><th>Task Code</th><th>Role</th><th>Type</th><th>Part</th><th>ATA</th><th>Part #</th><th>Hrs (÷peers)</th><th>Status</th><th>Action</th></tr> </thead>
             <tbody id="ae-body"></tbody>
            </table></div></div>
         </div>
@@ -1012,7 +1039,7 @@ tbody tr:hover td{background:var(--card2);}
                     </div>
                   </div>
                   <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
-                    <button class="btn bp" id="le-submit-btn" onclick="openLeReviewModal()">
+                    <button type="button" class="btn bp" id="le-submit-btn" onclick="openLeReviewModal()">
                       <span class="btn-spinner"></span>
                       <span class="btn-label">✓ Review &amp; Submit</span>
                     </button>
@@ -1027,7 +1054,7 @@ tbody tr:hover td{background:var(--card2);}
                 <div class="ch"><span class="ct">Today's Entries</span></div>
                 <div style="max-height:330px;overflow-y:auto;">
                    <table>
-                    <thead> <tr><th>Tech</th><th>Task Code</th><th>Role</th><th>Part</th><th>Hrs</th><th>Type</th><th>Action</th></tr> </thead>
+                    <thead> <tr><th>Tech</th><th>Task Code</th><th>Role</th><th>Part</th><th>Hrs</th><th>Status</th><th>Type</th><th>Action</th></tr> </thead>
                     <tbody id="le-today-list"></tbody>
                    </table>
                 </div>
@@ -1054,7 +1081,7 @@ tbody tr:hover td{background:var(--card2);}
     <div class="mbody" id="m-review-body"></div>
     <div class="mfoot">
       <button class="btn bo" onclick="closeModal('m-review')">← Go Back &amp; Edit</button>
-      <button class="btn bp" id="confirm-save-btn" onclick="confirmSave()">
+      <button type="button" class="btn bp" id="confirm-save-btn" onclick="confirmSave()">
         <span class="btn-spinner"></span>
         <span class="btn-label">Confirm &amp; Save →</span>
       </button>
@@ -1100,14 +1127,13 @@ tbody tr:hover td{background:var(--card2);}
       <div class="fgroup"><label class="flabel">Monthly Target (hrs)</label><input class="finput" id="mt-target" type="number" placeholder="160"></div>
       <div class="fgroup"><label class="flabel">Status</label><select class="fselect" id="mt-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
       <div class="fgroup"><label class="flabel">Password</label><input class="finput" id="mt-pwd" type="text" value="demo"></div>
+      <div class="fgroup"><label class="flabel">Role Access</label><select class="fselect" id="mt-role-access"><option value="tech">Technician only</option><option value="tech_sup">Under supervision only</option><option value="tech_insp">Inspector + Technician + Preliminary</option><option value="all">All 4 roles</option></select><div style="font-size:11px;color:var(--tx3);margin-top:3px;">Technicians can only use roles assigned here.</div></div>
       <div class="fgroup ff" style="grid-column:1/-1;">
-        <label class="flabel">Fixed Role *</label>
-        <select class="fselect" id="mt-fixed-role">
-          <option value="Technician">Technician</option>
-          <option value="Under Supervision">Under Supervision</option>
-          <option value="Inspector / Preliminary Inspector">Inspector / Preliminary Inspector</option>
-        </select>
-        <div style="font-size:11px;color:var(--tx3);margin-top:4px;">The selected technician can use only this role during data entry.</div>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 12px;background:var(--gdim);border:1px solid rgba(16,185,129,.2);border-radius:8px;">
+          <input type="checkbox" id="mt-unsup" style="width:16px;height:16px;accent-color:var(--green);flex-shrink:0;">
+          <div><div style="font-size:13px;font-weight:700;color:var(--green);">👁 Under Supervision</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:2px;">Allocation hours auto-set to 75% of SDT on every entry</div></div>
+        </label>
       </div>
       <div class="fgroup"><label class="flabel">Profile Photo</label>
         <div class="pic-up" onclick="document.getElementById('mt-pic').click()">
@@ -1256,81 +1282,28 @@ const APP_VERSION = '1.3.0';
 const DEV_RECOVERY_CODE = 'PROTRACK-DEV-2025-RESET';
 const EAT_TZ='Africa/Addis_Ababa';
 const ROLES=['Technician','Under Supervision','Inspector','Preliminary Inspector'];
+const ROLE_ACCESS_PROFILES={
+  tech:['Technician'],
+  tech_sup:['Under Supervision'],
+  tech_insp:['Technician','Inspector','Preliminary Inspector'],
+  all:['Technician','Under Supervision','Inspector','Preliminary Inspector']
+};
+const ROLE_ACCESS_LABELS={
+  tech:'Technician only',
+  tech_sup:'Under supervision only',
+  tech_insp:'Inspector + Technician + Preliminary',
+  all:'All 4 roles'
+};
 const ROLE_COLORS=['var(--blue)','var(--green)','var(--violet)','var(--cyan)'];
 const ROLE_SEL=['sel0','sel1','sel2','sel3'];
 const AV_COLORS=['#3b82f6','#10b981','#f59e0b','#f43f5e','#8b5cf6','#06b6d4','#ec4899','#84cc16'];
-
-const FIXED_ROLE_OPTIONS=['Technician','Under Supervision','Inspector / Preliminary Inspector'];
-
-function getFixedRoleGroup(tech){
-  const raw=(tech?.fixedRole||'').trim();
-  if(raw==='Under Supervision')return 'Under Supervision';
-  if(raw==='Inspector / Preliminary Inspector'||raw==='Inspector & Preliminary Inspector'||raw==='Inspector and Preliminary Inspector'||raw==='Inspector')return 'Inspector / Preliminary Inspector';
-  if(tech?.underSupervision)return 'Under Supervision';
-  return 'Technician';
-}
-function getFixedRoleLabel(tech){
-  const group=getFixedRoleGroup(tech);
-  return group==='Inspector / Preliminary Inspector'?'Inspector':group;
-}
-function getAllowedRolesForTech(tech){
-  const group=getFixedRoleGroup(tech);
-  if(group==='Under Supervision')return ['Under Supervision'];
-  if(group==='Inspector / Preliminary Inspector')return ['Technician','Inspector','Preliminary Inspector'];
-  return ['Technician'];
-}
-function getEntryTech(prefix){
-  if(prefix==='le'){
-    const id=document.getElementById('le-tech-sel')?.value||'';
-    return techs.find(t=>t.id===id)||null;
-  }
-  return CU;
-}
-function applyRoleLock(prefix){
-  const tech=getEntryTech(prefix);
-  const allowed=getAllowedRolesForTech(tech);
-  const ids=prefix==='le' ? ['le-jr0','le-jr1','le-jr2','le-jr3'] : ['jr0','jr1','jr2','jr3'];
-  ids.forEach((id,i)=>{
-    const el=document.getElementById(id); if(!el) return;
-    const role=ROLES[i];
-    if(allowed.length && !allowed.includes(role)) el.classList.add('disabled');
-    else el.classList.remove('disabled');
-  });
-  const currentRole=prefix==='le'?leJobRole:selJobRole;
-  const currentIdx=prefix==='le'?leJobRoleIdx:selJobRoleIdx;
-  if(prefix==='e' && jobType==='scrap' && !allowed.includes('Inspector')){
-    jobType='completed';
-    const comp=document.getElementById('cs-comp');
-    const scrap=document.getElementById('cs-scrap');
-    if(comp) comp.className='cs-opt sel-comp';
-    if(scrap) scrap.className='cs-opt';
-    const row=document.getElementById('scrap-hrs-row');
-    if(row) row.classList.remove('show');
-  }
-  if(prefix==='le' && leJobType==='scrap' && !allowed.includes('Inspector')){
-    leJobType='completed';
-    const comp=document.getElementById('le-cs-comp');
-    const scrap=document.getElementById('le-cs-scrap');
-    if(comp) comp.className='cs-opt sel-comp';
-    if(scrap) scrap.className='cs-opt';
-    const row=document.getElementById('le-scrap-hrs-row');
-    if(row) row.classList.remove('show');
-  }
-  const desired=allowed.includes(currentRole)?currentRole:allowed[0];
-  if(desired && desired!==currentRole){
-    if(prefix==='le') pickLeJobRole(desired,ROLES.indexOf(desired));
-    else pickJobRole(desired,ROLES.indexOf(desired));
-  } else if(desired && currentIdx!==ROLES.indexOf(desired)) {
-    if(prefix==='le') leJobRoleIdx=ROLES.indexOf(desired);
-    else selJobRoleIdx=ROLES.indexOf(desired);
-  }
-}
 
 let CU=null,CR=null,selRole='tech';
 let techs=[],parts=[],leaders=[],controllers=[],entries=[],assignments=[];
 let settings={defaultMonthlyTarget:160,passwords:{tech:'demo',lead:'demo',dev:'dev123'}};
 let profilePics={};
 let selJobRole='Technician',selJobRoleIdx=0;
+let selectedPartsByPrefix={e:null,le:null};
 let jobType='completed';
 let editTechId=null,editPartId=null,editLeaderId=null,editControllerId=null;
 let achievFilter='all';
@@ -1579,11 +1552,87 @@ function getDefR(){return settings.ratios||{tech:25,sup:75,inspHrs:1.0,prelimHrs
 function getRatioForPart(partNum){return(settings.partRatios||{})[partNum]||getDefR();}
 function isInspRole(role){return role==='Inspector'||role==='Preliminary Inspector';}
 function isSDT(e){if(e.jobType==='scrap')return true;return!isInspRole(e.jobRole);}
+function normalizeRoleAccessKey(v){
+  const s=String(v||'').trim().toLowerCase();
+  if(ROLE_ACCESS_PROFILES[s])return s;
+  if(s==='technician only')return 'tech';
+  if(s==='technician + under supervision')return 'tech_sup';
+  if(s==='technician + inspector + prelim.'||s==='technician + inspector + preliminary inspector'||s==='tech_insp')return 'tech_insp';
+  if(s==='all' || s==='all 4 roles' || s==='all roles')return 'all';
+  return 'tech';
+}
+function getAllowedRolesForTech(t){
+  if(t && Array.isArray(t.allowedRoles) && t.allowedRoles.length){
+    return [...new Set(t.allowedRoles.filter(r=>ROLES.includes(r)))];
+  }
+  const key=normalizeRoleAccessKey(t?.roleAccess || (t?.underSupervision ? 'tech_sup' : 'tech'));
+  return ROLE_ACCESS_PROFILES[key].slice();
+}
+function getRoleAccessKeyForTech(t){
+  if(t && Array.isArray(t.allowedRoles) && t.allowedRoles.length){
+    const sig=[...new Set(t.allowedRoles.filter(r=>ROLES.includes(r)))].join('|');
+    if(sig==='Technician')return 'tech';
+    if(sig==='Technician|Under Supervision')return 'tech_sup';
+    if(sig==='Technician|Inspector|Preliminary Inspector')return 'tech_insp';
+    if(sig==='Technician|Under Supervision|Inspector|Preliminary Inspector')return 'all';
+  }
+  return normalizeRoleAccessKey(t?.roleAccess || (t?.underSupervision ? 'tech_sup' : 'tech'));
+}
+function getRoleAccessLabel(v){return ROLE_ACCESS_LABELS[normalizeRoleAccessKey(v)]||ROLE_ACCESS_LABELS.tech;}
+function isRoleAllowedForTech(t, role){return getAllowedRolesForTech(t).includes(role);}
+function applyRoleAccessToButtons(prefix, tech){
+  const allowed=new Set(getAllowedRolesForTech(tech));
+  const jobTypeVal=prefix==='e' ? jobType : leJobType;
+  [['Technician',0],['Under Supervision',1],['Inspector',2],['Preliminary Inspector',3]].forEach(([role,idx])=>{
+    const el=document.getElementById(`${prefix}-jr${idx}`);
+    if(!el)return;
+    const ok=allowed.has(role) || (jobTypeVal==='scrap' && role==='Inspector');
+    el.classList.toggle('disabled', !ok);
+  });
+}
+function forcePickRole(prefix, role, idx){
+  if(prefix==='e') pickJobRole(role, idx, true);
+  else pickLeJobRole(role, idx, true);
+}
+function ensureAllowedRole(prefix, tech){
+  const allowed=getAllowedRolesForTech(tech);
+  const cur=prefix==='e' ? selJobRole : leJobRole;
+  if(allowed.includes(cur)) return;
+  const fb=allowed[0] || 'Technician';
+  forcePickRole(prefix, fb, ROLES.indexOf(fb));
+}
+function getEntryStatus(e){
+  const s=String(e?.approvalStatus||'accepted').toLowerCase();
+  if(s==='pending')return 'pending';
+  if(s==='rejected')return 'rejected';
+  if(s==='accepted' || s==='approved')return 'accepted';
+  return 'accepted';
+}
+function getEntryStatusBadge(e){
+  const s=getEntryStatus(e);
+  if(s==='pending')return '<span class="bdg bamb">Pending</span>';
+  if(s==='rejected')return '<span class="bdg bred">Rejected</span>';
+  return '<span class="bdg bgr">Accepted</span>';
+}
+function isApprovedEntry(e){return getEntryStatus(e)==='accepted';}
+window.approveEntryById=async function(id){
+  if(!['dev','lead'].includes(CR)){toast('Not allowed','error');return;}
+  const e=entries.find(x=>x.id===id);if(!e)return;
+  const u={...e,approvalStatus:'accepted',reviewedBy:CU?.name||'',reviewedById:CU?.id||'',reviewedAt:todayEAT()};
+  try{await window.setDoc(window.doc(window.db,'entries',id),u);const idx=entries.findIndex(x=>x.id===id);if(idx>-1)entries[idx]=u;renderLeaderEntry();renderAllEntries();toast('Entry accepted');}catch(err){toast('Approve failed: '+err.message,'error');}
+};
+window.rejectEntryById=async function(id){
+  if(!['dev','lead'].includes(CR)){toast('Not allowed','error');return;}
+  const e=entries.find(x=>x.id===id);if(!e)return;
+  const u={...e,approvalStatus:'rejected',reviewedBy:CU?.name||'',reviewedById:CU?.id||'',reviewedAt:todayEAT()};
+  try{await window.setDoc(window.doc(window.db,'entries',id),u);const idx=entries.findIndex(x=>x.id===id);if(idx>-1)entries[idx]=u;renderLeaderEntry();renderAllEntries();toast('Entry rejected');}catch(err){toast('Reject failed: '+err.message,'error');}
+};
 
 function getTaskGroupEntries(taskCode, partNum){
   const tc=sanitize(taskCode||'').toUpperCase();
   if(!tc||!partNum)return [];
   return entries.filter(e=>
+    isApprovedEntry(e) &&
     (e.taskCode||'').toUpperCase()===tc &&
     e.pnum===partNum &&
     e.jobType!=='scrap' &&
@@ -1592,42 +1641,26 @@ function getTaskGroupEntries(taskCode, partNum){
 }
 function calcPoolHrs(part,role,taskCode=''){
   const r=getRatioForPart(part.num);
-  if(isInspRole(role))return parseFloat((role==='Inspector'?r.inspHrs||1:r.prelimHrs||1).toFixed(3));
+  if(isInspRole(role))return parseFloat((role==='Inspector'?(r.inspHrs||1):(r.prelimHrs||1)).toFixed(3));
   if(role==='Under Supervision')return parseFloat((part.hours*(r.sup||0)/100).toFixed(3));
   const taskEntries=getTaskGroupEntries(taskCode,part.num);
   const hasSup=taskEntries.some(e=>e.jobRole==='Under Supervision');
   const techPool=hasSup ? (part.hours*(r.tech||0)/100) : part.hours;
   return parseFloat(techPool.toFixed(3));
 }
-function getTaskSplitPools(taskCode, partNum, stdHrs){
-  const ratios=getRatioForPart(partNum);
-  const taskEntries=getTaskGroupEntries(taskCode, partNum);
-  const hasSup=taskEntries.some(e=>e.jobRole==='Under Supervision');
-  return {
-    Technician: parseFloat((hasSup ? stdHrs*(ratios.tech||0)/100 : stdHrs).toFixed(3)),
-    'Under Supervision': parseFloat((stdHrs*(ratios.sup||0)/100).toFixed(3)),
-    Inspector: parseFloat((ratios.inspHrs||0).toFixed(3)),
-    'Preliminary Inspector': parseFloat((ratios.prelim||ratios.prelimHrs||0).toFixed(3))
-  };
-}
-
-// NEW getDividedHours: correct SDT division per role, no duplicate overwrite
 function getDividedHours(entry, allEntries) {
   if (!entry) return 0;
-  // Scrap entries use stored scrapHrs
   if (entry.jobType === 'scrap') {
     return parseFloat(entry.scrapHrs || 2);
   }
   const role = entry.jobRole || 'Technician';
-  // Inspector / Prelim Inspector: fixed hours, not SDT
   if (role === 'Inspector' || role === 'Preliminary Inspector') {
     const part = parts.find(p => p.num === entry.pnum);
     if (!part) return entry.hours || 0;
     const ratios = getRatioForPart(part.num);
     if (role === 'Inspector') return ratios.inspHrs || 1;
-    else return ratios.prelimHrs || 1;
+    return ratios.prelimHrs || 1;
   }
-  // Only Technician and Under Supervision are pooled for SDT
   const taskEntries = allEntries.filter(e =>
     (e.taskCode || '') === (entry.taskCode || '') &&
     e.pnum === entry.pnum &&
@@ -1644,14 +1677,16 @@ function getDividedHours(entry, allEntries) {
   if (role === 'Technician') {
     const techPool = hasSup ? stdHours * (ratios.tech / 100) : stdHours;
     return techEntries.length ? techPool / techEntries.length : 0;
-  } else { // Under Supervision
+  } else {
     const supPool = stdHours * (ratios.sup / 100);
     return supEntries.length ? supPool / supEntries.length : 0;
   }
 }
 
+
 // ════════════════════════════════════════════════
 //  RATIO PAGE
+// ════════════════════════════════════════════════
 // ════════════════════════════════════════════════
 function renderRatios(){
   const sdh=document.getElementById('scrap-default-hrs');
@@ -1787,32 +1822,27 @@ async function persistSettings(){
 //  ENTRY FORM
 // ════════════════════════════════════════════════
 function setJobType(type){
-  if(type==='scrap' && !getAllowedRolesForTech(getEntryTech('e')).includes('Inspector')) type='completed';
   jobType=type;
   document.getElementById('cs-comp').className='cs-opt'+(type==='completed'?' sel-comp':'');
   document.getElementById('cs-scrap').className='cs-opt'+(type==='scrap'?' sel-scrap':'');
-  for(let i=0;i<4;i++){
-    const el=document.getElementById('jr'+i);if(!el)continue;
-    if(type==='scrap'&&i!==2)el.classList.add('disabled');
-    else el.classList.remove('disabled');
-  }
-  if(type==='scrap'){pickJobRole('Inspector',2);
-    const shi=document.getElementById('e-scrap-hrs');if(shi)shi.value=String(settings.scrapDefaultHrs||2);
-  }
+  if(CU)applyRoleAccessToButtons('e',CU);
+  if(type==='scrap'){forcePickRole('e','Inspector',2);const shi=document.getElementById('e-scrap-hrs');if(shi)shi.value=String(settings.scrapDefaultHrs||2);} else if(CU){ensureAllowedRole('e',CU);}
   const shr=document.getElementById('scrap-hrs-row');
   if(shr){
     if(type==='scrap'){shr.classList.add('show');}else{shr.classList.remove('show');}
     const shi=document.getElementById('e-scrap-hrs');
     if(shi){shi.readOnly=(CR!=='lead');shi.style.opacity=(CR!=='lead'?'0.6':'1');}
   }
-  applyRoleLock('e');
   refreshAllocHrs();
 }
 window.setJobType=setJobType;
 
-function pickJobRole(role,idx){
-  const allowed=getAllowedRolesForTech(getEntryTech('e'));
-  if(allowed.length && !allowed.includes(role)) { role=allowed[0]; idx=ROLES.indexOf(role); }
+
+function pickJobRole(role,idx,force=false){
+  if(!force&&CR==='tech'&&CU&&!isRoleAllowedForTech(CU,role)&&!(jobType==='scrap'&&role==='Inspector')){
+    toast('Role not allowed for this technician','error');
+    return;
+  }
   selJobRole=role;selJobRoleIdx=idx;
   for(let i=0;i<4;i++){const el=document.getElementById('jr'+i);if(!el)continue;const d=el.classList.contains('disabled');el.className='jro'+(d?' disabled':'');}
   const el=document.getElementById('jr'+idx);if(el)el.classList.add(ROLE_SEL[idx]);
@@ -1831,7 +1861,7 @@ function refreshAllocHrs(){
     if(lbl)lbl.textContent='Allocated Hours';
     return;
   }
-  const part=parts.find(p=>p.id===partId);if(!part)return;
+  const part=findPartById(partId);if(!part)return;
   const taskCode=sanitize(document.getElementById('e-taskcode')?.value).toUpperCase();
   const pool=calcPoolHrs(part,selJobRole,taskCode);
   const insp=isInspRole(selJobRole);
@@ -1850,13 +1880,15 @@ function refreshAllocHrs(){
 window.refreshAllocHrs=refreshAllocHrs;
 
 function onPartSel(){
-  const partId=document.getElementById('e-part-sel')?.value;
-  const part=parts.find(p=>p.id===partId);
+  let part=getCachedOrSelectedPart('e');
   if(!part){
-    sv('e-desc','');sv('e-ata','');sv('e-pnum','');refreshAllocHrs();return;
+    part=resolvePartSelection('e', document.getElementById('e-part-search')?.value);
   }
-  sv('e-desc',part.name||'');sv('e-ata',part.ata||'');sv('e-pnum',part.num||'');
-  setPartPickerDisplay('e',part);
+  if(!part){
+    cacheSelectedPart('e',null);
+    sv('e-desc','');sv('e-ata','');sv('e-pnum','');sv('e-hours','');refreshAllocHrs();return;
+  }
+  applyPartSelection('e', part);
   refreshAllocHrs();
 }
 window.onPartSel=onPartSel;
@@ -1880,6 +1912,102 @@ function escapeHtml(v){
 }
 function partMatchText(p){
   return `${p.num||''} ${p.name||''} ${p.ata||''}`.toLowerCase();
+}
+function findPartById(partId){
+  const sid=String(partId ?? '');
+  return parts.find(p => String(p.id) === sid);
+}
+function cacheSelectedPart(prefix, part){
+  selectedPartsByPrefix[prefix]=part||null;
+}
+function getCachedOrSelectedPart(prefix){
+  const sel=document.getElementById(`${prefix}-part-sel`)?.value;
+  if(sel){
+    const p=findPartById(sel);
+    if(p){
+      cacheSelectedPart(prefix,p);
+      return p;
+    }
+  }
+  const cached=selectedPartsByPrefix[prefix];
+  if(cached && findPartById(cached.id)) return cached;
+  const resolved=resolvePartSelection(prefix, document.getElementById(`${prefix}-part-search`)?.value);
+  if(resolved){
+    cacheSelectedPart(prefix,resolved);
+    return resolved;
+  }
+  return null;
+}
+function applyPartSelection(prefix, part){
+  if(!part){
+    cacheSelectedPart(prefix,null);
+    setPartPickerDisplay(prefix,null);
+    clearPartFields(prefix);
+    return;
+  }
+  const select=document.getElementById(`${prefix}-part-sel`);
+  if(select)select.value=String(part.id);
+  cacheSelectedPart(prefix,part);
+  setPartPickerDisplay(prefix,part);
+  syncPartFields(prefix,part);
+}
+function normalizePartQuery(v){
+  return String(v ?? '')
+    .toLowerCase()
+    .trim()
+    .replace(/[\s\-—–_]+/g,'')
+    .replace(/[^a-z0-9]/g,'');
+}
+function getPartSearchKeys(part){
+  return [
+    part?.num,
+    part?.name,
+    part?.ata,
+    part?.desc,
+    part?.description,
+    part?.partNumber,
+    part?.stdHours,
+    part?.hours,
+    part?.num && part?.name ? `${part.num}${part.name}` : '',
+    part?.num && part?.name ? `${part.num}—${part.name}` : ''
+  ].filter(Boolean).map(normalizePartQuery);
+}
+function syncPartFields(prefix, part){
+  const desc = part ? (part.desc || part.description || part.name || '') : '';
+  const ata  = part ? (part.ata || part.ataChapter || part.chapter || '') : '';
+  const pnum = part ? (part.num || part.partNumber || part.id || '') : '';
+  const hrs  = part ? (part.hours ?? part.stdHours ?? part.std ?? part.hrs ?? '') : '';
+  if(prefix==='e'){
+    sv('e-desc', desc);
+    sv('e-ata', ata);
+    sv('e-pnum', pnum);
+    if(hrs !== '') sv('e-hours', hrs);
+    refreshAllocHrs();
+  }else if(prefix==='le'){
+    sv('le-desc', desc);
+    sv('le-ata', ata);
+    sv('le-pnum', pnum);
+    if(hrs !== '') sv('le-hours', hrs);
+    refreshLeAllocHrs();
+  }
+}
+function bestPartFromQuery(q){
+  const nq=normalizePartQuery(q);
+  if(!nq) return null;
+  const exact=parts.find(p => getPartSearchKeys(p).includes(nq));
+  if(exact) return exact;
+  const matches=parts.filter(p => partMatchText(p).includes(String(q).toLowerCase().trim()));
+  return matches.length===1 ? matches[0] : null;
+}
+function resolvePartSelection(prefix, q){
+  const raw=String(q ?? '').trim();
+  if(!raw) return null;
+  const exact=bestPartFromQuery(raw);
+  if(exact) return exact;
+  const nq=raw.toLowerCase();
+  const matches=parts.filter(p => partMatchText(p).includes(nq));
+  if(matches.length===1) return matches[0];
+  return null;
 }
 function setPartPickerDisplay(prefix, part){
   const input=document.getElementById(`${prefix}-part-search`);
@@ -1915,21 +2043,25 @@ function filterPartSearch(prefix){
     </button>
   `).join(''):'<div style="padding:10px 12px;font-size:12px;color:var(--tx3);">No matching parts</div>';
   list.style.display='block';
+
+  const chosen=resolvePartSelection(prefix,q);
+  if(chosen){
+    applyPartSelection(prefix, chosen);
+  }
 }
 function selectPartFromSearch(prefix, partId){
-  const part=parts.find(p=>p.id===partId);
+  const part=findPartById(partId);
   if(!part)return;
-  const select=document.getElementById(`${prefix}-part-sel`);
-  if(select)select.value=partId;
-  setPartPickerDisplay(prefix,part);
-  if(prefix==='e')onPartSel();
-  else if(prefix==='le')onLePartSel();
+  applyPartSelection(prefix, part);
+  if(prefix==='e') refreshAllocHrs();
+  else if(prefix==='le') refreshLeAllocHrs();
 }
 function clearPartSearch(prefix){
   const input=document.getElementById(`${prefix}-part-search`);
   if(input)input.value='';
   const list=document.getElementById(`${prefix}-part-list`);
   if(list){list.innerHTML='';list.style.display='none';}
+  cacheSelectedPart(prefix,null);
   setPartPickerDisplay(prefix,null);
   clearPartFields(prefix);
 }
@@ -1943,13 +2075,26 @@ document.addEventListener('click',function(e){
     }
   }
 });
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter') return;
+  const active=document.activeElement;
+  if(!active || !active.id || !active.id.includes('-part-search')) return;
+  const prefix=active.id.startsWith('le-')?'le':'e';
+  const part=bestPartFromQuery(active.value);
+  if(part){
+    e.preventDefault();
+    applyPartSelection(prefix, part);
+    if(prefix==='e') onPartSel(); else onLePartSel();
+  }
+});
 
 function renderEntry(){
-  applyRoleLock('e');
+  if(CR==='tech'&&CU){applyRoleAccessToButtons('e',CU);ensureAllowedRole('e',CU);if(jobType==='scrap'){forcePickRole('e','Inspector',2);}}
   const today=todayEAT(),wr=getWR();
   const me=entries.filter(e=>e.techId===CU.id);
-  const todaySDT=me.filter(e=>e.time?.startsWith(today)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const weekSDT=me.filter(e=>e.time>=wr.start&&e.time<=wr.end&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
+  const approvedMe=me.filter(isApprovedEntry);
+  const todaySDT=approvedMe.filter(e=>e.time?.startsWith(today)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
+  const weekSDT=approvedMe.filter(e=>e.time>=wr.start&&e.time<=wr.end&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
   const mt=CU.monthlyTarget||160;
   stxt('e-today-hrs',todaySDT.toFixed(2)+'h');
   stxt('e-week-hrs',weekSDT.toFixed(2)+'h');
@@ -1973,10 +2118,11 @@ function renderEntry(){
         <td style="font-size:11px;font-weight:700;color:${rc}">${e.jobRole||'Tech'}</td>
         <td style="font-size:12px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.pname}</td>
         <td class="mono">${div.toFixed(2)}h${insp?'<span class="not-sdt">!</span>':''}</td>
+        <td>${getEntryStatusBadge(e)}</td>
         <td><span class="${e.jobType==='scrap'?'cp-scrap':'cp-comp'}">${e.jobType==='scrap'?'Scrap':'Done'}</span></td>
         <td>${act}</td>
        </tr>`;
-    }).join(''):'<tr><td colspan="7" class="empty">No entries today</td></tr>';
+    }).join(''):'<tr><td colspan="8" class="empty">No entries today</td></tr>';
   }
 }
 function populatePartSel(){
@@ -1995,11 +2141,15 @@ function populateLeaderPartSel(){
 }
 
 function openReviewModal(){
-  const partId=document.getElementById('e-part-sel')?.value;
+  let part=getCachedOrSelectedPart('e');
   const taskCode=sanitize(document.getElementById('e-taskcode')?.value).toUpperCase();
-  if(!partId){toast('Select a part','error');return;}
+  if(!part){
+    part=resolvePartSelection('e', document.getElementById('e-part-search')?.value);
+    if(part) applyPartSelection('e', part);
+  }
+  if(!part){toast('Select a part','error');return;}
+  const partId=String(part.id);
   if(!taskCode){toast('Enter a Task Code','error');return;}
-  const part=parts.find(p=>p.id===partId);if(!part)return;
   const pool=calcPoolHrs(part,selJobRole,taskCode);
   const insp=isInspRole(selJobRole);
   const scrapHrs=jobType==='scrap'?gv('e-scrap-hrs')||2:null;
@@ -2009,7 +2159,10 @@ function openReviewModal(){
     time:document.getElementById('e-time')?.value||todayEAT(),
     hours:pool,stdHours:part.hours,
     isInspector:insp,ata:part.ata,desc:part.name,
-    scrapHrs:scrapHrs||null
+    scrapHrs:scrapHrs||null,
+    approvalStatus:'pending',
+    submittedBy:CU?.name||'',
+    submittedByRole:CR||''
   };
   const fields=[
     ['Task Code',`<span class="mono" style="color:var(--blue);font-weight:700;">${taskCode}</span>`],
@@ -2037,13 +2190,13 @@ async function confirmSave(){
   const btn=document.getElementById('confirm-save-btn');
   if(btn){btn.classList.add('saving');btn.disabled=true;}
   const savedEntry={...pendingEntry};
+  if(!savedEntry.approvalStatus)savedEntry.approvalStatus='pending';
   if(isDuplicateEntry(savedEntry)){
     toast('Duplicate entry blocked','error');
     if(btn){btn.classList.remove('saving');btn.disabled=false;}
     return;
   }
   try{
-    // Always create a new entry – no overwrite
     const ref=await window.addDoc(window.collection(window.db,'entries'),savedEntry);
     savedEntry.id=ref.id;
     entries.unshift(savedEntry);
@@ -2055,6 +2208,7 @@ async function confirmSave(){
   finally{if(btn){btn.classList.remove('saving');btn.disabled=false;}}
 }
 window.confirmSave=confirmSave;
+
 
 function clearEntry(){
   clearPartSearch('e');
@@ -2081,15 +2235,18 @@ function pb(id,val,max){
 function renderMyStats(){
   if(!CU) return;
   const me=entries.filter(e=>e.techId===CU.id);
+  const statusFilter=(document.getElementById('ms-status-filter')?.value||'all').toLowerCase();
   const mrSel=getMonthRangeFromInput(document.getElementById('ms-month-filter')?.value);
   const today=todayEAT(),wr=getWR();
   const mt=CU.monthlyTarget||160;
   const dt=getDailyTgt(mt),wt=getWeeklyTgt(mt);
-  const todaySDT=me.filter(e=>e.time?.startsWith(today)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const weekSDT=me.filter(e=>dateInRange(e.time,wr.start,wr.end)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const monthSDT=me.filter(e=>dateInRange(e.time,mrSel.start,mrSel.end)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
+  const approvedMe=me.filter(isApprovedEntry);
+  const visibleMe=me.filter(e=>statusFilter==='all' || getEntryStatus(e)===statusFilter);
+  const todaySDT=approvedMe.filter(e=>e.time?.startsWith(today)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
+  const weekSDT=approvedMe.filter(e=>dateInRange(e.time,wr.start,wr.end)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
+  const monthSDT=approvedMe.filter(e=>dateInRange(e.time,mrSel.start,mrSel.end)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
   const asnHrs=assignments.filter(a=>a.techId===CU.id&&a.date>=mrSel.start&&a.date<=mrSel.end).reduce((s,a)=>s+(a.hrs||0),0);
-  const inspHrs=me.filter(e=>dateInRange(e.time,mrSel.start,mrSel.end)&&!isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
+  const inspHrs=approvedMe.filter(e=>dateInRange(e.time,mrSel.start,mrSel.end)&&!isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
   const totalAchieved=monthSDT+asnHrs+inspHrs;
 
   stxt('ms-today',todaySDT.toFixed(2)+'h');
@@ -2113,15 +2270,18 @@ function renderMyStats(){
 
   const tbody=document.getElementById('ms-hist');
   if(tbody){
-    tbody.innerHTML=me.slice(0,60).map(e=>{
+    tbody.innerHTML=visibleMe.slice(0,60).map(e=>{
       const div=getDividedHours(e,entries),insp=!isSDT(e);
       const rc=ROLE_COLORS[ROLES.indexOf(e.jobRole||'Technician')]||'var(--blue)';
-      return`<tr><td class="mono">${fmtEAT(e.time,'date')}</td><td class="mono" style="color:var(--blue);">${e.taskCode||'—'}</td>
+      const st=getEntryStatus(e);
+      const rowStyle=st==='rejected'?'background:rgba(244,63,94,.08);border-left:3px solid var(--rose);':'';
+      return`<tr style="${rowStyle}"><td class="mono">${fmtEAT(e.time,'date')}</td><td class="mono" style="color:var(--blue);">${e.taskCode||'—'}</td>
       <td style="font-size:11px;font-weight:700;color:${rc}">${e.jobRole||'Tech'}</td>
       <td>${e.pname}</td><td class="mono">${e.ata||'—'}</td><td class="mono">${e.pnum||'—'}</td>
       <td class="mono">${div.toFixed(2)}h${insp?' <span class="not-sdt">NOT SDT</span>':''}</td>
-      <td><span class="${e.jobType==='scrap'?'cp-scrap':'cp-comp'}">${e.jobType==='scrap'?'Scrap':'Done'}</span></td></tr>`;
-    }).join('')||'<tr><td colspan="8" class="empty">No history</td></tr>';
+      <td><span class="${e.jobType==='scrap'?'cp-scrap':'cp-comp'}">${e.jobType==='scrap'?'Scrap':'Done'}</span></td>
+      <td>${getEntryStatusBadge(e)}</td></tr>`;
+    }).join('')||'<tr><td colspan="9" class="empty">No history</td></tr>';
   }
 
   const al=document.getElementById('ms-asn-list');
@@ -2139,9 +2299,10 @@ window.renderMyStats=renderMyStats;
 // ════════════════════════════════════════════════
 //  DASHBOARD + ACHIEVEMENT GRAPH
 // ════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 function renderDashboard(){
   const dr=getUIRange('dash');
-  const sdtEnt=entries.filter(e=>dateInRange(e.time,dr.start,dr.end)&&isSDT(e));
+  const sdtEnt=entries.filter(e=>dateInRange(e.time,dr.start,dr.end)&&isSDT(e)&&isApprovedEntry(e));
   const activeTechs=new Set(sdtEnt.map(e=>e.techId)).size;
   const totalSDT=sdtEnt.reduce((s,e)=>s+getDividedHours(e,entries),0);
   const totalTgt=techs.filter(t=>t.status==='active').reduce((s,t)=>s+(t.monthlyTarget||160),0);
@@ -2155,8 +2316,8 @@ function setAF(f,btn){achievFilter=f;document.querySelectorAll('.af-btn').forEac
 window.setAF=setAF;
 function renderAchievGraph(range=getUIRange('dash')){
   const cont=document.getElementById('achiev-chart');if(!cont)return;
-  const sdtEnt=entries.filter(e=>dateInRange(e.time,range.start,range.end)&&isSDT(e));
-  const inspEnt=entries.filter(e=>dateInRange(e.time,range.start,range.end)&&!isSDT(e));
+  const sdtEnt=entries.filter(e=>dateInRange(e.time,range.start,range.end)&&isSDT(e)&&isApprovedEntry(e));
+  const inspEnt=entries.filter(e=>dateInRange(e.time,range.start,range.end)&&!isSDT(e)&&isApprovedEntry(e));
   let stats=techs.filter(t=>t.status==='active').map(t=>{
     const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
     const insp=inspEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
@@ -2182,10 +2343,10 @@ function renderAchievGraph(range=getUIRange('dash')){
   }).join('');
 }
 function getLeaderboardStats(range=getUIRange('dash')){
-  const sdtEnt=entries.filter(e=>dateInRange(e.time,range.start,range.end)&&isSDT(e));
+  const sdtEnt=entries.filter(e=>dateInRange(e.time,range.start,range.end)&&isSDT(e)&&isApprovedEntry(e));
   return techs.filter(t=>t.status==='active').map(t=>{
     const sdt=sdtEnt.filter(e=>e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
-    const insp=entries.filter(e=>dateInRange(e.time,range.start,range.end)&&!isSDT(e)&&e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
+    const insp=entries.filter(e=>dateInRange(e.time,range.start,range.end)&&!isSDT(e)&&isApprovedEntry(e)&&e.techId===t.id).reduce((s,e)=>s+getDividedHours(e,entries),0);
     const asn=assignments.filter(a=>a.techId===t.id&&a.date>=range.start&&a.date<=range.end).reduce((s,a)=>s+(a.hrs||0),0);
     return{...t,total:sdt+asn+insp,tgt:t.monthlyTarget||160};
   });
@@ -2218,24 +2379,31 @@ function renderLB(range=getUIRange('dash')){
 }
 window.renderLB=renderLB;
 
+
 function buildLeaderboardExportPanel(stats){
   const sorted=[...stats]
     .map(t=>({...t,pct:t.tgt?Math.round((t.total/t.tgt)*100):0}))
-    .sort((a,b)=>b.pct-a.pct||b.total-a.total);
+    .sort((a,b)=>b.pct-a.pct);
 
   const maxPct = Math.max(150, ...sorted.map(t => t.pct || 0));
-  const chartH = 640;
-  const plotH = 430;
-  const footerH = 118;
+  const chartH = 560;
+  const plotH = 360;
   const scaleMax = Math.ceil(maxPct / 10) * 10 || 100;
+  const rulerStep = scaleMax >= 200 ? 20 : 10;
+  const rulerTicks = [];
+  for(let v=0; v<=scaleMax; v+=rulerStep){ rulerTicks.push(v); }
+  if(!rulerTicks.includes(100)) rulerTicks.push(100);
+  rulerTicks.sort((a,b)=>a-b);
+
   const panel = document.createElement('div');
   panel.id = 'lb-export-panel';
   panel.style.position = 'fixed';
   panel.style.left = '-99999px';
   panel.style.top = '0';
-  panel.style.width = '1920px';
+  const panelW = Math.max(1280, 180 + (sorted.length * 76));
+  panel.style.width = panelW + 'px';
   panel.style.height = '1080px';
-  panel.style.minWidth = '1920px';
+  panel.style.minWidth = panelW + 'px';
   panel.style.background = '#f0f4f8';
   panel.style.color = '#0f172a';
   panel.style.border = '1px solid #e2e8f0';
@@ -2266,7 +2434,7 @@ function buildLeaderboardExportPanel(stats){
     </div>
 
     <div style="padding:12px 28px 8px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;font-weight:700;">
-      <div style="color:#64748b;font-weight:600;">All active technicians arranged by achievement percentage.</div>
+      <div style="color:#64748b;font-weight:600;">All active technicians arranged by achievement percentage and total hours.</div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
         <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#10b981;display:inline-block;border-radius:2px;"></span>≥100%</span>
         <span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#f59e0b;display:inline-block;border-radius:2px;"></span>70–99%</span>
@@ -2274,41 +2442,55 @@ function buildLeaderboardExportPanel(stats){
       </div>
     </div>
 
-    <div style="position:relative;padding:6px 22px 14px;">
-      <div style="position:relative;height:${chartH}px;background:#fff;border:1px solid #dbe3ee;border-radius:18px;box-shadow:0 2px 10px rgba(15,23,42,.05);overflow:hidden;padding:18px 16px 14px 16px;box-sizing:border-box;display:flex;flex-direction:column;">
-
-        <div style="flex:1;position:relative;overflow:hidden;">
-          <div style="position:absolute;left:0;right:0;bottom:${Math.round((plotH * (100 / scaleMax))) + 2}px;height:2px;background:#ef4444;opacity:.95;"></div>
-          <div style="position:absolute;right:4px;bottom:${Math.round((plotH * (100 / scaleMax))) + 8}px;font-size:12px;font-weight:800;color:#ef4444;">100%</div>
-
-          <div style="position:absolute;left:0;right:0;bottom:0;top:0;display:grid;grid-template-columns:repeat(${sorted.length}, minmax(0, 1fr));gap:8px;align-items:end;padding-bottom:20px;">
-            ${sorted.map((t)=>{
-              const pct=t.pct;
-              const col=pct>=100?'#10b981':pct>=70?'#f59e0b':'#f43f5e';
-              const fill=Math.max(8, Math.round((pct/scaleMax)*plotH));
-              const avatarSize = 72;
-              return `
-                <div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:10px;">
-                  <div style="font-size:13px;font-weight:900;color:${col};line-height:1;white-space:nowrap;text-align:center;transform:translateY(-2px);">${pct}%</div>
-
-                  <div style="display:flex;align-items:center;justify-content:center;">
-                    ${exportAvatar(t.id,t.name,avatarSize,col)}
-                  </div>
-
-                  <div style="position:relative;width:22px;height:${fill}px;background:${col};border-radius:999px;box-shadow:0 2px 6px rgba(15,23,42,.12);margin-top:2px;"></div>
-                </div>
-              `;
-            }).join('')}
-          </div>
+    <div style="position:relative;padding:6px 22px 22px;">
+      <div style="position:relative;height:${chartH}px;background:#fff;border:1px solid #dbe3ee;border-radius:18px;box-shadow:0 2px 10px rgba(15,23,42,.05);overflow:hidden;padding:18px 16px 18px 84px;box-sizing:border-box;">
+        <div style="position:absolute;left:22px;top:18px;bottom:18px;width:44px;border-right:2px solid #94a3b8;">
+          ${rulerTicks.map(v=>{
+            const y = 18 + ((scaleMax - v) / scaleMax) * (chartH - 36);
+            const major = (v===0 || v===100 || v===scaleMax);
+            const tickW = major ? 18 : 10;
+            return `
+              <div style="position:absolute;left:0;right:0;top:${y}px;transform:translateY(-50%);height:1px;">
+                <div style="position:absolute;right:0;top:50%;transform:translateY(-50%);width:${tickW}px;height:2px;background:${major ? '#334155' : '#cbd5e1'};"></div>
+                <div style="position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:${major ? '11px' : '10px'};font-weight:${major ? '900' : '700'};color:${major ? '#0f172a' : '#64748b'};line-height:1;">${v}%</div>
+              </div>`;
+          }).join('')}
         </div>
 
-        <div style="height:${footerH}px;flex-shrink:0;padding-top:10px;border-top:1px solid #e2e8f0;display:grid;grid-template-columns:repeat(${sorted.length}, minmax(0, 1fr));gap:8px;align-items:center;">
-          ${sorted.map(t=>`
-            <div style="text-align:center;line-height:1.1;padding-top:2px;">
-              <div style="font-size:10px;font-weight:800;color:#64748b;letter-spacing:.5px;">TECH ID</div>
-              <div style="font-size:13px;font-weight:900;color:#0f172a;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${sanitize(t.id)}</div>
-            </div>
-          `).join('')}
+        <div style="position:absolute;left:66px;right:12px;top:18px;bottom:66px;display:grid;grid-template-columns:repeat(${sorted.length}, minmax(34px, 1fr));gap:4px;align-items:end;">
+          ${sorted.map((t)=>{
+            const pct=t.pct;
+            const col=pct>=100?'#10b981':pct>=70?'#f59e0b':'#f43f5e';
+            const fill=Math.max(8, Math.round((pct/scaleMax)*plotH));
+            const avatarSize = 46;
+            return `
+              <div style="position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px;min-width:0;padding:2px 0;">
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:30px;width:100%;">
+                  <div style="font-size:12px;font-weight:900;color:${col};line-height:1;white-space:nowrap;text-align:center;">${pct}%</div>
+                  <div style="font-size:10px;font-weight:800;color:#64748b;line-height:1;white-space:nowrap;text-align:center;">${Number(t.total||0).toFixed(1)}h</div>
+                </div>
+
+                <div style="display:flex;align-items:center;justify-content:center;">
+                  ${exportAvatar(t.id,t.name,avatarSize,col)}
+                </div>
+
+                <div style="position:relative;width:100%;height:${plotH}px;display:flex;align-items:flex-end;justify-content:center;">
+                  <div style="position:relative;width:22px;height:${fill}px;background:linear-gradient(180deg, ${col}, ${col});border-radius:999px;box-shadow:0 2px 6px rgba(15,23,42,.12);"></div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div style="position:absolute;left:66px;right:12px;bottom:14px;height:40px;display:grid;grid-template-columns:repeat(${sorted.length}, minmax(34px, 1fr));gap:6px;align-items:center;">
+          ${sorted.map((t)=>{
+            const safeId = String(t.id||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            return `
+              <div style="display:flex;align-items:center;justify-content:center;min-width:0;padding:0 4px;">
+                <div style="display:inline-flex;align-items:center;justify-content:center;min-width:72px;max-width:100%;padding:5px 8px;border-radius:999px;background:#0f172a;border:1px solid #334155;font-size:10.5px;font-weight:900;color:#fff;line-height:1;white-space:nowrap;overflow:visible;box-shadow:0 2px 8px rgba(15,23,42,.14);letter-spacing:.25px;">${safeId}</div>
+              </div>
+            `;
+          }).join('')}
         </div>
       </div>
     </div>
@@ -2316,9 +2498,10 @@ function buildLeaderboardExportPanel(stats){
   return panel;
 }
 
+
 async function exportLeaderboard(panelId,format='image'){
   if(!window.html2canvas){toast('Export library not loaded','error');return;}
-  const stats=getLeaderboardStats().map(t=>({...t,pct:t.tgt?Math.round((t.total/t.tgt)*100):0})).sort((a,b)=>b.pct-a.pct||b.total-a.total);
+  const stats=getLeaderboardStats().map(t=>({...t,pct:t.tgt?Math.round((t.total/t.tgt)*100):0})).sort((a,b)=>b.pct-a.pct);
   const exportPanel=buildLeaderboardExportPanel(stats);
   document.body.appendChild(exportPanel);
   try{
@@ -2525,11 +2708,13 @@ window.delEntry=window.delEntryById;
 
 function renderAllEntries(){
   const tf=document.getElementById('ae-tech')?.value||'';
+  const sf=document.getElementById('ae-st')?.value||'all';
   const fromV=document.getElementById('ae-dt-from')?.value||'';
   const toV=document.getElementById('ae-dt-to')?.value||'';
   const q=(document.getElementById('ae-q')?.value||'').toLowerCase();
   let f=[...entries];
   if(tf)f=f.filter(e=>e.techId===tf);
+  if(sf!=='all')f=f.filter(e=>getEntryStatus(e)===sf);
   if(fromV)f=f.filter(e=>e.time&&e.time.slice(0,10)>=fromV);
   if(toV)f=f.filter(e=>e.time&&e.time.slice(0,10)<=toV);
   if(q)f=f.filter(e=>(e.techName+e.pname+e.taskCode+e.pnum).toLowerCase().includes(q));
@@ -2537,11 +2722,17 @@ function renderAllEntries(){
   if(tbody){tbody.innerHTML=f.slice(0,200).map(e=>{
     const div=getDividedHours(e,entries),insp=!isSDT(e);
     const rc=ROLE_COLORS[ROLES.indexOf(e.jobRole||'Technician')]||'var(--blue)';
-    const act=canManageEntriesUI()?`<div style="display:flex;gap:6px;justify-content:center;">
+    const st=getEntryStatusBadge(e);
+    const can=canManageEntriesUI();
+    const act=can?`<div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn bg_ bsm" style="padding:4px 8px;" onclick="approveEntryById('${e.id}')">✓ Accept</button>
+        <button class="btn bd bsm" style="padding:4px 8px;" onclick="rejectEntryById('${e.id}')">✕ Reject</button>
         <button class="btn bo bsm" style="padding:4px 8px;" onclick="editEntryById('${e.id}')">✎</button>
         <button class="btn bd bsm" style="padding:4px 8px;" onclick="delEntryById('${e.id}')">🗑</button>
       </div>`:'—';
-    return`<tr>
+    const rowStyle=getEntryStatus(e)==='pending'?'background:rgba(245,158,11,.06);':'';
+    const rowStyle2=getEntryStatus(e)==='rejected'?'background:rgba(244,63,94,.08);border-left:3px solid var(--rose);':'';
+    return`<tr style="${rowStyle2||rowStyle}">
       <td class="mono">${fmtEAT(e.time,'date')}</td>
       <td>${e.techName}</td>
       <td class="mono" style="color:var(--blue);">${e.taskCode||'—'}</td>
@@ -2549,11 +2740,11 @@ function renderAllEntries(){
       <td><span class="${e.jobType==='scrap'?'cp-scrap':'cp-comp'}">${e.jobType==='scrap'?'Scrap':'Done'}</span></td>
       <td>${e.pname}</td><td class="mono">${e.ata||'—'}</td><td class="mono">${e.pnum||'—'}</td>
       <td class="mono">${div.toFixed(2)}h${insp?' <span class="not-sdt">!</span>':''}</td>
+      <td>${st}</td>
       <td>${act}</td>
      </tr>`;
-  }).join('')||'<tr><td colspan="10" class="empty">No entries</td></tr>';}
+  }).join('')||'<tr><td colspan="11" class="empty">No entries</td></tr>';}
 }
-
 // ════════════════════════════════════════════════
 //  REPORTS
 // ════════════════════════════════════════════════
@@ -2611,6 +2802,36 @@ function getTGFiltered(){
   }
   return f;
 }
+function getTaskSplitPools(taskCode, partNum, stdHrs = 0){
+  const tc=sanitize(taskCode||'').toUpperCase();
+  const pn=String(partNum||'');
+  const rel=entries.filter(e=>
+    isApprovedEntry(e) &&
+    (e.taskCode||'').toUpperCase()===tc &&
+    e.pnum===pn &&
+    e.jobType!=='scrap' &&
+    (e.jobRole==='Technician' || e.jobRole==='Under Supervision' || e.jobRole==='Inspector' || e.jobRole==='Preliminary Inspector')
+  );
+  const r=getRatioForPart(pn);
+  const techCount=rel.filter(e=>e.jobRole==='Technician').length;
+  const supCount=rel.filter(e=>e.jobRole==='Under Supervision').length;
+  const inspCount=rel.filter(e=>e.jobRole==='Inspector').length;
+  const prelimCount=rel.filter(e=>e.jobRole==='Preliminary Inspector').length;
+  const hasSup=supCount>0;
+  const techPool=hasSup ? (stdHrs*(r.tech||0)/100) : stdHrs;
+  const supPool=stdHrs*(r.sup||0)/100;
+  return {
+    'Technician': techPool,
+    'Under Supervision': supPool,
+    'Inspector': (r.inspHrs||1)*inspCount,
+    'Preliminary Inspector': (r.prelimHrs||1)*prelimCount,
+    techCount,
+    supCount,
+    inspCount,
+    prelimCount
+  };
+}
+
 function renderTG(){
   if(CR==='tech'){const a=document.getElementById('tc-alert');if(a)a.textContent='Showing task groups you are part of. All colleagues on the same task codes are also shown.';}
   const cont=document.getElementById('tc-body');if(!cont)return;
@@ -2622,6 +2843,9 @@ function renderTG(){
   const avC=['#3b82f6','#10b981','#f59e0b','#f43f5e','#8b5cf6','#06b6d4'];
   cont.innerHTML=codes.map(code=>{
     const g=groups[code];
+    const approvedEntries=g.entries.filter(isApprovedEntry);
+    const pendingCount=g.entries.filter(e=>getEntryStatus(e)==='pending').length;
+    const rejectedCount=g.entries.filter(e=>getEntryStatus(e)==='rejected').length;
     const byRole={};ROLES.forEach(r=>{byRole[r]=g.entries.filter(e=>(e.jobRole||'Technician')===r);});
     const partNum=g.entries[0]?.pnum||'';
     const stdHrs=g.entries[0]?.stdHours||0;
@@ -2632,12 +2856,16 @@ function renderTG(){
     const pools=getTaskSplitPools(code,partNum,stdHrs);
     const personRows=(arr,role,ri)=>{
       if(!arr.length)return`<div style="color:var(--tx3);font-size:12px;padding:6px 0;">No entries</div>`;
-      const cnt=arr.length,each=cnt?pools[role]/cnt:0,insp=isInspRole(role);
+      const approvedCount=arr.filter(isApprovedEntry).length;
+      const cnt=approvedCount||arr.length;
+      const each=cnt?pools[role]/cnt:0,insp=isInspRole(role);
       return arr.map((e,i)=>{
         const isMy=CR==='tech'&&e.techId===CU.id;
+        const st=getEntryStatusBadge(e);
+        const rowHrs=getEntryStatus(e)==='accepted'?each:0;
         return`<div class="tg-p" style="${isMy?'background:var(--bdim);border-radius:5px;padding:5px 6px;':''}">
           <div style="width:24px;height:24px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1px solid var(--bdr);">${avatarHtml(e.techId,e.techName,24)}</div>
-          <div><div class="tg-pn">${sanitize(e.techName)}${isMy?' <span style="font-size:9px;color:var(--blue);">(you)</span>':''} <span class="alloc-bdg ${['ab-b','ab-g','ab-v','ab-c'][ri]}">⏱${each.toFixed(2)}h</span>${insp?' <span class="not-sdt">NOT SDT</span>':''}</div>
+          <div><div class="tg-pn">${sanitize(e.techName)}${isMy?' <span style="font-size:9px;color:var(--blue);">(you)</span>':''} <span class="alloc-bdg ${['ab-b','ab-g','ab-v','ab-c'][ri]}">⏱${rowHrs.toFixed(2)}h</span>${insp?' <span class="not-sdt">NOT SDT</span>':''} ${st}</div>
           <div class="tg-pt">${fmtEAT(e.time,'date')} · <span class="${e.jobType==='scrap'?'cp-scrap':'cp-comp'}">${e.jobType==='scrap'?'Scrap':'Done'}</span></div></div>
         </div>`;
       }).join('');
@@ -2648,6 +2876,9 @@ function renderTG(){
           <span class="tg-code">${code}</span>
           <span style="font-size:12px;color:var(--tx2);">📋 ${sanitize(partName)} · <span class="mono">${partNum}</span></span>
           ${isOv?`<span style="font-size:10px;background:var(--adim);color:var(--amber);padding:2px 7px;border-radius:99px;font-weight:700;">Custom Ratio</span>`:''}
+          <span style="font-size:10px;background:var(--gdim);color:var(--green);padding:2px 7px;border-radius:99px;font-weight:700;">Accepted ${approvedEntries.length}</span>
+          ${pendingCount?`<span style="font-size:10px;background:var(--adim);color:var(--amber);padding:2px 7px;border-radius:99px;font-weight:700;">Pending ${pendingCount}</span>`:''}
+          ${rejectedCount?`<span style="font-size:10px;background:var(--rdim);color:var(--rose);padding:2px 7px;border-radius:99px;font-weight:700;">Rejected ${rejectedCount}</span>`:''}
         </div>
         <div class="tg-meta">
           ${ROLES.map((r,i)=>`<span style="color:${ROLE_COLORS[i]};">${byRole[r].length} ${r.split(' ')[0]}</span>`).join(' · ')}
@@ -2702,7 +2933,7 @@ function renderTechs(){
       <td class="mono"><span class="bdg bblu">${mt}h</span></td>
       <td class="mono">${getWeeklyTgt(mt).toFixed(1)}h/wk</td>
       <td class="mono">${getDailyTgt(mt).toFixed(1)}h/day</td>
-      <td><span class="bdg ${t.status==='active'?'bgr':'bgray'}">${t.status}</span><span class="bdg bvio" style="margin-left:4px;font-size:9px;">${getFixedRoleLabel(t)}</span></td>
+      <td><span class="bdg ${t.status==='active'?'bgr':'bgray'}">${t.status}</span>${t.underSupervision?'<span class="bdg bgr" style="margin-left:4px;font-size:9px;">👁 UnderSup</span>':''}</td>
       <td><div style="display:flex;gap:5px;">
         <button class="btn bo bsm" onclick="openEditTech('${t.id}')">✏️</button>
         <button class="btn bd bsm" onclick="delTech('${t.id}')">🗑</button>
@@ -2715,27 +2946,28 @@ window.openEditTech=function(id){
   const t=techs.find(x=>x.id===id);if(!t)return;editTechId=id;
   sv('mt-id',t.id);sv('mt-name',t.name);sv('mt-target',t.monthlyTarget||160);sv('mt-pwd',t.password||'demo');
   document.getElementById('mt-status').value=t.status||'active';
-  const frEl=document.getElementById('mt-fixed-role');if(frEl)frEl.value=getFixedRoleGroup(t);
+  const roleKey=getRoleAccessKeyForTech(t);const ra=document.getElementById('mt-role-access');if(ra)ra.value=roleKey;
+  const usEl=document.getElementById('mt-unsup');if(usEl)usEl.checked=(roleKey==='tech_sup'||roleKey==='all'||!!t.underSupervision);
   const pic=getUserPhoto(id);const pm=document.getElementById('mt-pic-prev'),pp=document.getElementById('mt-pic-ph');
   if(pic&&pm){pm.src=pic;pm.style.display='block';}if(pp)pp.style.display=pic?'none':'block';
   stxt('mt-title','Edit Technician');openModal('m-tech');
 };
-function clearTechForm(){['mt-id','mt-name','mt-target','mt-pwd'].forEach(id=>sv(id,''));document.getElementById('mt-status').value='active';const frEl=document.getElementById('mt-fixed-role');if(frEl)frEl.value='Technician';const pm=document.getElementById('mt-pic-prev'),pp=document.getElementById('mt-pic-ph');if(pm){pm.src='';pm.style.display='none';}if(pp)pp.style.display='block';}
+function clearTechForm(){['mt-id','mt-name','mt-target','mt-pwd'].forEach(id=>sv(id,''));document.getElementById('mt-status').value='active';const ra=document.getElementById('mt-role-access');if(ra)ra.value='tech';const _us=document.getElementById('mt-unsup');if(_us)_us.checked=false;const pm=document.getElementById('mt-pic-prev'),pp=document.getElementById('mt-pic-ph');if(pm){pm.src='';pm.style.display='none';}if(pp)pp.style.display='block';}
 window.saveTech=async function(){
   const id=sanitize(document.getElementById('mt-id')?.value);const name=sanitize(document.getElementById('mt-name')?.value);
   if(!id||!name){toast('ID and Name required','error');return;}
   const target=sanitizeNum(document.getElementById('mt-target')?.value)||160;
   const status=document.getElementById('mt-status')?.value;const pwd=sanitize(document.getElementById('mt-pwd')?.value)||'demo';
-  const fixedRole=document.getElementById('mt-fixed-role')?.value||'Technician';
-  const underSupervision=(fixedRole==='Under Supervision');
+  const roleAccessKey=normalizeRoleAccessKey(document.getElementById('mt-role-access')?.value||'tech');
+  const allowedRoles=ROLE_ACCESS_PROFILES[roleAccessKey].slice();
+  const underSupervision=allowedRoles.includes('Under Supervision');
   const colors=['#3b82f6','#10b981','#f59e0b','#f43f5e','#8b5cf6'];
-  if(editTechId){const idx=techs.findIndex(t=>t.id===editTechId);if(idx>-1){const u={...techs[idx],id,name,monthlyTarget:target,status,password:pwd,underSupervision,fixedRole};await window.setDoc(window.doc(window.db,'technicians',editTechId),u);techs[idx]=u;if(CU&&CU.id===editTechId)CU=u;}toast('Updated');}
-  else{if(techs.find(t=>t.id===id)){toast('ID exists','error');return;}const nt={id,name,monthlyTarget:target,status,password:pwd,underSupervision,fixedRole,initials:name.slice(0,2).toUpperCase(),color:colors[techs.length%colors.length]};await window.setDoc(window.doc(window.db,'technicians',id),nt);techs.push(nt);toast('Added');}
+  const payload={id,name,monthlyTarget:target,status,password:pwd,underSupervision,roleAccess:roleAccessKey,allowedRoles,initials:name.slice(0,2).toUpperCase(),color:colors[(editTechId?techs.findIndex(t=>t.id===editTechId):techs.length)%colors.length]};
+  if(editTechId){const idx=techs.findIndex(t=>t.id===editTechId);if(idx>-1){const u={...techs[idx],...payload};await window.setDoc(window.doc(window.db,'technicians',editTechId),u);techs[idx]=u;if(CU&&CU.id===editTechId)CU=u;}toast('Updated');}
+  else{if(techs.find(t=>t.id===id)){toast('ID exists','error');return;}await window.setDoc(window.doc(window.db,'technicians',id),payload);techs.push(payload);toast('Added');}
   const pf=document.getElementById('mt-pic')?.files[0];if(pf){const r=new FileReader();r.onload=async e=>await savePic(id,e.target.result);r.readAsDataURL(pf);}
   closeModal('m-tech');renderTechs();
 };
-window.delTech=async function(id){if(!confirm('Delete technician?'))return;await window.deleteDoc(window.doc(window.db,'technicians',id));techs=techs.filter(t=>t.id!==id);renderTechs();toast('Deleted');};
-
 // ════════════════════════════════════════════════
 //  ADMIN: PARTS
 // ════════════════════════════════════════════════
@@ -2923,7 +3155,7 @@ window.handlePartImport=function(input){const f=input.files[0];if(!f)return;cons
 //  EXPORT HELPERS
 // ════════════════════════════════════════════════
 function dlFile(c,fn,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=fn;a.click();URL.revokeObjectURL(a.href);}
-window.exportMine=function(){let csv='Date(EAT),TaskCode,Role,Type,Part,ATA,PartNum,Hrs(÷peers)\n';entries.filter(e=>e.techId===CU.id).forEach(e=>{const d=getDividedHours(e,entries);csv+=`"${fmtEAT(e.time,'date')}","${e.taskCode||''}","${e.jobRole||''}","${e.jobType||'completed'}","${e.pname}","${e.ata||''}","${e.pnum}",${d.toFixed(3)}\n`;});dlFile(csv,'my_production_'+todayEAT()+'.csv','text/csv');toast('Exported');};
+window.exportMine=function(){let csv='Date(EAT),TaskCode,Role,Type,Part,ATA,PartNum,Hrs(÷peers),Status\n';entries.filter(e=>e.techId===CU.id&&isApprovedEntry(e)).forEach(e=>{const d=getDividedHours(e,entries);csv+=`"${fmtEAT(e.time,'date')}","${e.taskCode||''}","${e.jobRole||''}","${e.jobType||'completed'}","${e.pname}","${e.ata||''}","${e.pnum}",${d.toFixed(3)},"${getEntryStatus(e)}"\n`;});dlFile(csv,'my_production_'+todayEAT()+'.csv','text/csv');toast('Exported');};
 window.exportAllEntries=function(){let csv='Date(EAT),Tech,TechID,TaskCode,Role,Type,Part,ATA,PartNum,Hrs(÷peers),HoursType\n';entries.forEach(e=>{const d=getDividedHours(e,entries),ht=isSDT(e)?'SDT':'NOT_SDT';csv+=`"${fmtEAT(e.time,'date')}","${e.techName}","${e.techId}","${e.taskCode||''}","${e.jobRole||''}","${e.jobType||'completed'}","${e.pname}","${e.ata||''}","${e.pnum}",${d.toFixed(3)},${ht}\n`;});dlFile(csv,'all_entries_'+todayEAT()+'.csv','text/csv');toast('Exported');};
 
 // ════════════════════════════════════════════════
@@ -2946,24 +3178,28 @@ function populateLeaderEntryTechs(){
   populateLeaderPartSel();
 }
 function onLeaderTechSel(){
-  applyRoleLock('le');
+  const techId=document.getElementById('le-tech-sel')?.value;
+  const tech=techs.find(t=>t.id===techId);
+  if(tech){applyRoleAccessToButtons('le',tech);ensureAllowedRole('le',tech);if(leJobType==='scrap'){forcePickRole('le','Inspector',2);}}
   refreshLeAllocHrs();
 }
 function setLeJobType(type){
-  if(type==='scrap' && !getAllowedRolesForTech(getEntryTech('le')).includes('Inspector')) type='completed';
   leJobType=type;
   document.getElementById('le-cs-comp').className='cs-opt'+(type==='completed'?' sel-comp':'');
   document.getElementById('le-cs-scrap').className='cs-opt'+(type==='scrap'?' sel-scrap':'');
-  for(let i=0;i<4;i++){const el=document.getElementById('le-jr'+i);if(!el)continue;if(type==='scrap'&&i!==2)el.classList.add('disabled');else el.classList.remove('disabled');}
-  if(type==='scrap'){pickLeJobRole('Inspector',2);const shi=document.getElementById('le-scrap-hrs');if(shi)shi.value=String(settings.scrapDefaultHrs||2);}
+  const tech=techs.find(t=>t.id===document.getElementById('le-tech-sel')?.value);
+  if(tech)applyRoleAccessToButtons('le',tech);
+  if(type==='scrap'){forcePickRole('le','Inspector',2);const shi=document.getElementById('le-scrap-hrs');if(shi)shi.value=String(settings.scrapDefaultHrs||2);} else if(tech){ensureAllowedRole('le',tech);}
   const shr=document.getElementById('le-scrap-hrs-row');if(shr){if(type==='scrap')shr.classList.add('show');else shr.classList.remove('show');}
-  applyRoleLock('le');
   refreshLeAllocHrs();
 }
 window.setLeJobType=setLeJobType;
-function pickLeJobRole(role,idx){
-  const allowed=getAllowedRolesForTech(getEntryTech('le'));
-  if(allowed.length && !allowed.includes(role)) { role=allowed[0]; idx=ROLES.indexOf(role); }
+function pickLeJobRole(role,idx,force=false){
+  const tech=techs.find(t=>t.id===document.getElementById('le-tech-sel')?.value);
+  if(!force&&tech&&!isRoleAllowedForTech(tech,role)&&!(leJobType==='scrap'&&role==='Inspector')){
+    toast('Role not allowed for this technician','error');
+    return;
+  }
   leJobRole=role;leJobRoleIdx=idx;
   for(let i=0;i<4;i++){const el=document.getElementById('le-jr'+i);if(!el)continue;const d=el.classList.contains('disabled');el.className='jro'+(d?' disabled':'');}
   const el=document.getElementById('le-jr'+idx);if(el)el.classList.add(ROLE_SEL[idx]);
@@ -2981,7 +3217,7 @@ function refreshLeAllocHrs(){
     if(lbl)lbl.textContent='Allocated Hours';
     return;
   }
-  const part=parts.find(p=>p.id===partId);if(!part)return;
+  const part=findPartById(partId);if(!part)return;
   const taskCode=sanitize(document.getElementById('le-taskcode')?.value).toUpperCase();
   const pool=calcPoolHrs(part,leJobRole,taskCode);
   const insp=isInspRole(leJobRole);
@@ -2992,51 +3228,60 @@ function refreshLeAllocHrs(){
 }
 window.refreshLeAllocHrs=refreshLeAllocHrs;
 function onLePartSel(){
-  const partId=document.getElementById('le-part-sel')?.value;
-  const part=parts.find(p=>p.id===partId);
+  let part=getCachedOrSelectedPart('le');
   if(!part){
-    sv('le-desc','');sv('le-ata','');sv('le-pnum','');refreshLeAllocHrs();return;
+    part=resolvePartSelection('le', document.getElementById('le-part-search')?.value);
   }
-  sv('le-desc',part.name||'');sv('le-ata',part.ata||'');sv('le-pnum',part.num||'');
-  setPartPickerDisplay('le',part);
+  if(!part){
+    cacheSelectedPart('le',null);
+    sv('le-desc','');sv('le-ata','');sv('le-pnum','');sv('le-hours','');refreshLeAllocHrs();return;
+  }
+  applyPartSelection('le', part);
   refreshLeAllocHrs();
 }
 window.onLePartSel=onLePartSel;
 function renderLeaderEntry(){
-  applyRoleLock('le');
   const today=todayEAT();
   const tbody=document.getElementById('le-today-list');
   if(tbody){
-    const tod=entries.filter(e=>e.time?.startsWith(today)&&e.loggedByLeader);
-    tbody.innerHTML=tod.length?tod.slice(0,30).map(e=>{
+    const tod=entries.filter(e=>e.time?.startsWith(today)).sort((a,b)=>{
+      const r=x=>getEntryStatus(x)==='pending'?0:getEntryStatus(x)==='rejected'?2:1;
+      return r(a)-r(b)||new Date(b.time||0)-new Date(a.time||0);
+    });
+    tbody.innerHTML=tod.length?tod.map(e=>{
       const div=getDividedHours(e,entries),insp=!isSDT(e);
       const rc=ROLE_COLORS[ROLES.indexOf(e.jobRole||'Technician')]||'var(--blue)';
-      const act=canManageEntriesUI()?`<div style="display:flex;gap:6px;justify-content:flex-end;">
-          <button class="btn bo bsm" style="padding:4px 8px;" onclick="editEntryById('${e.id}')">✎</button>
-          <button class="btn bd bsm" style="padding:4px 8px;" onclick="delEntryById('${e.id}')">🗑</button>
+      const st=getEntryStatusBadge(e);
+      const act=canManageEntriesUI()?`<div style="display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;">
+          <button class="btn bgr bsm" style="padding:4px 8px;" onclick="approveEntryById('${e.id}')">✓ Accept</button>
+          <button class="btn bd bsm" style="padding:4px 8px;" onclick="rejectEntryById('${e.id}')">✕ Reject</button>
         </div>`:'—';
-      return`<tr><td style="font-size:11px;">${e.techName}</td>
+      return`<tr style="${getEntryStatus(e)==='rejected'?'opacity:.65;background:rgba(244,63,94,.08);border-left:3px solid var(--rose);':''}"><td style="font-size:11px;">${e.techName}</td>
         <td class="mono" style="color:var(--blue);font-weight:600;">${e.taskCode||'—'}</td>
         <td style="font-size:10px;font-weight:700;color:${rc}">${(e.jobRole||'Tech').split(' ')[0]}</td>
         <td style="font-size:11px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.pname}</td>
-        <td class="mono">${div.toFixed(2)}h</td>
+        <td class="mono">${div.toFixed(2)}h${insp?' <span class="not-sdt">!</span>':''}</td>
+        <td>${st}</td>
         <td><span class="${e.jobType==='scrap'?'cp-scrap':'cp-comp'}">${e.jobType==='scrap'?'Scrap':'Done'}</span></td>
         <td>${act}</td>
        </tr>`;
-    }).join(''):'<tr><td colspan="7" class="empty">No leader entries today</td></tr>';
+    }).join(''):'<tr><td colspan="8" class="empty">No leader entries today</td></tr>';
   }
   if(!document.getElementById('le-time')?.value)sv('le-time',todayEAT());
   renderLB();
 }
 function openLeReviewModal(){
   const techId=document.getElementById('le-tech-sel')?.value;
-  const partId=document.getElementById('le-part-sel')?.value;
   const taskCode=sanitize(document.getElementById('le-taskcode')?.value).toUpperCase();
   if(!techId){toast('Select a technician','error');return;}
-  if(!partId){toast('Select a part','error');return;}
+  let part=getCachedOrSelectedPart('le');
+  if(!part){
+    part=resolvePartSelection('le', document.getElementById('le-part-search')?.value);
+    if(part) applyPartSelection('le', part);
+  }
+  if(!part){toast('Select a part','error');return;}
   if(!taskCode){toast('Enter a Task Code','error');return;}
   const tech=techs.find(t=>t.id===techId);if(!tech)return;
-  const part=parts.find(p=>p.id===partId);if(!part)return;
   const pool=calcPoolHrs(part,leJobRole,taskCode);
   const insp=isInspRole(leJobRole);
   const scrapHrs=leJobType==='scrap'?gv('le-scrap-hrs')||2:null;
@@ -3047,7 +3292,10 @@ function openLeReviewModal(){
     hours:pool,stdHours:part.hours,
     isInspector:insp,ata:part.ata,desc:part.name,
     scrapHrs:scrapHrs||null,
-    loggedByLeader:true,loggedBy:CU.name
+    loggedByLeader:true,loggedBy:CU.name,
+    approvalStatus:'pending',
+    submittedBy:CU?.name||'',
+    submittedByRole:CR||''
   };
   const fields=[
     ['Technician',`<strong>${tech.name}</strong> <span class="mono">(${tech.id})</span>`],
@@ -3063,7 +3311,8 @@ function openLeReviewModal(){
   document.getElementById('m-review-body').innerHTML=
     `<div class="al al-a"><span class="al-ico">⚠️</span><div>You are submitting on behalf of <strong>${tech.name}</strong>. Verify all details below.</div></div>`+
     `<div style="background:var(--card2);border-radius:8px;padding:12px 14px;margin-top:8px;">`+
-    fields.map(([l,v])=>`<div class="review-field"><div class="rf-label">${l}</div><div class="rf-val">${v}</div></div>`).join('')+`</div>`;
+    fields.map(([l,v])=>`<div class="review-field"><div class="rf-label">${l}</div><div class="rf-val">${v}</div></div>`).join('')+
+    `</div>`;
   document.getElementById('confirm-save-btn').onclick=confirmLeSave;
   openModal('m-review');
 }
@@ -3073,13 +3322,13 @@ async function confirmLeSave(){
   const btn=document.getElementById('confirm-save-btn');
   if(btn){btn.classList.add('saving');btn.disabled=true;}
   const savedEntry={...lePendingEntry};
+  if(!savedEntry.approvalStatus)savedEntry.approvalStatus='pending';
   if(isDuplicateEntry(savedEntry)){
     toast('Duplicate entry blocked','error');
     if(btn){btn.classList.remove('saving');btn.disabled=false;}
     return;
   }
   try{
-    // Always create a new entry – no overwrite
     const ref=await window.addDoc(window.collection(window.db,'entries'),savedEntry);
     savedEntry.id=ref.id;
     entries.unshift(savedEntry);
@@ -3100,11 +3349,12 @@ function clearLeEntry(){
 }
 window.clearLeEntry=clearLeEntry;
 
+
 // ════════════════════════════════════════════════
 //  NAVIGATION
 // ════════════════════════════════════════════════
 const NAV={
-  tech:['mystats','taskgroups'],
+  tech:['entry','mystats','taskgroups'],
   lead:['dashboard','controllerentry','assignments','allentries','reports','ratios','taskgroups'],
   ctrl:['controllerentry','allentries','taskgroups'],
   dev:['techs','parts','leaders','controllers','pwmgmt','ratios','taskgroups','system']
@@ -3221,7 +3471,7 @@ async function doLogin(){
   document.getElementById('login').classList.remove('on');
   document.getElementById('app').classList.add('on');
   hideLoading();
-  if(CR==='tech'){navTo('mystats');}
+  if(CR==='tech'){navTo('entry');}
   else if(CR==='lead')navTo('dashboard');
   else if(CR==='ctrl')navTo('controllerentry');
   else navTo('techs');
@@ -3247,6 +3497,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   });
   sv('asn-date',todayEAT());
+  ['e-time','le-time'].forEach(id=>{const el=document.getElementById(id);if(el&&!el.value)el.value=todayEAT();});
   setTimeout(hideLoading,800);
   document.getElementById('login').classList.add('on');
   const mf=document.getElementById('ms-month-filter');if(mf&&!mf.value)mf.value=todayEAT().slice(0,7);
