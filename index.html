@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="description" content="ProTrack MRO Production KPI System">
 <meta name="theme-color" content="#070c18">
-<title>ProTrack v1.3.0</title>
+<title>ProTrack v1.3.1</title>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -605,32 +605,34 @@ tbody tr:hover td{background:var(--card2);}
 
         <!-- TECH: MY STATS -->
         <div class="pg" id="pg-mystats">
-          <div class="tbr" style="margin-bottom:12px;gap:12px;flex-wrap:wrap;">
-            <div class="fgroup" style="max-width:240px;">
-              <label class="flabel">Month Filter</label>
-              <input type="month" class="finput" id="ms-month-filter" onchange="renderMyStats()">
+          <div class="tbr" style="margin-bottom:12px;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+            <div class="fgroup" style="max-width:200px;min-width:160px;">
+              <label class="flabel">From Date</label>
+              <input type="date" class="finput" id="ms-hist-from" onchange="document.getElementById('ms-dt-preset').value='';renderMyStats()">
             </div>
+            <div class="fgroup" style="max-width:200px;min-width:160px;">
+              <label class="flabel">To Date</label>
+              <input type="date" class="finput" id="ms-hist-to" onchange="document.getElementById('ms-dt-preset').value='';renderMyStats()">
+            </div>
+            <select class="fsel" id="ms-dt-preset" onchange="applyMyStatsPreset(this.value)" title="Quick range">
+              <option value="">Quick Range…</option>
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="all">All Time</option>
+            </select>
+            <button class="btn bo bsm" onclick="renderMyStats()">⟳</button>
           </div>
-          <div class="kg k4" style="margin-bottom:5px;">
-            <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Today SDT</div><div class="kv" id="ms-today" style="color:var(--blue)">0Hrs</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-t-pb" style="background:var(--blue);width:0%"></div></div><div class="kpb-s"><span id="ms-dt">Daily: —</span><span id="ms-dpc">0%</span></div></div></div>
-            <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">This Week</div><div class="kv" id="ms-week" style="color:var(--amber)">0Hrs</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-w-pb" style="background:var(--amber);width:0%"></div></div><div class="kpb-s"><span id="ms-wt">Weekly: —</span><span id="ms-wpc">0%</span></div></div></div>
-            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Total Achieved Hours</div><div class="kv" id="ms-month" style="color:var(--green)">0Hrs</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-m-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-mt">Month: —</span><span id="ms-mpc">0%</span></div></div></div>
-          </div>
-          <div class="kg k2" style="margin-bottom:14px;">
-            <div class="kc"><div class="kac" style="background:var(--cyan)"></div><div class="kl">Additional Assignment Hrs (Month)</div><div class="kv" id="ms-asn" style="color:var(--cyan)">0Hrs</div><div class="ks">Add to total achieved hrs</div></div>
+          <div class="kg k4" style="margin-bottom:14px;">
+            <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Filtered SDT Hrs</div><div class="kv" id="ms-today" style="color:var(--blue)">0Hrs</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-t-pb" style="background:var(--blue);width:0%"></div></div><div class="kpb-s"><span id="ms-dt">Range: —</span><span id="ms-dpc">0%</span></div></div></div>
+            <div class="kc"><div class="kac" style="background:var(--violet)"></div><div class="kl">Filtered Inspector Hrs</div><div class="kv" id="ms-week" style="color:var(--violet)">0Hrs</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-w-pb" style="background:var(--violet);width:0%"></div></div><div class="kpb-s"><span id="ms-wt">Range: —</span><span id="ms-wpc">0%</span></div></div></div>
+            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Total Achieved Hours</div><div class="kv" id="ms-month" style="color:var(--green)">0Hrs</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-m-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-mt">Range: —</span><span id="ms-mpc">0%</span></div></div></div>
+            <div class="kc"><div class="kac" style="background:var(--cyan)"></div><div class="kl">Additional Assignment Hrs</div><div class="kv" id="ms-asn" style="color:var(--cyan)">0Hrs</div><div class="ks">Filtered by selected date range</div></div>
           </div>
                     <div class="card">
             <div class="ch" style="align-items:flex-end;">
               <span class="ct">Production History</span>
               <div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;margin-left:auto;">
-                <div class="fgroup" style="min-width:150px;">
-                  <label class="flabel">From Date</label>
-                  <input type="date" class="finput" id="ms-hist-from" onchange="renderMyStats()">
-                </div>
-                <div class="fgroup" style="min-width:150px;">
-                  <label class="flabel">To Date</label>
-                  <input type="date" class="finput" id="ms-hist-to" onchange="renderMyStats()">
-                </div>
                 <div class="fgroup" style="min-width:160px;">
                   <label class="flabel">Status Filter</label>
                   <select class="fselect" id="ms-status-filter" onchange="renderMyStats()">
@@ -767,6 +769,9 @@ tbody tr:hover td{background:var(--card2);}
               <option value="all">All Time</option>
             </select>
             <button class="btn bo bsm" onclick="exportAllEntries()">⬇ CSV</button>
+            <button class="btn bg_ bsm" onclick="bulkAcceptAll()">✔ Accept All</button>
+            <button class="btn bd bsm" onclick="bulkRejectAll()">✖ Reject All</button>
+            <button class="btn bd bsm" onclick="bulkDeleteAll()">🗑 Delete All</button>
           </div>
           <div class="card"><div class="tw"><table>
             <thead> <tr><th>Date/Time (EAT)</th><th>Tech</th><th>Task Code</th><th>Role</th><th>Type</th><th>Part</th><th>ATA</th><th>Part #</th><th>Hrs (÷peers)</th><th>Status</th><th>Action</th></tr> </thead>
@@ -990,7 +995,32 @@ tbody tr:hover td{background:var(--card2);}
           </div>
         </div>
 
-        <!-- PRODUCTION CONTROLLER: TECHNICIAN ENTRY -->
+  
+      <!-- DEV/LEADER: PRODUCTION ENTRY IMPORT -->
+      <div class="pg" id="pg-productionimport">
+        <div class="al al-b"><span class="al-ico">⬆️</span><div>Import ComponentTATStatus Excel production entries. Entry date is taken from <strong>Date Completed</strong>. Entries are saved as <strong>Pending</strong>. Missing parts/employees show Add and Try Import buttons.</div></div>
+        <div class="card">
+          <div class="ch"><span class="ct">📥 Import Production Entries</span></div>
+          <div class="cb">
+            <div style="border:2px dashed var(--bdr2);border-radius:8px;padding:24px;text-align:center;cursor:pointer;" onclick="document.getElementById('imp-prod-f').click()">
+              📂 Upload ComponentTATStatus Excel
+              <input type="file" id="imp-prod-f" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleProductionImport(this)">
+            </div>
+            <div style="font-size:11.5px;color:var(--tx3);margin-top:8px;line-height:1.5;">
+              Uses: <span class="mono">WP ID</span>, <span class="mono">PART NAME</span>, <span class="mono">OEM P/N</span>, <span class="mono">Status</span>, <span class="mono">Date Completed</span>, <span class="mono">Released By</span>, <span class="mono">TECH_ID</span>, <span class="mono">INSP_ID</span>.<br>
+              Hours are fetched only from ProTrack Parts by <span class="mono">OEM P/N</span>. Excel <span class="mono">Est. Man Hr.</span> is ignored.
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><span class="ct">Import Preview / Actions</span><button class="btn bo bsm" onclick="clearProductionImportPreview()">Clear Preview</button></div>
+          <div class="tw"><table>
+            <thead><tr><th>Row</th><th>Date Completed</th><th>Employee</th><th>Role</th><th>Task Code</th><th>Part #</th><th>Hours</th><th>Status / Action</th></tr></thead>
+            <tbody id="prod-import-body"><tr><td colspan="8" class="empty">No import yet</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+      <!-- PRODUCTION CONTROLLER: TECHNICIAN ENTRY -->
         <div class="pg" id="pg-controllerentry">
           <div class="al al-b"><span class="al-ico">⊕</span><div>Submit a production entry on behalf of a technician. Choose the technician, fill in all fields, then Review &amp; Submit as the production controller.</div></div>
           <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:14px;align-items:start;">
@@ -1105,7 +1135,7 @@ tbody tr:hover td{background:var(--card2);}
   <div class="modal msm">Change My Password
     <div class="mhd"><div class="mttl">Forgot Password</div><button class="mxb" onclick="closeModal('m-forgot')">✕</button></div>
     <div class="mbody">
-      <div class="al al-a"><span class="al-ico">💡</span><div>Contact your Developer/Admin to reset your password. Email:natnaelni@ethiopianairlines.com <a href="/cdn-cgi/l/" class="__cf_email__" data-cfemail="204e41544e41454c4e4960455448494f5049414e4149524c494e45530e434f4d">[email&#160;protected]</a></div></div>
+      <div class="al al-a"><span class="al-ico">💡</span><div>Contact your Developer/Admin to reset your password. Email:natnaelni@ethiopianairlines.com</div></div>
       <div style="margin-top:8px;">
         <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Developer Recovery</div>
         <div class="fg">
@@ -1272,13 +1302,12 @@ tbody tr:hover td{background:var(--card2);}
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 <script>
 'use strict';
 // ════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ════════════════════════════════════════════════
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.3.1';
 const DEV_RECOVERY_CODE = 'PROTRACK-DEV-2025-RESET';
 const EAT_TZ='Africa/Addis_Ababa';
 const ROLES=['Technician','Under Supervision','Inspector','Preliminary Inspector'];
@@ -1415,6 +1444,38 @@ function getMonthRangeFromInput(v){
   const label=new Date(Date.UTC(yy,mm-1,1)).toLocaleDateString('en-GB',{month:'long',year:'numeric',timeZone:'UTC'});
   return {start,end,label};
 }
+function getMyStatsRange(){
+  const preset=(document.getElementById('ms-dt-preset')?.value||'').trim();
+  const fromEl=document.getElementById('ms-hist-from');
+  const toEl=document.getElementById('ms-hist-to');
+  let from=(fromEl?.value||'').trim();
+  let to=(toEl?.value||'').trim();
+  if(preset==='all'&&!from&&!to){
+    return {start:'0000-01-01',end:'9999-12-31',label:'All Time'};
+  }
+  if(!from&&!to){
+    const mr=getMR();
+    if(fromEl)fromEl.value=mr.start;
+    if(toEl)toEl.value=mr.end;
+    return {...mr,label:'This Month'};
+  }
+  let start=from||'0000-01-01';
+  let end=to||'9999-12-31';
+  if(start>end){const tmp=start;start=end;end=tmp;}
+  const label=(start==='0000-01-01'&&end==='9999-12-31')?'All Time':`${start} → ${end}`;
+  return {start,end,label};
+}
+function applyMyStatsPreset(v){
+  const today=todayEAT(),wr=getWR(),mr=getMR();
+  const fromEl=document.getElementById('ms-hist-from'),toEl=document.getElementById('ms-hist-to');
+  if(!fromEl||!toEl)return;
+  if(v==='today'){fromEl.value=today;toEl.value=today;}
+  else if(v==='week'){fromEl.value=wr.start;toEl.value=wr.end;}
+  else if(v==='month'||!v){fromEl.value=mr.start;toEl.value=mr.end;}
+  else if(v==='all'){fromEl.value='';toEl.value='';}
+  renderMyStats();
+}
+window.applyMyStatsPreset=applyMyStatsPreset;
 function dateInRange(iso,start,end){const d=(iso||'').slice(0,10);return !!d&&d>=start&&d<=end;}
 function getDailyTgt(m){return parseFloat((m/22).toFixed(2));}
 function getWeeklyTgt(m){return parseFloat((getDailyTgt(m)*5).toFixed(2));}
@@ -2236,37 +2297,35 @@ function renderMyStats(){
   if(!CU) return;
   const me=entries.filter(e=>e.techId===CU.id);
   const statusFilter=(document.getElementById('ms-status-filter')?.value||'all').toLowerCase();
-  const mrSel=getMonthRangeFromInput(document.getElementById('ms-month-filter')?.value);
-  const today=todayEAT(),wr=getWR();
+  const range=getMyStatsRange();
   const mt=CU.monthlyTarget||160;
-  const dt=getDailyTgt(mt),wt=getWeeklyTgt(mt);
   const approvedMe=me.filter(isApprovedEntry);
-  const visibleMe=me.filter(e=>statusFilter==='all' || getEntryStatus(e)===statusFilter);
-  const todaySDT=approvedMe.filter(e=>e.time?.startsWith(today)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const weekSDT=approvedMe.filter(e=>dateInRange(e.time,wr.start,wr.end)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const monthSDT=approvedMe.filter(e=>dateInRange(e.time,mrSel.start,mrSel.end)&&isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const asnHrs=assignments.filter(a=>a.techId===CU.id&&a.date>=mrSel.start&&a.date<=mrSel.end).reduce((s,a)=>s+(a.hrs||0),0);
-  const inspHrs=approvedMe.filter(e=>dateInRange(e.time,mrSel.start,mrSel.end)&&!isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
-  const totalAchieved=monthSDT+asnHrs+inspHrs;
+  const approvedInRange=approvedMe.filter(e=>dateInRange(e.time,range.start,range.end));
+  const visibleMe=me.filter(e=>dateInRange(e.time,range.start,range.end)&&(statusFilter==='all' || getEntryStatus(e)===statusFilter));
 
-  stxt('ms-today',todaySDT.toFixed(2)+'Hrs');
-  stxt('ms-week',weekSDT.toFixed(2)+'Hrs');
+  const filteredSDT=approvedInRange.filter(isSDT).reduce((s,e)=>s+getDividedHours(e,entries),0);
+  const filteredInspector=approvedInRange.filter(e=>!isSDT(e)).reduce((s,e)=>s+getDividedHours(e,entries),0);
+  const asnHrs=assignments.filter(a=>a.techId===CU.id&&a.date>=range.start&&a.date<=range.end).reduce((s,a)=>s+(a.hrs||0),0);
+  const totalAchieved=filteredSDT+filteredInspector+asnHrs;
+
+  stxt('ms-today',filteredSDT.toFixed(2)+'Hrs');
+  stxt('ms-week',filteredInspector.toFixed(2)+'Hrs');
   stxt('ms-month',totalAchieved.toFixed(2)+'Hrs');
   stxt('ms-asn',asnHrs.toFixed(2)+'Hrs');
-  stxt('ms-dt',`Daily: ${dt.toFixed(1)}Hrs`);
-  stxt('ms-wt',`Weekly: ${wt.toFixed(1)}Hrs`);
-  stxt('ms-mt',`Month: ${mrSel.label}`);
+  stxt('ms-dt',`Range: ${range.label}`);
+  stxt('ms-wt',`Range: ${range.label}`);
+  stxt('ms-mt',`Range: ${range.label}`);
 
-  pb('ms-t-pb',todaySDT,dt);
-  pb('ms-w-pb',weekSDT,wt);
+  pb('ms-t-pb',filteredSDT,mt);
+  pb('ms-w-pb',filteredInspector,mt);
   pb('ms-m-pb',totalAchieved,mt);
 
-  const dpc = dt > 0 ? Math.round((todaySDT / dt) * 100) : 0;
-  const wpc = wt > 0 ? Math.round((weekSDT / wt) * 100) : 0;
-  const mpc = mt > 0 ? Math.round((totalAchieved / mt) * 100) : 0;
-  stxt('ms-dpc',dpc+'%');
-  stxt('ms-wpc',wpc+'%');
-  stxt('ms-mpc',mpc+'%');
+  const sdtPct = mt > 0 ? Math.round((filteredSDT / mt) * 100) : 0;
+  const inspPct = mt > 0 ? Math.round((filteredInspector / mt) * 100) : 0;
+  const totalPct = mt > 0 ? Math.round((totalAchieved / mt) * 100) : 0;
+  stxt('ms-dpc',sdtPct+'%');
+  stxt('ms-wpc',inspPct+'%');
+  stxt('ms-mpc',totalPct+'%');
 
   const tbody=document.getElementById('ms-hist');
   if(tbody){
@@ -2274,7 +2333,7 @@ function renderMyStats(){
       const div=getDividedHours(e,entries),insp=!isSDT(e);
       const rc=ROLE_COLORS[ROLES.indexOf(e.jobRole||'Technician')]||'var(--blue)';
       const st=getEntryStatus(e);
-      const rowStyle=st==='rejected'?'background:rgba(244,63,94,.08);border-left:3px solid var(--rose);':'';
+      const rowStyle=st==='rejected'?'background:rgba(244,63,94,.08);border-left:3px solid var(--rose);':(st==='pending'?'background:rgba(245,158,11,.06);':'');
       return`<tr style="${rowStyle}"><td class="mono">${fmtEAT(e.time,'date')}</td><td class="mono" style="color:var(--blue);">${e.taskCode||'—'}</td>
       <td style="font-size:11px;font-weight:700;color:${rc}">${e.jobRole||'Tech'}</td>
       <td>${e.pname}</td><td class="mono">${e.ata||'—'}</td><td class="mono">${e.pnum||'—'}</td>
@@ -2286,7 +2345,7 @@ function renderMyStats(){
 
   const al=document.getElementById('ms-asn-list');
   if(al){
-    const list=assignments.filter(a=>a.techId===CU.id&&a.date>=mrSel.start&&a.date<=mrSel.end);
+    const list=assignments.filter(a=>a.techId===CU.id&&a.date>=range.start&&a.date<=range.end);
     al.innerHTML=list.length?list.sort((a,b)=>new Date(b.date||0)-new Date(a.date||0)).map(a=>`
       <div class="asn-card">
         <div class="asn-hd"><div style="width:24px;height:24px;border-radius:50%;overflow:hidden;">${avatarHtml(a.techId,a.techName,24)}</div><span class="asn-nm">${sanitize(a.desc)}</span></div>
@@ -2715,7 +2774,7 @@ window.delEntryById=async function(id){
 };
 window.delEntry=window.delEntryById;
 
-function renderAllEntries(){
+function getAllEntriesFiltered(){
   const tf=document.getElementById('ae-tech')?.value||'';
   const sf=document.getElementById('ae-st')?.value||'all';
   const fromV=document.getElementById('ae-dt-from')?.value||'';
@@ -2727,6 +2786,54 @@ function renderAllEntries(){
   if(fromV)f=f.filter(e=>e.time&&e.time.slice(0,10)>=fromV);
   if(toV)f=f.filter(e=>e.time&&e.time.slice(0,10)<=toV);
   if(q)f=f.filter(e=>(e.techName+e.pname+e.taskCode+e.pnum).toLowerCase().includes(q));
+  return f;
+}
+
+async function bulkApplyToFiltered(mode){
+  if(!canManageEntriesUI()){toast('Not allowed','error');return;}
+  const filtered=getAllEntriesFiltered();
+  if(!filtered.length){toast('No filtered entries to update','warn');return;}
+  const label=mode==='accepted'?'accept':mode==='rejected'?'reject':'delete';
+  if(!confirm(`Are you sure you want to ${label} ${filtered.length} filtered entr${filtered.length===1?'y':'ies'}?`))return;
+  const loadingText=mode==='accepted'?'Accepting':mode==='rejected'?'Rejecting':'Deleting';
+  showLoading(`${loadingText} ${filtered.length} filtered entr${filtered.length===1?'y':'ies'}...`);
+  let done=0, failed=0;
+  try{
+    for(const e of filtered){
+      try{
+        if(mode==='delete'){
+          await window.deleteDoc(window.doc(window.db,'entries',e.id));
+          entries=entries.filter(x=>x.id!==e.id);
+        }else{
+          const u={...e,approvalStatus:mode,reviewedBy:CU?.name||'',reviewedById:CU?.id||'',reviewedAt:todayEAT()};
+          await window.setDoc(window.doc(window.db,'entries',e.id),u);
+          const idx=entries.findIndex(x=>x.id===e.id);
+          if(idx>-1)entries[idx]=u;
+        }
+        done++;
+      }catch(err){
+        failed++;
+        console.error(err);
+      }
+    }
+    renderEntry();
+    renderLeaderEntry();
+    renderAllEntries();
+    renderReports();
+    renderTG();
+    renderLB();
+    toast((label.charAt(0).toUpperCase()+label.slice(1))+' complete: '+done+' done'+(failed?(', '+failed+' failed'):''));
+  }finally{
+    hideLoading();
+  }
+}
+window.bulkApplyToFiltered=bulkApplyToFiltered;
+window.bulkAcceptAll=async function(){return bulkApplyToFiltered('accepted');};
+window.bulkRejectAll=async function(){return bulkApplyToFiltered('rejected');};
+window.bulkDeleteAll=async function(){return bulkApplyToFiltered('delete');};
+
+function renderAllEntries(){
+  const f=getAllEntriesFiltered();
   const tbody=document.getElementById('ae-body');
   if(tbody){tbody.innerHTML=f.slice(0,200).map(e=>{
     const div=getDividedHours(e,entries),insp=!isSDT(e);
@@ -3163,8 +3270,68 @@ window.handlePartImport=function(input){const f=input.files[0];if(!f)return;cons
 // ════════════════════════════════════════════════
 //  EXPORT HELPERS
 // ════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════
+// DEV/LEADER: PRODUCTION ENTRY IMPORT
+// Date comes from Date Completed. Missing part/employee rows get Add + Try Import buttons.
+// ════════════════════════════════════════════════
+let productionImportResults=[];
+let productionImportPendingRows={};
+let productionImportKeySeq=0;
+function getImportValue(row, keys){
+  if(!row||!keys)return'';const lookup={};Object.keys(row).forEach(k=>lookup[String(k).trim().toLowerCase()]=row[k]);
+  for(const k of keys){const v=lookup[String(k).trim().toLowerCase()];if(v!==undefined&&v!==null&&String(v).trim()!=='')return v;}return'';
+}
+function normalizeImportDate(value){
+  try{if(value instanceof Date&&!isNaN(value))return value.toISOString().slice(0,10);if(typeof value==='number'&&isFinite(value)){const d=new Date(Math.round((value-25569)*86400*1000));if(!isNaN(d))return d.toISOString().slice(0,10);}const s=String(value??'').trim();if(!s)return'';const d=new Date(s);if(!isNaN(d))return d.toISOString().slice(0,10);const m=s.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);if(m)return`${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;}catch(e){}return'';
+}
+function splitImportIds(value){const raw=String(value??'').trim();if(!raw)return[];const seen=new Set();return raw.split(/[,;\/\s\n\r\t]+/).map(x=>String(x).trim()).filter(x=>x&&!['0','-','null','undefined','nan','n/a','na'].includes(x.toLowerCase())).filter(x=>{if(seen.has(x))return false;seen.add(x);return true;});}
+function normalizeImportStatus(value){const s=String(value??'').trim().toUpperCase();if(s==='RFI')return'completed';if(s==='SCRAP')return'scrap';if(s==='CMPLT AS U/S'||s.includes('CMPLT')||s.includes('U/S'))return'under_supervision_skip';return'unsupported';}
+function normalizePartNumberForImport(v){return String(v??'').trim().toUpperCase().replace(/[\s\-—–_]+/g,'').replace(/[^A-Z0-9]/g,'');}
+function findPartByNumber(partNumber){const target=normalizePartNumberForImport(partNumber);if(!target)return null;return parts.find(p=>normalizePartNumberForImport(p.num||p.partNumber||p.id)===target)||null;}
+function isFooterImportRow(row){const wp=String(getImportValue(row,['WP ID','WPID','Task Code','TaskCode'])??'').trim();if(!wp)return true;const low=wp.toLowerCase();return low.includes('average')||low.includes('total count')||low.includes('total est')||low.includes('total act')||low.startsWith('total ');}
+function chooseImportIds(ids,role,taskCode){if(!ids||!ids.length)return[];if(ids.length===1)return ids;while(true){const ans=prompt(`Multiple ${role} IDs found for WP ${taskCode}:\n${ids.join(', ')}\n\nEnter all, one ID, multiple IDs separated by comma, or skip`);if(ans===null)return null;const v=String(ans).trim();if(!v)continue;if(v.toLowerCase()==='skip')return[];if(v.toLowerCase()==='all')return ids;const selected=splitImportIds(v).filter(x=>ids.includes(x));if(selected.length)return selected;alert('Invalid selection. Use all, skip, or IDs from the list.');}}
+function importSafe(v){return String(v??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');}
+function addImportResult(r){productionImportResults.push(r);}
+function openImportAddPart(partNumber='',partName=''){openAddPart();setTimeout(()=>{sv('mp-num',String(partNumber||''));sv('mp-name',String(partName||''));sv('mp-hours','');sv('mp-ata','');},80);}
+function openImportAddEmployee(id='',role='Technician'){openAddTech();setTimeout(()=>{sv('mt-id',String(id||''));sv('mt-name','Imported Employee '+String(id||''));sv('mt-target',settings.defaultMonthlyTarget||160);sv('mt-pwd',settings.passwords?.tech||'demo');const st=document.getElementById('mt-status');if(st)st.value='active';const ra=document.getElementById('mt-role-access');if(ra)ra.value=(role==='Technician')?'tech':'tech_insp';const us=document.getElementById('mt-unsup');if(us)us.checked=false;},80);}
+function makeImportPendingKey(row,rowIndex){const key='p'+(++productionImportKeySeq);productionImportPendingRows[key]={row,rowIndex};return key;}
+function addImportMissingPart(partNumber,partName,rowNum,taskCode,row,rowIndex,date){const key=makeImportPendingKey(row,rowIndex);addImportResult({key,row:rowNum,date:date||'—',employee:'—',role:'—',taskCode,partNumber,hours:'—',status:'Part not found. Add part, enter correct hours, save, then click Try Import.',type:'warn',action:'part',partNumber,partName});}
+function resolveImportEmployee(id,role,rowNum,taskCode,partNumber,row,rowIndex,date){const tech=techs.find(t=>String(t.id).trim()===String(id).trim());if(tech)return tech;const ans=prompt(`Employee ID ${id} was not found for ${role}.\n1 = Add employee now\n2 = Ignore this ID\n3 = Cancel import`,'1');if(ans===null||String(ans).trim()==='3')return'CANCEL_IMPORT';if(String(ans).trim()==='1'){const key=makeImportPendingKey(row,rowIndex);openImportAddEmployee(id,role);addImportResult({key,row:rowNum,date:date||'—',employee:id,role,taskCode,partNumber,hours:'—',status:'Employee not found. Add employee, save, then click Try Import.',type:'warn',action:'tech',employeeId:id,employeeRole:role});return'ADD_REQUIRED';}return null;}
+function buildImportEntriesForRow(row,rowIndex){
+  const rowNum=rowIndex+2;if(isFooterImportRow(row))return[];
+  const taskCode=String(getImportValue(row,['WP ID','WPID','Task Code','TaskCode'])||'').trim().toUpperCase();
+  const partName=String(getImportValue(row,['PART NAME','Part Name','Description'])||'').trim();
+  const partNumber=String(getImportValue(row,['OEM P/N','OEM PN','OEM_PN','Part Number','P/N'])||'').trim();
+  const statusVal=getImportValue(row,['Status','STATUS']);const jobType=normalizeImportStatus(statusVal);
+  const date=normalizeImportDate(getImportValue(row,['Date Completed','DATE COMPLETED','Completed Date']));
+  if(!taskCode)return[];
+  if(!date){addImportResult({row:rowNum,date:'—',employee:'—',role:'—',taskCode,partNumber,hours:'—',status:'Error: Date Completed is missing/invalid',type:'error'});return[];}
+  if(jobType==='under_supervision_skip'||jobType==='unsupported')return[]; // ignored totally: no preview row
+  const part=findPartByNumber(partNumber);if(!part){addImportMissingPart(partNumber,partName,rowNum,taskCode,row,rowIndex,date);return[];}
+  const roleFields=[{role:'Technician',keys:['TECH_ID','TECH ID','Tech ID','Technician ID']},{role:'Inspector',keys:['Released By','RELEASED BY','ReleasedBy']},{role:'Preliminary Inspector',keys:['INSP_ID','INSP ID','Inspector ID','Preliminary ID']}];
+  const out=[];
+  for(const rf of roleFields){let ids=splitImportIds(getImportValue(row,rf.keys));ids=chooseImportIds(ids,rf.role,taskCode);if(ids===null)return'CANCEL_IMPORT';for(const id of ids){const tech=resolveImportEmployee(id,rf.role,rowNum,taskCode,part.num,row,rowIndex,date);if(tech==='CANCEL_IMPORT')return'CANCEL_IMPORT';if(!tech||tech==='ADD_REQUIRED')continue;const hrs=calcPoolHrs(part,rf.role,taskCode);out.push({techId:tech.id,techName:tech.name,pname:part.name,pnum:part.num,taskCode,jobRole:rf.role,jobType,time:date,hours:hrs,stdHours:part.hours,isInspector:rf.role==='Inspector'||rf.role==='Preliminary Inspector',ata:part.ata||'',desc:part.name,scrapHrs:jobType==='scrap'&&rf.role==='Inspector'?(settings.scrapDefaultHrs||2):null,approvalStatus:'pending',submittedBy:CU?.name||'Import User',submittedByRole:CR||'import',imported:true,importedSource:'ComponentTATStatus',importedAt:new Date().toISOString(),_preview:{row:rowNum,date,employee:`${tech.name} (${tech.id})`,role:rf.role,taskCode,partNumber:part.num,hours:hrs}});}}
+  return out;
+}
+async function saveImportEntries(built,rowIndexForErr=0){let saved=0,errors=0;if(!built||!built.length)return{saved,errors};for(const entry of built){try{const prev=entry._preview||{};delete entry._preview;if(isDuplicateEntry(entry)){continue;}const ref=await window.addDoc(window.collection(window.db,'entries'),entry);entry.id=ref.id;entries.unshift(entry);saved++;addImportResult({...prev,status:'Saved as pending',type:'success'});}catch(err){errors++;addImportResult({row:rowIndexForErr+2,date:entry.time||'—',employee:entry.techId||'—',role:entry.jobRole||'—',taskCode:entry.taskCode||'—',partNumber:entry.pnum||'—',hours:'—',status:'Save error: '+(err.message||err),type:'error'});}}return{saved,errors};}
+async function retryProductionImportRow(key){const p=productionImportPendingRows[key];if(!p){toast('Retry data not found','error');return;}productionImportResults=productionImportResults.filter(r=>r.key!==key);const built=buildImportEntriesForRow(p.row,p.rowIndex);if(built==='CANCEL_IMPORT'){toast('Retry cancelled','warn');renderProductionImportPreview();return;}const res=await saveImportEntries(built,p.rowIndex);if(res.saved>0)delete productionImportPendingRows[key];renderProductionImportPreview();if(typeof renderAllEntries==='function')renderAllEntries();if(typeof renderTG==='function')renderTG();if(typeof renderReports==='function')renderReports();if(typeof renderLB==='function')renderLB();toast(`Try import complete: ${res.saved} saved, ${res.errors} errors`);}
+function renderProductionImportPreview(results=productionImportResults){const body=document.getElementById('prod-import-body');if(!body)return;body.dataset.hasImport='1';if(!results.length){body.innerHTML='<tr><td colspan="8" class="empty">No import results</td></tr>';return;}const cls=t=>t==='success'?'bgr':t==='error'?'bred':t==='duplicate'?'bgray':t==='info'?'bblu':'bamb';body.innerHTML=results.map(r=>{let action='';if(r.action==='part')action=` <button class="btn bp bsm" onclick="openImportAddPart('${importSafe(r.partNumber)}','${importSafe(r.partName)}')">+ Add Part</button> <button class="btn bg_ bsm" onclick="retryProductionImportRow('${r.key}')">↻ Try Import</button>`;if(r.action==='tech')action=` <button class="btn bp bsm" onclick="openImportAddEmployee('${importSafe(r.employeeId)}','${importSafe(r.employeeRole)}')">+ Add Employee</button> <button class="btn bg_ bsm" onclick="retryProductionImportRow('${r.key}')">↻ Try Import</button>`;return`<tr><td class="mono">${sanitize(String(r.row??''))}</td><td class="mono">${sanitize(String(r.date??'—'))}</td><td>${sanitize(String(r.employee??'—'))}</td><td>${sanitize(String(r.role??'—'))}</td><td class="mono" style="color:var(--blue);">${sanitize(String(r.taskCode??'—'))}</td><td class="mono" style="color:var(--amber);">${sanitize(String(r.partNumber??'—'))}</td><td class="mono">${r.hours!==undefined&&r.hours!=='—'?sanitizeNum(r.hours).toFixed(2)+'h':'—'}</td><td><span class="bdg ${cls(r.type)}">${sanitize(String(r.status??''))}</span>${action}</td></tr>`;}).join('');}
+function clearProductionImportPreview(){productionImportResults=[];productionImportPendingRows={};const body=document.getElementById('prod-import-body');if(body){delete body.dataset.hasImport;body.innerHTML='<tr><td colspan="8" class="empty">No import yet</td></tr>';}}
+function renderProductionImportPage(){const body=document.getElementById('prod-import-body');if(body&&!body.dataset.hasImport)body.innerHTML='<tr><td colspan="8" class="empty">No import yet</td></tr>';}
+async function handleProductionImport(input){const file=input?.files?.[0];if(!file)return;productionImportResults=[];productionImportPendingRows={};let saved=0,skipped=0,errors=0;showLoading('Importing Excel data...');try{const buf=await file.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});for(let i=0;i<rows.length;i++){const row=rows[i];if(isFooterImportRow(row))continue;const built=buildImportEntriesForRow(row,i);if(built==='CANCEL_IMPORT'){break;}if(!built||!built.length){skipped++;continue;}const res=await saveImportEntries(built,i);saved+=res.saved;errors+=res.errors;}}catch(err){errors++;addImportResult({row:'—',date:'—',employee:'—',role:'—',taskCode:'—',partNumber:'—',hours:'—',status:'Import failed: '+(err.message||err),type:'error'});}finally{hideLoading();renderProductionImportPreview();if(typeof renderAllEntries==='function')renderAllEntries();if(typeof renderTG==='function')renderTG();if(typeof renderReports==='function')renderReports();if(typeof renderLB==='function')renderLB();toast(`Production import complete: ${saved} saved, ${skipped} ignored, ${errors} errors`);if(input)input.value='';}}
+window.handleProductionImport=handleProductionImport;window.renderProductionImportPage=renderProductionImportPage;window.renderProductionImportPreview=renderProductionImportPreview;window.clearProductionImportPreview=clearProductionImportPreview;window.openImportAddPart=openImportAddPart;window.openImportAddEmployee=openImportAddEmployee;window.retryProductionImportRow=retryProductionImportRow;
+
 function dlFile(c,fn,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=fn;a.click();URL.revokeObjectURL(a.href);}
-window.exportMine=function(){let csv='Date(EAT),TaskCode,Role,Type,Part,ATA,PartNum,Hrs(÷peers),Status\n';entries.filter(e=>e.techId===CU.id&&isApprovedEntry(e)).forEach(e=>{const d=getDividedHours(e,entries);csv+=`"${fmtEAT(e.time,'date')}","${e.taskCode||''}","${e.jobRole||''}","${e.jobType||'completed'}","${e.pname}","${e.ata||''}","${e.pnum}",${d.toFixed(3)},"${getEntryStatus(e)}"\n`;});dlFile(csv,'my_production_'+todayEAT()+'.csv','text/csv');toast('Exported');};
+window.exportMine=function(){
+  const range=getMyStatsRange();
+  const statusFilter=(document.getElementById('ms-status-filter')?.value||'all').toLowerCase();
+  let csv='Date(EAT),TaskCode,Role,Type,Part,ATA,PartNum,Hrs(÷peers),Status\n';
+  entries
+    .filter(e=>e.techId===CU.id&&dateInRange(e.time,range.start,range.end)&&(statusFilter==='all'||getEntryStatus(e)===statusFilter))
+    .forEach(e=>{const d=getDividedHours(e,entries);csv+=`"${fmtEAT(e.time,'date')}","${e.taskCode||''}","${e.jobRole||''}","${e.jobType||'completed'}","${e.pname}","${e.ata||''}","${e.pnum}",${d.toFixed(3)},"${getEntryStatus(e)}"\n`;});
+  dlFile(csv,'my_production_'+todayEAT()+'.csv','text/csv');toast('Exported');
+};
 window.exportAllEntries=function(){let csv='Date(EAT),Tech,TechID,TaskCode,Role,Type,Part,ATA,PartNum,Hrs(÷peers),HoursType\n';entries.forEach(e=>{const d=getDividedHours(e,entries),ht=isSDT(e)?'SDT':'NOT_SDT';csv+=`"${fmtEAT(e.time,'date')}","${e.techName}","${e.techId}","${e.taskCode||''}","${e.jobRole||''}","${e.jobType||'completed'}","${e.pname}","${e.ata||''}","${e.pnum}",${d.toFixed(3)},${ht}\n`;});dlFile(csv,'all_entries_'+todayEAT()+'.csv','text/csv');toast('Exported');};
 
 // ════════════════════════════════════════════════
@@ -3364,9 +3531,9 @@ window.clearLeEntry=clearLeEntry;
 // ════════════════════════════════════════════════
 const NAV={
   tech:['entry','mystats','taskgroups'],
-  lead:['dashboard','controllerentry','assignments','allentries','reports','ratios','taskgroups'],
+  lead:['dashboard','controllerentry','productionimport','assignments','allentries','reports','ratios','taskgroups'],
   ctrl:['controllerentry','allentries','taskgroups'],
-  dev:['techs','parts','leaders','controllers','pwmgmt','ratios','taskgroups','system']
+  dev:['techs','parts','leaders','controllers','productionimport','pwmgmt','ratios','taskgroups','system']
 };
 const META={
   entry:{t:'Production Entry',d:'Log completed or scrap work'},
@@ -3382,10 +3549,11 @@ const META={
   parts:{t:'Parts & Inventory',d:''},
   leaders:{t:'Team Leaders',d:''},
   controllers:{t:'Production Controllers',d:''},
+  productionimport:{t:'Import Production Entries',d:'Import ComponentTATStatus Excel entries'},
   pwmgmt:{t:'Password Management',d:'Reset user passwords'},
   system:{t:'System Settings',d:''}
 };
-const ICONS={entry:'⊕',mystats:'📊',dashboard:'🖥',assignments:'📌',allentries:'📋',controllerentry:'⊕',reports:'📈',ratios:'⚖️',taskgroups:'🗂',techs:'👷',parts:'🔩',leaders:'👥',controllers:'🏭',pwmgmt:'🔐',system:'⚙️'};
+const ICONS={entry:'⊕',mystats:'📊',dashboard:'🖥',assignments:'📌',allentries:'📋',controllerentry:'⊕',reports:'📈',ratios:'⚖️',taskgroups:'🗂',techs:'👷',parts:'🔩',leaders:'👥',controllers:'🏭',productionimport:'⬆️',pwmgmt:'🔐',system:'⚙️'};
 
 function buildNav(){
   const nav=document.getElementById('sbnav');if(!nav)return;
@@ -3409,6 +3577,7 @@ window.navTo=function(page){
   if(page==='parts')renderParts();
   if(page==='leaders')renderLeaders();
   if(page==='controllers')renderControllers();
+  if(page==='productionimport')renderProductionImportPage();
   if(page==='controllerentry'){populateLeaderEntryTechs();renderLeaderEntry();}
   if(page==='pwmgmt')renderPwMgmt();
   if(page==='system')renderSystem();
