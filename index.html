@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="description" content="ProTrack MRO Production KPI System">
 <meta name="theme-color" content="#070c18">
-<title>ProTrack v1.3.1</title>
+<title>ProTrack v1.3.2</title>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -394,12 +394,16 @@ tbody tr:hover td{background:var(--card2);}
 .part-search-wrap .finput{padding-right:34px;}
 .part-search-clear{position:absolute;right:10px;top:10px;background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;line-height:1;padding:0;display:none;}
 .part-search-clear:hover{color:var(--rose);}
-.part-search-list{display:none;margin-top:6px;max-height:240px;overflow-y:auto;background:var(--card);border:1px solid var(--bdr);border-radius:9px;box-shadow:0 10px 26px var(--shadow);position:relative;z-index:5;}
-.part-search-item{width:100%;display:block;text-align:left;background:none;border:none;border-bottom:1px solid var(--bdr);padding:10px 12px;cursor:pointer;color:var(--tx);font-family:inherit;transition:background .12s;}
+.part-search-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);max-height:280px;overflow-y:auto;background:var(--card);border:1px solid var(--bdr);border-radius:12px;box-shadow:0 16px 34px var(--shadow);z-index:35;}
+.part-search-item{width:100%;display:flex;flex-direction:column;align-items:stretch;text-align:left;background:none;border:none;border-bottom:1px solid var(--bdr);padding:12px 13px;cursor:pointer;color:var(--tx);font-family:inherit;transition:background .12s,border-color .12s;}
 .part-search-item:last-child{border-bottom:none;}
-.part-search-item:hover{background:var(--bdim);}
-.part-search-num{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;color:var(--amber);}
-.part-search-meta{font-size:11px;color:var(--tx2);margin-top:2px;line-height:1.35;}
+.part-search-item:hover,.part-search-item.active{background:var(--bdim);}
+.part-search-item:focus{outline:none;background:var(--bdim);}
+.part-search-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.part-search-num{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;color:var(--amber);}
+.part-search-badge{font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--blue);background:var(--bdim);padding:2px 7px;border-radius:99px;white-space:nowrap;}
+.part-search-meta{font-size:12px;color:var(--tx);margin-top:3px;line-height:1.35;font-weight:600;}
+.part-search-ata{font-size:10.5px;color:var(--tx2);margin-top:2px;font-family:'JetBrains Mono',monospace;}
 .part-search-sel{display:none!important;}
 .part-search-hint{font-size:10.5px;color:var(--tx3);margin-top:4px;}
 
@@ -562,7 +566,7 @@ tbody tr:hover td{background:var(--card2);}
                         <div class="part-search-list" id="e-part-list"></div>
                       </div>
                       <select class="fselect part-search-sel" id="e-part-sel" onchange="onPartSel()"><option value="">— Choose Part —</option></select>
-                      <div class="part-search-hint">Search first, then choose a part from the list.</div>
+                      <div class="part-search-hint">Search and click a result to confirm the part.</div>
                     </div>
                     <div class="fgroup"><label class="flabel">Description</label><input class="finput" id="e-desc" readonly></div>
                     <div class="fgroup"><label class="flabel">ATA Chapter</label><input class="finput" id="e-ata" readonly></div>
@@ -1056,7 +1060,7 @@ tbody tr:hover td{background:var(--card2);}
                         <div class="part-search-list" id="le-part-list"></div>
                       </div>
                       <select class="fselect part-search-sel" id="le-part-sel" onchange="onLePartSel()"><option value="">— Choose Part —</option></select>
-                      <div class="part-search-hint">Search first, then choose a part from the list.</div>
+                      <div class="part-search-hint">Search and click a result to confirm the part.</div>
                     </div>
                     <div class="fgroup"><label class="flabel">Description</label><input class="finput" id="le-desc" readonly></div>
                     <div class="fgroup"><label class="flabel">ATA Chapter</label><input class="finput" id="le-ata" readonly></div>
@@ -1307,7 +1311,7 @@ tbody tr:hover td{background:var(--card2);}
 // ════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ════════════════════════════════════════════════
-const APP_VERSION = '1.3.1';
+const APP_VERSION = '1.3.2';
 const DEV_RECOVERY_CODE = 'PROTRACK-DEV-2025-RESET';
 const EAT_TZ='Africa/Addis_Ababa';
 const ROLES=['Technician','Under Supervision','Inspector','Preliminary Inspector'];
@@ -2074,7 +2078,7 @@ function setPartPickerDisplay(prefix, part){
   const input=document.getElementById(`${prefix}-part-search`);
   const list=document.getElementById(`${prefix}-part-list`);
   const clearBtn=document.getElementById(`${prefix}-part-clear`);
-  if(input)input.value=part?`${part.num} — ${part.name}`:'';
+  if(input)input.value=part?`${part.num || part.id || ''} — ${part.name || ''}`:'';
   if(list){list.innerHTML='';list.style.display='none';}
   if(clearBtn)clearBtn.style.display=part?'block':'none';
 }
@@ -2097,18 +2101,20 @@ function filterPartSearch(prefix){
   if(!list)return;
   if(!q){list.style.display='none';list.innerHTML='';return;}
   const matches=parts.filter(p=>partMatchText(p).includes(q)).slice(0,24);
-  list.innerHTML=matches.length?matches.map(p=>`
-    <button type="button" class="part-search-item" data-id="${escapeHtml(p.id)}" onclick="selectPartFromSearch('${prefix}', this.dataset.id)">
-      <div class="part-search-num">${escapeHtml(p.num||'—')} · ${escapeHtml(p.hours ?? '—')}h</div>
-      <div class="part-search-meta">${escapeHtml(p.name||'—')}<br>${escapeHtml(p.ata||'—')}</div>
+  const activeId=selectedPartsByPrefix[prefix]?.id ? String(selectedPartsByPrefix[prefix].id) : '';
+  list.innerHTML=matches.length?matches.map(p=>{
+    const id=String(p.id);
+    return `
+    <button type="button" class="part-search-item${id===activeId?' active':''}" data-id="${escapeHtml(p.id)}" onclick="selectPartFromSearch('${prefix}', this.dataset.id)">
+      <div class="part-search-top">
+        <div class="part-search-num">${escapeHtml(p.num||'—')}</div>
+        <div class="part-search-badge">${escapeHtml((p.hours ?? '—'))} Hrs</div>
+      </div>
+      <div class="part-search-meta">${escapeHtml(p.name||'—')}</div>
+      <div class="part-search-ata">ATA ${escapeHtml(p.ata||'—')}</div>
     </button>
-  `).join(''):'<div style="padding:10px 12px;font-size:12px;color:var(--tx3);">No matching parts</div>';
+  `;}).join(''):'<div style="padding:12px 13px;font-size:12px;color:var(--tx3);">No matching parts</div>';
   list.style.display='block';
-
-  const chosen=resolvePartSelection(prefix,q);
-  if(chosen){
-    applyPartSelection(prefix, chosen);
-  }
 }
 function selectPartFromSearch(prefix, partId){
   const part=findPartById(partId);
@@ -2116,6 +2122,7 @@ function selectPartFromSearch(prefix, partId){
   applyPartSelection(prefix, part);
   if(prefix==='e') refreshAllocHrs();
   else if(prefix==='le') refreshLeAllocHrs();
+  toast(`Selected: ${part.num || part.id} — ${part.name || 'Part'}`,'success');
 }
 function clearPartSearch(prefix){
   const input=document.getElementById(`${prefix}-part-search`);
@@ -2137,15 +2144,11 @@ document.addEventListener('click',function(e){
   }
 });
 document.addEventListener('keydown',function(e){
-  if(e.key!=='Enter') return;
   const active=document.activeElement;
   if(!active || !active.id || !active.id.includes('-part-search')) return;
-  const prefix=active.id.startsWith('le-')?'le':'e';
-  const part=bestPartFromQuery(active.value);
-  if(part){
+  if(e.key==='Enter'){
     e.preventDefault();
-    applyPartSelection(prefix, part);
-    if(prefix==='e') onPartSel(); else onLePartSel();
+    return;
   }
 });
 
@@ -2795,8 +2798,7 @@ async function bulkApplyToFiltered(mode){
   if(!filtered.length){toast('No filtered entries to update','warn');return;}
   const label=mode==='accepted'?'accept':mode==='rejected'?'reject':'delete';
   if(!confirm(`Are you sure you want to ${label} ${filtered.length} filtered entr${filtered.length===1?'y':'ies'}?`))return;
-  const loadingText=mode==='accepted'?'Accepting':mode==='rejected'?'Rejecting':'Deleting';
-  showLoading(`${loadingText} ${filtered.length} filtered entr${filtered.length===1?'y':'ies'}...`);
+  showLoading(`${label.charAt(0).toUpperCase()+label.slice(1)}ing ${filtered.length} filtered entr${filtered.length===1?'y':'ies'}...`);
   let done=0, failed=0;
   try{
     for(const e of filtered){
@@ -3319,7 +3321,7 @@ async function retryProductionImportRow(key){const p=productionImportPendingRows
 function renderProductionImportPreview(results=productionImportResults){const body=document.getElementById('prod-import-body');if(!body)return;body.dataset.hasImport='1';if(!results.length){body.innerHTML='<tr><td colspan="8" class="empty">No import results</td></tr>';return;}const cls=t=>t==='success'?'bgr':t==='error'?'bred':t==='duplicate'?'bgray':t==='info'?'bblu':'bamb';body.innerHTML=results.map(r=>{let action='';if(r.action==='part')action=` <button class="btn bp bsm" onclick="openImportAddPart('${importSafe(r.partNumber)}','${importSafe(r.partName)}')">+ Add Part</button> <button class="btn bg_ bsm" onclick="retryProductionImportRow('${r.key}')">↻ Try Import</button>`;if(r.action==='tech')action=` <button class="btn bp bsm" onclick="openImportAddEmployee('${importSafe(r.employeeId)}','${importSafe(r.employeeRole)}')">+ Add Employee</button> <button class="btn bg_ bsm" onclick="retryProductionImportRow('${r.key}')">↻ Try Import</button>`;return`<tr><td class="mono">${sanitize(String(r.row??''))}</td><td class="mono">${sanitize(String(r.date??'—'))}</td><td>${sanitize(String(r.employee??'—'))}</td><td>${sanitize(String(r.role??'—'))}</td><td class="mono" style="color:var(--blue);">${sanitize(String(r.taskCode??'—'))}</td><td class="mono" style="color:var(--amber);">${sanitize(String(r.partNumber??'—'))}</td><td class="mono">${r.hours!==undefined&&r.hours!=='—'?sanitizeNum(r.hours).toFixed(2)+'h':'—'}</td><td><span class="bdg ${cls(r.type)}">${sanitize(String(r.status??''))}</span>${action}</td></tr>`;}).join('');}
 function clearProductionImportPreview(){productionImportResults=[];productionImportPendingRows={};const body=document.getElementById('prod-import-body');if(body){delete body.dataset.hasImport;body.innerHTML='<tr><td colspan="8" class="empty">No import yet</td></tr>';}}
 function renderProductionImportPage(){const body=document.getElementById('prod-import-body');if(body&&!body.dataset.hasImport)body.innerHTML='<tr><td colspan="8" class="empty">No import yet</td></tr>';}
-async function handleProductionImport(input){const file=input?.files?.[0];if(!file)return;productionImportResults=[];productionImportPendingRows={};let saved=0,skipped=0,errors=0;showLoading('Importing Excel data...');try{const buf=await file.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});for(let i=0;i<rows.length;i++){const row=rows[i];if(isFooterImportRow(row))continue;const built=buildImportEntriesForRow(row,i);if(built==='CANCEL_IMPORT'){break;}if(!built||!built.length){skipped++;continue;}const res=await saveImportEntries(built,i);saved+=res.saved;errors+=res.errors;}}catch(err){errors++;addImportResult({row:'—',date:'—',employee:'—',role:'—',taskCode:'—',partNumber:'—',hours:'—',status:'Import failed: '+(err.message||err),type:'error'});}finally{hideLoading();renderProductionImportPreview();if(typeof renderAllEntries==='function')renderAllEntries();if(typeof renderTG==='function')renderTG();if(typeof renderReports==='function')renderReports();if(typeof renderLB==='function')renderLB();toast(`Production import complete: ${saved} saved, ${skipped} ignored, ${errors} errors`);if(input)input.value='';}}
+async function handleProductionImport(input){const file=input?.files?.[0];if(!file)return;productionImportResults=[];productionImportPendingRows={};let saved=0,skipped=0,errors=0;showLoading('Importing production Excel...');try{const buf=await file.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});for(let i=0;i<rows.length;i++){const row=rows[i];if(isFooterImportRow(row))continue;const built=buildImportEntriesForRow(row,i);if(built==='CANCEL_IMPORT'){break;}if(!built||!built.length){skipped++;continue;}const res=await saveImportEntries(built,i);saved+=res.saved;errors+=res.errors;}}catch(err){errors++;addImportResult({row:'—',date:'—',employee:'—',role:'—',taskCode:'—',partNumber:'—',hours:'—',status:'Import failed: '+(err.message||err),type:'error'});}finally{renderProductionImportPreview();if(typeof renderAllEntries==='function')renderAllEntries();if(typeof renderTG==='function')renderTG();if(typeof renderReports==='function')renderReports();if(typeof renderLB==='function')renderLB();toast(`Production import complete: ${saved} saved, ${skipped} ignored, ${errors} errors`);if(input)input.value='';hideLoading();}}
 window.handleProductionImport=handleProductionImport;window.renderProductionImportPage=renderProductionImportPage;window.renderProductionImportPreview=renderProductionImportPreview;window.clearProductionImportPreview=clearProductionImportPreview;window.openImportAddPart=openImportAddPart;window.openImportAddEmployee=openImportAddEmployee;window.retryProductionImportRow=retryProductionImportRow;
 
 function dlFile(c,fn,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=fn;a.click();URL.revokeObjectURL(a.href);}
