@@ -1,13 +1,4 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="description" content="ProTrack MRO Production KPI System">
-<meta name="theme-color" content="#070c18">
-<title>ProTrack v1.3.4</title>
 
-<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, addDoc, getDocs, doc, setDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -28,1290 +19,16 @@
   window.deleteDoc=deleteDoc;window.query=query;window.where=where;
   window.serverTimestamp=serverTimestamp;
   signInAnonymously(auth).catch(e=>console.error("Auth:",e));
-</script>
 
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<style>
-/* ═══════════════════════════════════════
-   CSS VARIABLES — DARK + LIGHT THEMES
-═══════════════════════════════════════ */
-:root,[data-theme="dark"]{
-  --bg:#070c18;--sf:#0c1220;--card:#111827;--card2:#162035;
-  --bdr:#1e2d47;--bdr2:#263a57;
-  --inp-bg:#0c1220;--inp-bdr:#1e2d47;
-  --tx:#e2e8f0;--tx2:#94a3b8;--tx3:#475569;--tx4:#253a57;
-  --blue:#3b82f6;--bdim:rgba(59,130,246,.13);--bdark:#1d4ed8;
-  --green:#10b981;--gdim:rgba(16,185,129,.13);
-  --amber:#f59e0b;--adim:rgba(245,158,11,.13);
-  --rose:#f43f5e;--rdim:rgba(244,63,94,.13);
-  --violet:#8b5cf6;--vdim:rgba(139,92,246,.13);
-  --cyan:#06b6d4;--cdim:rgba(6,182,212,.13);
-  --shadow:rgba(0,0,0,.5);
-  --theme-icon:"🌙";
-}
-[data-theme="light"]{
-  --bg:#f0f4f8;--sf:#ffffff;--card:#ffffff;--card2:#f8fafc;
-  --bdr:#e2e8f0;--bdr2:#cbd5e1;
-  --inp-bg:#f8fafc;--inp-bdr:#cbd5e1;
-  --tx:#0f172a;--tx2:#475569;--tx3:#94a3b8;--tx4:#cbd5e1;
-  --bdim:rgba(59,130,246,.09);--gdim:rgba(16,185,129,.09);
-  --adim:rgba(245,158,11,.09);--rdim:rgba(244,63,94,.09);
-  --vdim:rgba(139,92,246,.09);--cdim:rgba(6,182,212,.09);
-  --shadow:rgba(0,0,0,.12);
-  --theme-icon:"☀️";
-}
 
-/* ═══════════ BASE ═══════════ */
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{font-size:16px;scroll-behavior:smooth;}
-body{min-height:100vh;background:var(--bg);color:var(--tx);font-family:'Plus Jakarta Sans',sans-serif;overflow-x:hidden;transition:background .25s,color .25s;}
-::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:4px;}
-input,select,button,textarea{font-family:inherit;}
 
-/* ═══════════ SCREENS ═══════════ */
-.scr{display:none;min-height:100vh;}
-.scr.on{display:flex;}
 
-/* ═══════════ LOADING OVERLAY ═══════════ */
-#loading-overlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .3s;}
-#loading-overlay.hide{opacity:0;pointer-events:none;}
-.spin{width:44px;height:44px;border:3px solid var(--bdr);border-top-color:var(--blue);border-radius:50%;animation:spin .75s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.loading-txt{font-size:14px;color:var(--tx2);font-weight:500;}
-
-/* ═══════════ LOGIN ═══════════ */
-#login{flex-direction:column;align-items:center;justify-content:center;padding:20px;
-  background:radial-gradient(ellipse 70% 50% at 50% -5%,var(--bdim) 0%,transparent 60%),var(--bg);}
-.lw{width:100%;max-width:400px;}
-.lb_{display:flex;align-items:center;gap:10px;margin-bottom:28px;justify-content:center;}
-.lmk{width:38px;height:38px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
-.lnm{font-size:20px;font-weight:800;letter-spacing:-.3px;}
-.lnm em{font-style:normal;color:var(--blue);}
-.lcard{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:28px;position:relative;box-shadow:0 8px 32px var(--shadow);}
-.lcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);border-radius:14px 14px 0 0;}
-.lh{font-size:20px;font-weight:700;margin-bottom:3px;}
-.ls{color:var(--tx2);font-size:13px;margin-bottom:22px;}
-.fl{display:block;font-size:11px;font-weight:700;color:var(--tx2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;}
-.fi{width:100%;padding:11px 13px;background:var(--inp-bg);border:1px solid var(--inp-bdr);border-radius:8px;color:var(--tx);font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:14px;}
-.fi:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--bdim);}
-.rg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
-.ro{border:1px solid var(--bdr);border-radius:9px;padding:11px 8px;cursor:pointer;text-align:center;transition:all .15s;background:var(--inp-bg);user-select:none;}
-.ro:hover{border-color:var(--bdr2);background:var(--card2);}
-.ro.sel{border-color:var(--blue);background:var(--bdim);}
-.ro .ri{font-size:20px;display:block;margin-bottom:5px;}
-.ro .rl{font-size:10.5px;font-weight:700;color:var(--tx2);letter-spacing:.4px;}
-.ro.sel .rl{color:var(--blue);}
-.lbtn{width:100%;padding:13px;background:var(--blue);border:none;border-radius:9px;color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;transition:background .15s,transform .1s;position:relative;overflow:hidden;}
-.lbtn:hover{background:var(--bdark);}
-.lbtn:active{transform:scale(.99);}
-.lbtn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
-.lbtn-spinner{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin-right:8px;}
-.lbtn.loading .lbtn-spinner{display:inline-block;}
-.ql{margin-top:12px;text-align:center;font-size:12px;color:var(--tx3);}
-.ql a{color:var(--blue);cursor:pointer;text-decoration:none;}
-.ql a:hover{text-decoration:underline;}
-.ver-badge{margin-top:12px;text-align:center;}
-.ver-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:var(--gdim);border:1px solid rgba(16,185,129,.2);border-radius:99px;font-size:11px;font-weight:600;color:var(--green);cursor:pointer;}
-.ver-history{background:var(--card2);border:1px solid var(--bdr);border-radius:10px;padding:14px 16px;margin-top:8px;display:none;}
-.ver-history.open{display:block;}
-.ver-item{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--bdr);font-size:12px;}
-.ver-item:last-child{border-bottom:none;}
-.ver-tag{font-family:'JetBrains Mono',monospace;color:var(--blue);font-weight:700;flex-shrink:0;}
-.ver-note{color:var(--tx2);}
-.lcredit{margin-top:14px;text-align:center;font-size:11px;color:var(--tx3);}
-.forgot-link{display:block;text-align:right;font-size:12px;color:var(--blue);cursor:pointer;margin-top:-8px;margin-bottom:12px;}
-.forgot-link:hover{text-decoration:underline;}
-.login-attempts{font-size:12px;color:var(--rose);text-align:center;margin-top:6px;display:none;}
-
-/* ═══════════ THEME TOGGLE ═══════════ */
-.theme-btn{position:fixed;top:14px;right:14px;z-index:100;background:var(--card);border:1px solid var(--bdr);border-radius:50%;width:38px;height:38px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s;box-shadow:0 2px 8px var(--shadow);}
-.theme-btn:hover{border-color:var(--bdr2);transform:scale(1.05);}
-
-
-/* ═══════════ APP SHELL ═══════════ */
-#app{flex-direction:column;}
-.mob-topbar{display:none;height:54px;background:var(--sf);border-bottom:1px solid var(--bdr);align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:60;flex-shrink:0;}
-.mob-brand{display:flex;align-items:center;gap:8px;}
-.mob-brand .lmk{width:30px;height:30px;font-size:10px;}
-.mob-brand .lnm{font-size:14px;}
-.hamburger{background:none;border:none;color:var(--tx2);cursor:pointer;font-size:20px;padding:5px;border-radius:7px;transition:color .15s;}
-.hamburger:hover{color:var(--tx);}
-.app-body{display:flex;flex:1;}
-.sb{width:240px;flex-shrink:0;background:var(--sf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto;transition:transform .25s;}
-.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:55;backdrop-filter:blur(2px);}
-.sb-overlay.on{display:block;}
-@media(max-width:768px){
-  #app{flex-direction:column;}
-  .mob-topbar{display:flex;}
-  .app-body{flex-direction:column;}
-  .sb{position:fixed;top:0;left:0;height:100vh;z-index:58;transform:translateX(-100%);width:260px;}
-  .sb.open{transform:translateX(0);}
-  .main{min-height:calc(100vh - 54px);}
-  .hdr{display:none;}
-  .pc{padding:14px 12px;}
-  .k4{grid-template-columns:repeat(2,1fr)!important;}
-  .k3{grid-template-columns:repeat(2,1fr)!important;}
-  .k2{grid-template-columns:1fr 1fr!important;}
-  .f2{grid-template-columns:1fr!important;}
-  .f3{grid-template-columns:1fr!important;}
-  .tc-body{grid-template-columns:1fr 1fr!important;}
-  .achiev-chart{flex-wrap:wrap;}
-  .tbr{flex-wrap:wrap;}
-  .tbr .sbx input{width:100%!important;}
-  table{font-size:12px;}
-  th,td{padding:7px 9px!important;}
-}
-.sb-top{padding:16px 14px 12px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:9px;}
-.sb-top .lmk{width:29px;height:29px;font-size:10px;}
-.sb-top .lnm{font-size:14px;}
-.sb-sec{padding:12px 13px 3px;font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--tx3);text-transform:uppercase;}
-.nl{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:7px;cursor:pointer;color:var(--tx2);font-size:13px;font-weight:500;transition:all .12s;margin:1px 4px;user-select:none;}
-.nl:hover{background:var(--card2);color:var(--tx);}
-.nl.on{background:var(--bdim);color:var(--blue);font-weight:600;}
-.nl .ni{width:17px;text-align:center;font-size:14px;flex-shrink:0;}
-.sb-ft{margin-top:auto;padding:12px;}
-.sb-user{background:var(--card2);border:1px solid var(--bdr);border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;}
-.u-av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;flex-shrink:0;overflow:hidden;}
-.u-av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.un{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ur{font-size:10px;color:var(--tx3);font-family:'JetBrains Mono',monospace;}
-.lob{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;padding:4px;border-radius:4px;transition:color .15s;}
-.lob:hover{color:var(--rose);}
-.sb-cred{padding:6px 11px 2px;font-size:10px;color:var(--tx3);text-align:center;}
-
-.main{flex:1;display:flex;flex-direction:column;min-height:100vh;overflow-y:auto;}
-.hdr{height:58px;border-bottom:1px solid var(--bdr);background:var(--sf);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:40;flex-shrink:0;}
-.hdr-l h1{font-size:16px;font-weight:700;}
-.hdr-l p{font-size:11.5px;color:var(--tx2);margin-top:1px;}
-.hdr-r{display:flex;align-items:center;gap:8px;}
-.live{display:flex;align-items:center;gap:5px;padding:4px 10px;background:var(--gdim);border:1px solid rgba(16,185,129,.2);border-radius:99px;font-size:11px;font-weight:600;color:var(--green);}
-.ld{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
-.pc{flex:1;padding:20px 22px;}
-.pg{display:none;animation:fi .2s ease;}
-.pg.on{display:block;}
-@keyframes fi{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
-
-.card{background:var(--card);border:1px solid var(--bdr);border-radius:11px;overflow:hidden;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
-.ch{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-.ct{font-size:13.5px;font-weight:700;}
-.cb{padding:15px 16px;}
-
-.kg{display:grid;gap:12px;margin-bottom:16px;}
-.k4{grid-template-columns:repeat(4,1fr);}
-.k3{grid-template-columns:repeat(3,1fr);}
-.k2{grid-template-columns:repeat(2,1fr);}
-.kc{background:var(--card);border:1px solid var(--bdr);border-radius:11px;padding:14px 16px;position:relative;box-shadow:0 2px 6px rgba(0,0,0,.05);}
-.kac{position:absolute;top:0;left:0;width:3px;height:100%;border-radius:11px 0 0 11px;}
-.kl{font-size:10.5px;font-weight:700;color:var(--tx2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
-.kv{font-size:26px;font-weight:800;line-height:1;letter-spacing:-1px;}
-.ks{font-size:11px;color:var(--tx2);margin-top:5px;}
-.kpb{margin-top:6px;}
-.kpb-bg{height:3px;background:var(--bdr);border-radius:99px;overflow:hidden;}
-.kpb-f{height:100%;border-radius:99px;transition:width .5s;}
-.kpb-s{display:flex;justify-content:space-between;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--tx3);margin-top:2px;}
-
-.btn{padding:7px 14px;border-radius:8px;border:none;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;gap:6px;position:relative;}
-.btn:disabled{opacity:.55;cursor:not-allowed;}
-.bp{background:var(--blue);color:#fff;}.bp:hover:not(:disabled){background:var(--bdark);}
-.bo{background:transparent;color:var(--tx2);border:1px solid var(--bdr);}.bo:hover:not(:disabled){border-color:var(--bdr2);color:var(--tx);}
-.bd{background:transparent;color:var(--rose);border:1px solid rgba(244,63,94,.25);}.bd:hover:not(:disabled){background:var(--rdim);}
-.bg_{background:var(--green);color:#fff;}.bg_:hover:not(:disabled){background:#059669;}
-.bsm{padding:5px 11px;font-size:12px;}
-.btn-spinner{display:none;width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;}
-.btn.saving .btn-spinner{display:inline-block;}
-.btn.saving .btn-label{display:none;}
-
-.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-table{width:100%;border-collapse:collapse;}
-thead tr{border-bottom:1px solid var(--bdr);}
-th{padding:9px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.7px;color:var(--tx3);text-transform:uppercase;background:var(--card2);}
-td{padding:9px 12px;font-size:12.5px;border-bottom:1px solid var(--bdr);}
-td:last-child{border-bottom-color:transparent;}
-tr:last-child td{border-bottom:none;}
-tbody tr:hover td{background:var(--card2);}
-.mono{font-family:'JetBrains Mono',monospace;font-size:11px;}
-
-.bdg{display:inline-flex;align-items:center;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:600;}
-.bblu{background:var(--bdim);color:var(--blue);}
-.bgr{background:var(--gdim);color:var(--green);}
-.bamb{background:var(--adim);color:var(--amber);}
-.bred{background:var(--rdim);color:var(--rose);}
-.bvio{background:var(--vdim);color:var(--violet);}
-.bcyn{background:var(--cdim);color:var(--cyan);}
-.bgray{background:var(--bdr);color:var(--tx2);}
-
-.fg{display:grid;gap:12px;}
-.f2{grid-template-columns:1fr 1fr;}
-.f3{grid-template-columns:1fr 1fr 1fr;}
-.ff{grid-column:1/-1;}
-.fgroup{display:flex;flex-direction:column;gap:4px;}
-.flabel{font-size:11px;font-weight:700;color:var(--tx2);letter-spacing:.5px;text-transform:uppercase;}
-.finput,.fselect{padding:9px 11px;background:var(--inp-bg);border:1px solid var(--inp-bdr);border-radius:8px;color:var(--tx);font-family:inherit;font-size:13.5px;outline:none;transition:border-color .18s,box-shadow .18s;width:100%;}
-.finput:focus,.fselect:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--bdim);}
-[data-theme="light"] .finput[type="date"]::-webkit-calendar-picker-indicator,
-[data-theme="light"] .finput[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:none;opacity:.7;}
-[data-theme="dark"] .finput[type="date"]::-webkit-calendar-picker-indicator,
-[data-theme="dark"] .finput[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(1.5);opacity:.8;}
-.finput[readonly]{opacity:.55;cursor:default;}
-.finput[readonly]:focus{border-color:var(--inp-bdr);box-shadow:none;}
-
-.jrg{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:4px;}
-.jro{border:1px solid var(--bdr);border-radius:9px;padding:9px 7px;cursor:pointer;text-align:center;transition:all .14s;background:var(--inp-bg);user-select:none;}
-.jro:hover:not(.disabled){border-color:var(--bdr2);background:var(--card2);}
-.jro.sel0{border-color:var(--blue)!important;background:var(--bdim)!important;}
-.jro.sel1{border-color:var(--green)!important;background:var(--gdim)!important;}
-.jro.sel2{border-color:var(--violet)!important;background:var(--vdim)!important;}
-.jro.sel3{border-color:var(--cyan)!important;background:var(--cdim)!important;}
-.jro.disabled{opacity:.3;pointer-events:none;}
-.ji{font-size:17px;display:block;margin-bottom:4px;}
-.jl{font-size:9.5px;font-weight:700;color:var(--tx2);letter-spacing:.3px;}
-.jro.sel0 .jl{color:var(--blue);}
-.jro.sel1 .jl{color:var(--green);}
-.jro.sel2 .jl{color:var(--violet);}
-.jro.sel3 .jl{color:var(--cyan);}
-
-.cs-toggle{display:flex;border:1px solid var(--bdr);border-radius:9px;overflow:hidden;margin-top:4px;}
-.cs-opt{flex:1;padding:10px 8px;cursor:pointer;text-align:center;font-size:13px;font-weight:700;transition:all .15s;background:var(--inp-bg);color:var(--tx2);border:none;font-family:inherit;}
-.cs-opt.sel-comp{background:var(--gdim);color:var(--green);}
-.cs-opt.sel-scrap{background:var(--rdim);color:var(--rose);}
-
-.scrap-hrs-row{display:none;margin-top:10px;padding:12px 14px;background:var(--rdim);border:1px solid rgba(244,63,94,.2);border-radius:9px;}
-.scrap-hrs-row.show{display:block;}
-
-.review-field{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr);gap:12px;}
-.review-field:last-child{border-bottom:none;}
-.rf-label{font-size:12px;color:var(--tx2);font-weight:600;}
-.rf-val{font-size:13px;font-weight:700;text-align:right;}
-
-.szn{border:2px dashed var(--bdr2);border-radius:10px;padding:20px 14px;text-align:center;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;margin-bottom:12px;}
-.szn:hover{border-color:var(--blue);background:var(--bdim);}
-.szn-bm{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);animation:beam 1.8s linear infinite;display:none;}
-.szn.scanning .szn-bm{display:block;}
-@keyframes beam{from{top:0;}to{top:100%;}}
-
-.mbg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px);padding:0;}
-.mbg.open{display:flex;}
-@media(min-width:640px){.mbg{align-items:center;padding:20px;}}
-.modal{background:var(--card);border:1px solid var(--bdr);border-radius:14px 14px 0 0;width:100%;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;animation:slideUp .25s ease;}
-@media(min-width:640px){.modal{border-radius:14px;animation:fi .2s ease;}}
-.msm{max-width:460px;}.mmd{max-width:560px;}.mlg{max-width:740px;}
-@keyframes slideUp{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-.mhd{padding:16px 20px;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0;}
-.mttl{font-size:15px;font-weight:700;}
-.msub{font-size:12px;color:var(--tx2);margin-top:2px;}
-.mxb{background:none;border:1px solid var(--bdr);border-radius:7px;color:var(--tx2);width:30px;height:30px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .13s;}
-.mxb:hover{border-color:var(--rose);color:var(--rose);}
-.mbody{padding:18px 20px;overflow-y:auto;flex:1;}
-.mfoot{padding:12px 20px;border-top:1px solid var(--bdr);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0;}
-
-.toast{position:fixed;bottom:80px;right:14px;z-index:1000;padding:11px 15px;background:var(--card);border:1px solid var(--bdr);border-radius:10px;display:flex;align-items:center;gap:10px;min-width:240px;max-width:90vw;transform:translateX(120%);transition:transform .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 6px 28px var(--shadow);}
-@media(min-width:640px){.toast{bottom:22px;right:22px;}}
-.toast.on{transform:translateX(0);}
-.ti{font-size:17px;flex-shrink:0;}.tm{font-size:13px;font-weight:500;flex:1;}
-.tbar_{position:absolute;bottom:0;left:0;height:2px;border-radius:0 0 10px 10px;animation:tb 3.3s linear forwards;}
-@keyframes tb{from{width:100%;}to{width:0;}}
-.ts{background:var(--green);}.te{background:var(--rose);}.tw_{background:var(--amber);}
-
-.al{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border-radius:9px;margin-bottom:14px;font-size:12.5px;}
-.al-b{background:var(--bdim);border:1px solid rgba(59,130,246,.18);}
-.al-a{background:var(--adim);border:1px solid rgba(245,158,11,.18);}
-.al-g{background:var(--gdim);border:1px solid rgba(16,185,129,.18);}
-.al-ico{font-size:16px;flex-shrink:0;}
-
-.av-i{border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;flex-shrink:0;overflow:hidden;}
-.av-i img{width:100%;height:100%;object-fit:cover;}
-
-.lb-row{display:flex;align-items:center;gap:11px;padding:10px 15px;border-bottom:1px solid var(--bdr);cursor:pointer;transition:background .12s;}
-.lb-row:last-child{border-bottom:none;}
-.lb-row:hover{background:var(--card2);}
-.lb-rk{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx3);width:18px;text-align:center;}
-.lb-in{flex:1;min-width:0;}
-.lb-nm{font-size:13px;font-weight:600;}
-.lb-id{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tx3);margin-top:1px;}
-.lb-pb{width:120px;height:4px;background:var(--bdr);border-radius:99px;overflow:hidden;}
-.lb-pbf{height:100%;border-radius:99px;transition:width .5s;}
-.lb-hrs{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;min-width:60px;text-align:right;}
-
-.achiev-chart{display:flex;align-items:flex-end;gap:10px;padding:16px 10px 0;min-height:200px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.ach-col{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:60px;flex-shrink:0;}
-.ach-av{width:36px;height:36px;border-radius:50%;overflow:hidden;border:2px solid var(--bdr);}
-.ach-bw{display:flex;align-items:flex-end;height:100px;width:36px;}
-.ach-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height .5s;}
-.ach-pct{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;}
-.ach-nm{font-size:10px;color:var(--tx2);text-align:center;line-height:1.3;max-width:60px;word-break:break-all;}
-.ach-filters{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
-.af-btn{padding:4px 11px;border-radius:7px;border:1px solid var(--bdr);background:transparent;color:var(--tx2);font-size:11.5px;font-weight:600;cursor:pointer;transition:all .13s;font-family:inherit;}
-.af-btn.sel{background:var(--bdim);border-color:var(--blue);color:var(--blue);}
-
-.ratio-slider{-webkit-appearance:none;appearance:none;flex:1;height:5px;border-radius:99px;outline:none;cursor:pointer;background:var(--bdr);}
-.ratio-slider::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;cursor:pointer;border:2px solid var(--bg);}
-.rs-tech::-webkit-slider-thumb{background:var(--blue);}
-.rs-sup::-webkit-slider-thumb{background:var(--green);}
-.ratio-input{width:72px;padding:7px 9px;background:var(--inp-bg);border:1px solid var(--inp-bdr);border-radius:6px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:12px;text-align:center;outline:none;}
-.ratio-input:focus{border-color:var(--blue);}
-.rt.ok{color:var(--green);font-family:'JetBrains Mono',monospace;font-weight:700;}
-.rt.bad{color:var(--rose);font-family:'JetBrains Mono',monospace;font-weight:700;}
-.rv{display:flex;height:6px;border-radius:99px;overflow:hidden;flex:1;gap:1px;}
-.rv-s{height:100%;border-radius:2px;transition:flex .3s;}
-.alloc-bdg{display:inline-flex;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;}
-.ab-b{background:var(--bdim);color:var(--blue);}
-.ab-g{background:var(--gdim);color:var(--green);}
-.ab-v{background:var(--vdim);color:var(--violet);}
-.ab-c{background:var(--cdim);color:var(--cyan);}
-
-.tg{background:var(--card);border:1px solid var(--bdr);border-radius:11px;margin-bottom:12px;overflow:hidden;}
-.tgh{padding:12px 15px;background:var(--card2);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;cursor:pointer;}
-.tg-code{font-family:'JetBrains Mono',monospace;font-size:13.5px;font-weight:700;color:var(--blue);}
-.tg-meta{font-size:11px;color:var(--tx2);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.tg-body{padding:12px 15px;display:grid;grid-template-columns:repeat(4,1fr);gap:9px;}
-@media(max-width:900px){.tg-body{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:480px){.tg-body{grid-template-columns:1fr 1fr;}}
-.tg-col{background:var(--inp-bg);border:1px solid var(--bdr);border-radius:8px;padding:10px 11px;}
-.tg-rh{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
-.tg-p{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid var(--bdr);}
-.tg-p:last-child{border-bottom:none;}
-.tg-pn{font-size:12px;font-weight:600;}
-.tg-pt{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--tx3);margin-top:1px;}
-.not-sdt{font-size:9px;color:var(--violet);background:var(--vdim);padding:1px 5px;border-radius:3px;}
-.cp-comp{background:var(--gdim);color:var(--green);font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;}
-.cp-scrap{background:var(--rdim);color:var(--rose);font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;}
-
-.tbr{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
-.sbx{position:relative;flex:1;min-width:180px;}
-.sbx input{width:100%;padding:8px 11px 8px 30px;background:var(--card);border:1px solid var(--bdr);border-radius:8px;color:var(--tx);font-family:inherit;font-size:13px;outline:none;transition:border-color .15s;}
-.sbx input:focus{border-color:var(--blue);}
-.sbx::before{content:'🔍';position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:12px;pointer-events:none;}
-.fsel{padding:7px 10px;background:var(--card);border:1px solid var(--bdr);border-radius:8px;color:var(--tx2);font-family:inherit;font-size:12.5px;outline:none;cursor:pointer;transition:border-color .15s;}
-.fsel:focus{border-color:var(--blue);}
-.part-search-wrap{position:relative;}
-.part-search-wrap .finput{padding-right:34px;}
-.part-search-clear{position:absolute;right:10px;top:10px;background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;line-height:1;padding:0;display:none;}
-.part-search-clear:hover{color:var(--rose);}
-.part-search-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);max-height:280px;overflow-y:auto;background:var(--card);border:1px solid var(--bdr);border-radius:12px;box-shadow:0 16px 34px var(--shadow);z-index:35;}
-.part-search-item{width:100%;display:flex;flex-direction:column;align-items:stretch;text-align:left;background:none;border:none;border-bottom:1px solid var(--bdr);padding:12px 13px;cursor:pointer;color:var(--tx);font-family:inherit;transition:background .12s,border-color .12s;}
-.part-search-item:last-child{border-bottom:none;}
-.part-search-item:hover,.part-search-item.active{background:var(--bdim);}
-.part-search-item:focus{outline:none;background:var(--bdim);}
-.part-search-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
-.part-search-num{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;color:var(--amber);}
-.part-search-badge{font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--blue);background:var(--bdim);padding:2px 7px;border-radius:99px;white-space:nowrap;}
-.part-search-meta{font-size:12px;color:var(--tx);margin-top:3px;line-height:1.35;font-weight:600;}
-.part-search-ata{font-size:10.5px;color:var(--tx2);margin-top:2px;font-family:'JetBrains Mono',monospace;}
-.part-search-sel{display:none!important;}
-.part-search-hint{font-size:10.5px;color:var(--tx3);margin-top:4px;}
-
-.asn-card{background:var(--card2);border:1px solid var(--bdr);border-radius:9px;padding:12px 14px;margin-bottom:9px;}
-.asn-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-.asn-nm{font-weight:700;font-size:13px;}
-.asn-desc{color:var(--tx2);font-size:12.5px;margin-bottom:5px;}
-.asn-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:11px;color:var(--tx3);}
-.asn-hrs{color:var(--amber);font-weight:700;font-family:'JetBrains Mono',monospace;}
-
-.srow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--bdr);gap:12px;}
-.srow:last-child{border-bottom:none;}
-.srl-t{font-size:13.5px;font-weight:600;}
-.srl-d{font-size:11.5px;color:var(--tx2);margin-top:2px;}
-
-.pic-up{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;background:var(--inp-bg);border:2px dashed var(--bdr2);border-radius:9px;cursor:pointer;transition:all .18s;}
-.pic-up:hover{border-color:var(--blue);background:var(--bdim);}
-.pic-up input{display:none;}
-.pic-prev{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--bdr);}
-
-.pw-reset-user{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bdr);gap:10px;flex-wrap:wrap;}
-.pw-reset-user:last-child{border-bottom:none;}
-
-.empty{text-align:center;padding:36px 16px;color:var(--tx2);}
-.ei{font-size:28px;opacity:.25;margin-bottom:8px;}
-.et{font-size:13.5px;}
-
-.v-current{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--green);}
-
-/* ═══════════ TV / EXPORT / TV DISPLAY ═══════════ */
-.export-group{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
-.tv-board{width:100%;}
-.tv-board .ch{gap:8px;}
-.tv-board .ct{font-size:16px;}
-.tv-board .lb-row{padding:12px 16px;}
-.tv-board .lb-nm{font-size:14px;}
-.tv-board .lb-id{font-size:11px;}
-.tv-board .lb-hrs{font-size:15px;min-width:78px;}
-.tv-board .lb-pb{width:150px;height:6px;}
-.tv-board .achiev-chart{min-height:240px;gap:14px;padding-top:18px;}
-.tv-board .ach-col{min-width:74px;}
-.tv-board .ach-bw{height:130px;width:44px;}
-.tv-board .ach-bar{border-radius:6px 6px 0 0;}
-.tv-board .ach-pct{font-size:13px;}
-.tv-board .ach-nm{font-size:11px;max-width:72px;}
-
-</style>
-</head>
-<body>
-
-<button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark mode" aria-label="Toggle theme">🌙</button>
-
-
-<div id="loading-overlay">
-  <div class="lmk" style="width:46px;height:46px;font-size:14px;margin-bottom:4px;">PT</div>
-  <div class="spin"></div>
-  <div class="loading-txt" id="loading-txt">Loading ProTrack…</div>
-</div>
-
-<div id="login" class="scr">
-  <div class="lw">
-    <div class="lb_"><div class="lmk">PT</div><div class="lnm">Pro<em>Track</em></div></div>
-    <div class="lcard">
-      <div class="lh">Welcome back</div>
-      <div class="ls">Electric Shop Production Tracking Web</div>
-      <label class="fl">Employee / User ID</label>
-      <input class="fi" id="li-id" autocomplete="off" autocapitalize="none" value="">
-      <label class="fl">Password</label>
-      <input class="fi" id="li-pw" type="password" autocomplete="new-password" value="">
-      <span class="forgot-link" onclick="openForgot()">Forgot password?</span>
-      <button class="lbtn" id="sign-in-btn" onclick="doLogin()">
-        <span class="lbtn-spinner"></span>
-        <span id="lbtn-txt">Sign In →</span>
-      </button>
-      <div class="login-attempts" id="login-attempts"></div>
-      <div class="ql">Default Password: <a onclick="ql('T1001','tech')">demo</a>  <a onclick="ql('TL001','lead')"></a></div>
-    </div>
-    <div class="ver-badge">
-      <div class="ver-pill" onclick="toggleVer()">
-        <span>📋</span>
-        <span class="v-current" id="ver-current">v1.2.0</span>
-        <span style="color:var(--tx3);">Release Notes ▾</span>
-      </div>
-      <div class="ver-history" id="ver-history">
-        <div class="ver-item"><span class="ver-tag"></span><span class="ver-note"></span></div>
-        <div class="ver-item"><span class="ver-tag">v1.2.0</span><span class="ver-note">SDT division fixed: Technician/Under Supervision shares based on configurable ratios, no duplicate overwrite, equal sharing within each role.</span></div>
-        <div class="ver-item"><span class="ver-tag">v1.1.0</span><span class="ver-note">Under-Supervision auto 75% allocation · Date range pickers · Leader Tech Entry page · Duplicate overwrite · Entry form cleanup.</span></div>
-        <div class="ver-item"><span class="ver-tag">v1.0.0</span><span class="ver-note">Initial release — Firebase backend, technician/leader/developer roles, monthly KPI targets.</span></div>
-      </div>
-    </div>
-    <div class="lcredit">Developed by <strong>NATNAEL N.</strong></div>
-  </div>
-</div>
-
-<div id="app" class="scr">
-  <div class="mob-topbar">
-    <button class="hamburger" onclick="toggleSidebar()">☰</button>
-    <div class="mob-brand"><div class="lmk">PT</div><div class="lnm">Pro<em>Track</em></div></div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <div class="live"><div class="ld"></div>LIVE</div>
-    </div>
-  </div>
-  <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
-  <div class="app-body">
-    <aside class="sb" id="sb">
-      <div class="sb-top"><div class="lmk">PT</div><div class="lnm">Pro<em>Track</em></div></div>
-      <div id="sbnav"></div>
-      <div class="sb-ft">
-        <div class="sb-user">
-          <div class="u-av av-i" id="sb-av" style="width:32px;height:32px;font-size:11px;"></div>
-          <div style="flex:1;min-width:0;"><div class="un" id="sb-un"></div><div class="ur" id="sb-ur"></div></div>
-          <button class="lob" onclick="logout()" title="Sign out">Sign Out</button>
-        </div>
-        <div style="margin-top:6px;display:flex;gap:5px;">
-          <button class="btn bo bsm" onclick="openModal('m-password')" style="flex:1;font-size:11px;">🔐 change password</button>
-          <button class="btn bo bsm" onclick="toggleTheme()" style="font-size:11px;">🌙</button>
-        </div>
-        <div class="sb-cred">Developed by <strong>NATNAEL N.</strong></div>
-      </div>
-    </aside>
-
-    <main class="main">
-      <header class="hdr">
-        <div class="hdr-l"><h1 id="pg-title">Dashboard</h1><p id="pg-desc"></p></div>
-        <div class="hdr-r"><div class="live"><div class="ld"></div>LIVE</div></div>
-      </header>
-
-      <div class="pc">
-
-        <!-- TECH: ENTRY -->
-        <div class="pg" id="pg-entry">
-          <div class="al al-b"><span class="al-ico">ℹ️</span><div id="entry-alert-txt">Be sure before you submit your task</div></div>
-          <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:14px;align-items:start;">
-            <div>
-              <div class="card">
-                <div class="ch"><span class="ct">📋 Production Entry</span></div>
-                <div class="cb">
-                  <div class="fg f2">
-                    <div class="fgroup ff"><label class="flabel">Job Type *</label>
-                      <div class="cs-toggle">
-                        <button class="cs-opt sel-comp" id="cs-comp" onclick="setJobType('completed')">✅ Completed</button>
-                        <button class="cs-opt" id="cs-scrap" onclick="setJobType('scrap')">🗑 Scrap</button>
-                      </div>
-                    </div>
-                    <div class="fgroup ff"><label class="flabel">👤 Job Role *</label>
-                      <div class="jrg" id="jrg">
-                        <div class="jro sel0" id="jr0" onclick="pickJobRole('Technician',0)"><span class="ji">🔧</span><span class="jl">TECHNICIAN</span></div>
-                        <div class="jro" id="jr1" onclick="pickJobRole('Under Supervision',1)"><span class="ji">👁</span><span class="jl">UNDER SUPERVISION</span></div>
-                        <div class="jro" id="jr2" onclick="pickJobRole('Inspector',2)"><span class="ji">🔍</span><span class="jl">INSPECTOR</span></div>
-                        <div class="jro" id="jr3" onclick="pickJobRole('Preliminary Inspector',3)"><span class="ji">🔎</span><span class="jl">PRELIM. INSPECTOR</span></div>
-                      </div>
-                    </div>
-                    <div class="fgroup ff"><label class="flabel">🏷 Task Code (WORK PACKAGE CODE) *</label>
-                      <input class="finput" id="e-taskcode" placeholder="e.g. TSFN800GRE30" style="font-family:'JetBrains Mono',monospace;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase();refreshAllocHrs()">
-                    </div>
-                    <div class="fgroup ff"><label class="flabel">Select Part</label>
-                      <div class="part-search-wrap">
-                        <input class="finput" id="e-part-search" placeholder="🔍 Type part number, description, or ATA..." oninput="filterPartSearch('e')" autocomplete="off">
-                        <button type="button" class="part-search-clear" id="e-part-clear" onclick="clearPartSearch('e')">✕</button>
-                        <div class="part-search-list" id="e-part-list"></div>
-                      </div>
-                      <select class="fselect part-search-sel" id="e-part-sel" onchange="onPartSel()"><option value="">— Choose Part —</option></select>
-                      <div class="part-search-hint">Search and click a result to confirm the part.</div>
-                    </div>
-                    <div class="fgroup"><label class="flabel">Description</label><input class="finput" id="e-desc" readonly></div>
-                    <div class="fgroup"><label class="flabel">ATA Chapter</label><input class="finput" id="e-ata" readonly></div>
-                    <div class="fgroup"><label class="flabel">Part Number</label><input class="finput" id="e-pnum" readonly></div>
-                    <div class="fgroup" id="e-hours-row"><label class="flabel" id="e-hrs-lbl">Allocated Hours</label><input class="finput" id="e-hours" readonly></div>
-                    <div class="fgroup"><label class="flabel">Date &amp; Time</label><input class="finput" id="e-time" type="date"></div>
-                    <div class="fgroup ff scrap-hrs-row" id="scrap-hrs-row">
-                      <label class="flabel" style="color:var(--rose);" id="scrap-hrs-lbl">🗑 Scrap Inspector Hours <span id="scrap-hrs-note" style="font-size:9.5px;color:var(--tx3);font-weight:400;">(Default: 2Hrs — Team Leader can adjust)</span></label>
-                      <input class="finput" id="e-scrap-hrs" type="number" step="0.5" min="0" placeholder="2.0" value="2">
-                      <div style="font-size:11px;color:var(--tx3);margin-top:3px;">Inspector hours for this scrap task (separate from SDT)</div>
-                    </div>
-                  </div>
-                  <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
-                    <button type="button" class="btn bp" id="submit-btn" onclick="openReviewModal()">
-                      <span class="btn-spinner"></span>
-                      <span class="btn-label">✓ Review &amp; Submit</span>
-                    </button>
-                    <button class="btn bo" onclick="clearEntry()">✕ Clear</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div class="kg k2" style="margin-bottom:12px;">
-                <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Today SDT</div><div class="kv" id="e-today-hrs" style="color:var(--blue)">0Hrs</div><div class="ks">target: <span id="e-daily-target">—</span>Hrs</div></div>
-                <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">This Week</div><div class="kv" id="e-week-hrs" style="color:var(--amber)">0Hrs</div><div class="ks">target: <span id="e-week-target">—</span>Hrs</div></div>
-              </div>
-              <div class="card">
-                <div class="ch"><span class="ct">Today's Submissions</span></div>
-                <div style="max-height:380px;overflow-y:auto;">
-                   <table>
-                    <thead> <tr><th>Time</th><th>Task Code</th><th>Role</th><th>Part</th><th>Hrs</th><th>Status</th><th>Type</th><th>Action</th></tr> </thead>
-                    <tbody id="e-today-list"></tbody>
-                   </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- TECH: MY STATS -->
-        <div class="pg" id="pg-mystats">
-          <div class="tbr" style="margin-bottom:12px;gap:12px;flex-wrap:wrap;align-items:flex-end;">
-            <div class="fgroup" style="max-width:200px;min-width:160px;">
-              <label class="flabel">From Date</label>
-              <input type="date" class="finput" id="ms-hist-from" onchange="document.getElementById('ms-dt-preset').value='';renderMyStats()">
-            </div>
-            <div class="fgroup" style="max-width:200px;min-width:160px;">
-              <label class="flabel">To Date</label>
-              <input type="date" class="finput" id="ms-hist-to" onchange="document.getElementById('ms-dt-preset').value='';renderMyStats()">
-            </div>
-            <select class="fsel" id="ms-dt-preset" onchange="applyMyStatsPreset(this.value)" title="Quick range">
-              <option value="">Quick Range…</option>
-              <option value="today">Today</option>
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
-              <option value="all">All Time</option>
-            </select>
-            <button class="btn bo bsm" onclick="renderMyStats()">⟳</button>
-          </div>
-          <div class="kg k4" style="margin-bottom:14px;">
-            <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Filtered SDT Hrs</div><div class="kv" id="ms-today" style="color:var(--blue)">0Hrs</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-t-pb" style="background:var(--blue);width:0%"></div></div><div class="kpb-s"><span id="ms-dt">Range: —</span><span id="ms-dpc">0%</span></div></div></div>
-            <div class="kc"><div class="kac" style="background:var(--violet)"></div><div class="kl">Filtered Inspector Hrs</div><div class="kv" id="ms-week" style="color:var(--violet)">0Hrs</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-w-pb" style="background:var(--violet);width:0%"></div></div><div class="kpb-s"><span id="ms-wt">Range: —</span><span id="ms-wpc">0%</span></div></div></div>
-            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Total Achieved Hours</div><div class="kv" id="ms-month" style="color:var(--green)">0Hrs</div><div class="kpb"><div class="kpb-bg"><div class="kpb-f" id="ms-m-pb" style="background:var(--green);width:0%"></div></div><div class="kpb-s"><span id="ms-mt">Range: —</span><span id="ms-mpc">0%</span></div></div></div>
-            <div class="kc"><div class="kac" style="background:var(--cyan)"></div><div class="kl">Additional Assignment Hrs</div><div class="kv" id="ms-asn" style="color:var(--cyan)">0Hrs</div><div class="ks">Filtered by selected date range</div></div>
-          </div>
-                    <div class="card">
-            <div class="ch" style="align-items:flex-end;">
-              <span class="ct">Production History</span>
-              <div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;margin-left:auto;">
-                <div class="fgroup" style="min-width:160px;">
-                  <label class="flabel">Status Filter</label>
-                  <select class="fselect" id="ms-status-filter" onchange="renderMyStats()">
-                    <option value="all">All</option>
-                    <option value="accepted">Accepted</option>
-                    <option value="rejected">Rejected</option>
-                    <option value="pending">Pending</option>
-                  </select>
-                </div>
-                <button class="btn bo bsm" onclick="exportMine()">⬇ Export</button>
-              </div>
-            </div>
-            <div class="tw"><table><thead> <tr><th>Date/Time (EAT)</th><th>Task Code</th><th>Role</th><th>Part</th><th>ATA</th><th>Part #</th><th>Hrs (÷peers)</th><th>Type</th><th>Status</th></tr> </thead>
-            <tbody id="ms-hist"></tbody></table></div>
-          </div>          <div class="card">
-            <div class="ch"><span class="ct">📌 My Additional Assignments</span></div>
-            <div id="ms-asn-list"><div class="empty"><div class="ei">📌</div><div class="et">No Additional assignments</div></div></div>
-          </div>
-        </div>
-
-        <!-- LEADER: DASHBOARD -->
-        <div class="pg" id="pg-dashboard">
-          <div class="tbr" style="margin-bottom:12px;">
-            <div class="fgroup" style="max-width:200px;min-width:160px;">
-              <label class="flabel">From Date</label>
-              <input type="date" class="fsel" id="dash-dt-from" onchange="renderDashboard();renderLB();" title="From date" style="color:var(--tx);">
-            </div>
-            <div class="fgroup" style="max-width:200px;min-width:160px;">
-              <label class="flabel">To Date</label>
-              <input type="date" class="fsel" id="dash-dt-to" onchange="renderDashboard();renderLB();" title="To date" style="color:var(--tx);">
-            </div>
-            <select class="fsel" id="dash-dt-preset" onchange="applyDashPreset(this.value)" title="Quick range">
-              <option value="">Quick Range…</option>
-              <option value="today">Today</option>
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
-              <option value="all">All Time</option>
-            </select>
-            <button class="btn bo bsm" onclick="renderDashboard();renderLB();">⟳</button>
-          </div>
-          <div class="kg k4" style="margin-bottom:16px;">
-            <div class="kc"><div class="kac" style="background:var(--blue)"></div><div class="kl">Active Techs</div><div class="kv" id="d-act" style="color:var(--blue)">0</div><div class="ks" id="d-acts"></div></div>
-            <div class="kc"><div class="kac" style="background:var(--green)"></div><div class="kl">Shop achivement (Monthly)</div><div class="kv" id="d-sdt" style="color:var(--green)">0Hrs</div><div class="ks">target: <span id="d-tgt">—</span>Hrs</div></div>
-            <div class="kc"><div class="kac" style="background:var(--amber)"></div><div class="kl">Avg Hrs/Tech</div><div class="kv" id="d-avg" style="color:var(--amber)">0Hrs</div><div class="ks">this month</div></div>
-            <div class="kc"><div class="kac" style="background:var(--violet)"></div><div class="kl">Shop Progress</div><div class="kv" id="d-prog" style="color:var(--violet)">0%</div><div class="ks">monthly</div></div>
-          </div>
-          <div class="card" style="margin-bottom:14px;">
-            <div class="ch">
-              <span class="ct">📊 Target Achievement — Monthly</span>
-              <div class="ach-filters">
-                <button class="af-btn sel" id="af-all" onclick="setAF('all',this)">All</button>
-                <button class="af-btn" id="af-top" onclick="setAF('top',this)">Top</button>
-                <button class="af-btn" id="af-low" onclick="setAF('low',this)">Low</button>
-                <button class="btn bo bsm" onclick="openMonthTgtModal()">⚙ Targets</button>
-              </div>
-            </div>
-            <div class="achiev-chart" id="achiev-chart"></div>
-            <div style="display:flex;gap:14px;padding:9px 14px;border-top:1px solid var(--bdr);font-size:11px;color:var(--tx2);">
-              <span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:var(--green);display:inline-block;"></span>≥100%</span>
-              <span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:var(--amber);display:inline-block;"></span>70–99%</span>
-              <span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:var(--rose);display:inline-block;"></span>&lt;70%</span>
-            </div>
-          </div>
-          <div class="card tv-board" id="lb-card">
-            <div class="ch">
-              <span class="ct">🏆 Monthly Leaderboard</span>
-              <div class="export-group">
-                <div class="sbx" style="max-width:200px;"><input type="text" id="lb-q" placeholder="Search..." oninput="renderLB()"></div>
-                <button class="btn bo bsm" onclick="exportLeaderboard('lb-card','image')">🖼 Image</button>
-                <button class="btn bo bsm" onclick="exportLeaderboard('lb-card','pdf')">⬇ PDF</button>
-                              </div>
-            </div>
-            <div id="lb-body"></div>
-          </div>
-        </div>
-
-        <!-- LEADER: ASSIGNMENTS -->
-        <div class="pg" id="pg-assignments">
-          <div class="al al-b"><span class="al-ico">📌</span><div>Assignments count toward the technician's achieved hours and are displayed on their stats page.</div></div>
-          <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:14px;align-items:start;">
-            <div class="card">
-              <div class="ch"><span class="ct">➕ New Assignment</span></div>
-              <div class="cb">
-                <div class="fg f2">
-                  <div class="fgroup ff"><label class="flabel">Technician *</label><select class="fselect" id="asn-tech"><option value="">— Select —</option></select></div>
-                  <div class="fgroup ff"><label class="flabel">Description *</label><input class="finput" id="asn-desc" placeholder="Task description..."></div>
-                  <div class="fgroup"><label class="flabel">Hours *</label><input class="finput" id="asn-hrs" type="number" step="0.5" min="0.5" placeholder="e.g. 4"></div>
-                  <div class="fgroup"><label class="flabel">Date</label><input class="finput" id="asn-date" type="date"></div>
-                  <div class="fgroup ff"><label class="flabel">Comment</label><input class="finput" id="asn-comment" placeholder="Optional..."></div>
-                </div>
-                <div style="display:flex;gap:8px;margin-top:12px;">
-                  <button class="btn bp" onclick="submitAssignment()">✓ Add</button>
-                  <button class="btn bo" onclick="clearAssignment()">✕ Cancel</button>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div class="tbr">
-                <div class="sbx"><input type="text" id="asn-q" placeholder="Search..." oninput="renderAssignments()"></div>
-                <select class="fsel" id="asn-ft" onchange="renderAssignments()"><option value="">All Techs</option></select>
-                <input type="date" class="fsel" id="asn-dt-from" onchange="renderAssignments()" title="From date" style="color:var(--tx);">
-                <input type="date" class="fsel" id="asn-dt-to" onchange="renderAssignments()" title="To date" style="color:var(--tx);">
-                <select class="fsel" id="asn-dt-preset" onchange="applyAsnPreset(this.value)" title="Quick range">
-                  <option value="">Quick Range…</option>
-                  <option value="today">Today</option>
-                  <option value="week">This Week</option>
-                  <option value="month">This Month</option>
-                  <option value="all">All Time</option>
-                </select>
-              </div>
-              <div id="asn-list"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ALL ENTRIES -->
-        <div class="pg" id="pg-allentries">
-          <div class="tbr">
-            <div class="sbx"><input type="text" id="ae-q" placeholder="Search name, task code, part..." oninput="renderAllEntries()"></div>
-            <select class="fsel" id="ae-tech" onchange="renderAllEntries()"><option value="">All Techs</option></select>
-            <select class="fsel" id="ae-st" onchange="renderAllEntries()">
-              <option value="all">All Status</option>
-              <option value="accepted">Accepted</option>
-              <option value="rejected">Rejected</option>
-              <option value="pending">Pending</option>
-            </select>
-            <input type="date" class="fsel" id="ae-dt-from" onchange="renderAllEntries()" title="From date" style="color:var(--tx);">
-            <input type="date" class="fsel" id="ae-dt-to" onchange="renderAllEntries()" title="To date" style="color:var(--tx);">
-            <select class="fsel" id="ae-dt-preset" onchange="applyAEPreset(this.value)" title="Quick range">
-              <option value="">Quick Range…</option>
-              <option value="today">Today</option>
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
-              <option value="all">All Time</option>
-            </select>
-            <button class="btn bo bsm" onclick="exportAllEntries()">⬇ CSV</button>
-            <button class="btn bg_ bsm" onclick="bulkAcceptAll()">✔ Accept All</button>
-            <button class="btn bd bsm" onclick="bulkRejectAll()">✖ Reject All</button>
-            <button class="btn bd bsm" onclick="bulkDeleteAll()">🗑 Delete All</button>
-          </div>
-          <div class="card"><div class="tw"><table>
-            <thead> <tr><th>Date/Time (EAT)</th><th>Tech</th><th>Task Code</th><th>Role</th><th>Type</th><th>Part</th><th>ATA</th><th>Part #</th><th>Hrs (÷peers)</th><th>Status</th><th>Action</th></tr> </thead>
-            <tbody id="ae-body"></tbody>
-           </table></div></div>
-        </div>
-
-        <!-- REPORTS -->
-        <div class="pg" id="pg-reports">
-          <div class="tbr" style="margin-bottom:12px;">
-            <div class="fgroup" style="max-width:200px;min-width:160px;">
-              <label class="flabel">From Date</label>
-              <input type="date" class="fsel" id="rpt-dt-from" onchange="renderReports()" title="From date" style="color:var(--tx);">
-            </div>
-            <div class="fgroup" style="max-width:200px;min-width:160px;">
-              <label class="flabel">To Date</label>
-              <input type="date" class="fsel" id="rpt-dt-to" onchange="renderReports()" title="To date" style="color:var(--tx);">
-            </div>
-            <select class="fsel" id="rpt-dt-preset" onchange="applyRptPreset(this.value)" title="Quick range">
-              <option value="">Quick Range…</option>
-              <option value="today">Today</option>
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
-              <option value="all">All Time</option>
-            </select>
-            <button class="btn bo bsm" onclick="renderReports()">⟳</button>
-          </div>
-          <div class="card"><div class="ch"><span class="ct">Monthly Target Summary</span><button class="btn bo bsm" onclick="exportAllEntries()">⬇ Export</button></div>
-            <div class="tw"><table><thead> <tr><th>Tech</th><th>SDT Target</th><th>SDT Actual</th><th>Asn Hrs</th><th>Total Achieved</th><th>Insp Hrs</th><th>Progress</th><th>Avg/Day</th><th>Status</th></tr> </thead>
-            <tbody id="rpt-body"></tbody></table></div>
-          </div>
-        </div>
-
-        <!-- TASK CODE GROUPS -->
-        <div class="pg" id="pg-taskgroups">
-          <div class="al al-b"><span class="al-ico">🗂</span><div id="tc-alert">Grouped by Task Code. Hours divided by same-role peers. Technicians see all groups they participate in, plus all colleagues on those same task codes.</div></div>
-          <div class="tbr">
-            <div class="sbx"><input type="text" id="tc-q" placeholder="Search task code..." oninput="renderTG()"></div>
-            <input type="date" class="fsel" id="tc-dt-from" onchange="renderTG()" title="From date" style="color:var(--tx);">
-            <input type="date" class="fsel" id="tc-dt-to" onchange="renderTG()" title="To date" style="color:var(--tx);">
-            <select class="fsel" id="tc-dt-preset" onchange="applyTCPreset(this.value)" title="Quick range">
-              <option value="">Quick Range…</option>
-              <option value="today">Today</option>
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
-              <option value="all">All Time</option>
-            </select>
-            <button class="btn bo bsm" onclick="renderTG()">⟳</button>
-            <button class="btn bo bsm" onclick="exportTG()">⬇ CSV</button>
-          </div>
-          <div id="tc-body"></div>
-        </div>
-
-        <!-- RATIOS -->
-        <div class="pg" id="pg-ratios">
-          <div class="al al-b"><span class="al-ico">⚖️</span><div>Tech% + Under Supervision% must = 100%. Inspector and Preliminary Inspector use fixed hours — completely separate from SDT. If no supervision is recorded for a task, the technician gets 100% of SDT.</div></div>
-          <div class="card" style="margin-bottom:14px;">
-            <div class="ch"><span class="ct">🗑 Scrap Operation — Inspector Default Hours</span><button class="btn bp bsm" onclick="saveScrapDefaultHrs()">💾 Save</button></div>
-            <div class="cb">
-              <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-                <div>
-                  <div style="font-size:13.5px;font-weight:600;margin-bottom:4px;">Default Inspector Hours for Scrap Operations</div>
-                  <div style="font-size:12px;color:var(--tx2);">When a technician selects <span style="color:var(--rose);font-weight:700;">Scrap</span> job type, the inspector hours field defaults to this value. You can override per-entry on the entry form.</div>
-                </div>
-                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <input class="ratio-input" id="scrap-default-hrs" type="number" min="0.5" step="0.5" value="2" style="width:80px;">
-                  <span style="font-weight:700;color:var(--rose);">HRS</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="ch"><span class="ct">🌐 Default Global Ratios</span><button class="btn bp bsm" onclick="saveDefaultRatios()">💾 Save</button></div>
-            <div class="cb">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:16px;">
-                <div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><span style="font-weight:700;color:var(--blue);">🔧 Technician</span><div style="display:flex;align-items:center;gap:6px;"><input class="ratio-input" id="r-tech" type="number" min="0" max="100" value="25" oninput="onRI()"><span style="color:var(--tx2);font-size:13px;">%</span></div></div>
-                  <input type="range" class="ratio-slider rs-tech" id="rs-tech" min="0" max="100" value="25" oninput="syncSl('tech')">
-                </div>
-                <div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><span style="font-weight:700;color:var(--green);">👁 Under Supervision</span><div style="display:flex;align-items:center;gap:6px;"><input class="ratio-input" id="r-sup" type="number" min="0" max="100" value="75" oninput="onRI()"><span style="color:var(--tx2);font-size:13px;">%</span></div></div>
-                  <input type="range" class="ratio-slider rs-sup" id="rs-sup" min="0" max="100" value="75" oninput="syncSl('sup')">
-                </div>
-              </div>
-              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);margin-bottom:14px;">
-                <span style="font-size:12px;color:var(--tx2);">SDT Split:</span>
-                <div class="rv" id="rv-def" style="max-width:none;flex:1;"><div class="rv-s" style="background:var(--blue);flex:25;"></div><div class="rv-s" style="background:var(--green);flex:75;"></div></div>
-                <span style="font-size:12px;color:var(--tx2);">Total:</span><span class="rt ok" id="rt-def">100%</span>
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                <div style="background:var(--vdim);border:1px solid rgba(139,92,246,.2);border-radius:8px;padding:12px 14px;">
-                  <div style="font-weight:700;color:var(--violet);margin-bottom:3px;">🔍 Inspector Fixed HRS</div>
-                  <div style="font-size:11px;color:var(--tx3);margin-bottom:8px;">NOT included in SDT</div>
-                  <div style="display:flex;align-items:center;gap:7px;"><input class="ratio-input" id="r-insp-hrs" type="number" min="0" step="0.1" value="1.0" style="width:80px;"><span style="color:var(--violet);font-weight:700;">HRS</span></div>
-                </div>
-                <div style="background:var(--cdim);border:1px solid rgba(6,182,212,.2);border-radius:8px;padding:12px 14px;">
-                  <div style="font-weight:700;color:var(--cyan);margin-bottom:3px;">🔎 Prelim. Inspector Fixed HRS</div>
-                  <div style="font-size:11px;color:var(--tx3);margin-bottom:8px;">NOT included in SDT</div>
-                  <div style="display:flex;align-items:center;gap:7px;"><input class="ratio-input" id="r-prelim-hrs" type="number" min="0" step="0.1" value="1.0" style="width:80px;"><span style="color:var(--cyan);font-weight:700;">HRS</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="ch"><span class="ct">🔩 Per-Part-Number Overrides</span><button class="btn bp bsm" onclick="openAddOverride()">+ Add Override</button></div>
-            <div style="font-size:10px;font-weight:700;letter-spacing:.6px;color:var(--tx3);text-transform:uppercase;display:grid;grid-template-columns:180px 70px 70px 80px 80px 50px 1fr auto;gap:8px;align-items:center;padding:8px 14px;background:var(--card2);">
-              <div>Part #</div><div>Tech %</div><div>Sup %</div><div>Insp HRS</div><div>Prelim HRS</div><div>Total</div><div>Note</div><div></div>
-            </div>
-            <div id="ratio-overrides"></div>
-          </div>
-        </div>
-
-        <!-- DEV: TECHNICIANS -->
-        <div class="pg" id="pg-techs">
-          <div class="tbr">
-            <div class="sbx"><input type="text" id="at-q" placeholder="Search technicians..." oninput="renderTechs()"></div>
-            <button class="btn bp" onclick="openAddTech()">+ Add</button>
-            <button class="btn bo" onclick="openModal('m-import-tech')">⬆ Import</button>
-          </div>
-          <div class="card"><div class="tw"><table>
-            <thead> <tr><th>Photo</th><th>ID</th><th>Name</th><th>Monthly Target</th><th>Weekly Target</th><th>Daily Target</th><th>Status</th><th>Actions</th></tr> </thead>
-            <tbody id="at-body"></tbody>
-           </table></div></div>
-        </div>
-
-        <!-- DEV: PARTS -->
-        <div class="pg" id="pg-parts">
-          <div class="tbr">
-            <div class="sbx"><input type="text" id="ap-q" placeholder="Search parts..." oninput="renderParts()"></div>
-            <button class="btn bp" onclick="openAddPart()">+ Add</button>
-            <button class="btn bo" onclick="openModal('m-import-part')">⬆ Import</button>
-          </div>
-          <div class="card"><div class="tw"><table>
-            <thead> <tr><th>Description</th><th>ATA</th><th>Part Number</th><th>Std Hours</th><th>Actions</th></tr> </thead>
-            <tbody id="ap-body"></tbody>
-           </table></div></div>
-        </div>
-
-        <!-- DEV: TEAM LEADERS -->
-        <div class="pg" id="pg-leaders">
-          <div class="tbr">
-            <div class="sbx"><input type="text" id="al-q" placeholder="Search leaders..." oninput="renderLeaders()"></div>
-            <button class="btn bp" onclick="openAddLeader()">+ Add</button>
-          </div>
-          <div class="card"><div class="tw"><table>
-            <thead> <tr><th>Photo</th><th>ID</th><th>Name</th><th>Email</th><th>Status</th><th>Actions</th></tr> </thead>
-            <tbody id="al-body"></tbody>
-           </table></div></div>
-        </div>
-
-
-        <!-- DEV: PRODUCTION CONTROLLERS -->
-        <div class="pg" id="pg-controllers">
-          <div class="tbr">
-            <div class="sbx"><input type="text" id="ac-q" placeholder="Search controllers..." oninput="renderControllers()"></div>
-            <button class="btn bp" onclick="openAddController()">+ Add</button>
-          </div>
-          <div class="card"><div class="tw"><table>
-            <thead> <tr><th>Photo</th><th>ID</th><th>Name</th><th>Email</th><th>Status</th><th>Actions</th></tr> </thead>
-            <tbody id="ac-body"></tbody>
-           </table></div></div>
-        </div>
-
-        <!-- DEV: PASSWORD MANAGEMENT -->
-        <div class="pg" id="pg-pwmgmt">
-          <div class="al al-a"><span class="al-ico">🔐</span><div>Reset any user's password independently. For emergency developer password recovery, use the recovery code displayed on the login page (appears after 5 failed attempts).</div></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-            <div class="card"><div class="ch"><span class="ct">🔄 Reset User Password</span></div><div class="cb">
-              <div class="fg" style="margin-bottom:12px;">
-                <div class="fgroup"><label class="flabel">User Type</label><select class="fselect" id="rp-type" onchange="fillRpUsers()"><option value="tech">Technician</option><option value="lead">Team Leader</option><option value="ctrl">Production Controller</option></select></div>
-                <div class="fgroup"><label class="flabel">Select User</label><select class="fselect" id="rp-user"></select></div>
-                <div class="fgroup"><label class="flabel">New Password</label><input class="finput" id="rp-new" type="text" placeholder="Enter new password"></div>
-              </div>
-              <div style="display:flex;gap:8px;">
-                <button class="btn bd" onclick="doResetPw()">Reset Password</button>
-                <button class="btn bo" onclick="document.getElementById('rp-new').value=''">Cancel</button>
-              </div>
-            </div></div>
-            <div class="card"><div class="ch"><span class="ct">🔑 Developer Password</span></div><div class="cb">
-              <div class="fg" style="margin-bottom:12px;">
-                <div class="fgroup"><label class="flabel">New Developer Password</label><input class="finput" id="dev-new-pw" type="text" placeholder="Enter new developer password"></div>
-              </div>
-              <div style="display:flex;gap:8px;">
-                <button class="btn bd" onclick="changeDevPw()">Update Dev Password</button>
-                <button class="btn bo" onclick="document.getElementById('dev-new-pw').value=''">Cancel</button>
-              </div>
-              <div style="margin-top:14px;padding:12px;background:var(--adim);border:1px solid rgba(245,158,11,.2);border-radius:8px;">
-                <div style="font-size:12px;font-weight:600;color:var(--amber);margin-bottom:5px;">Recovery Code</div>
-                <div class="mono" id="dev-recovery-code" style="font-size:13px;color:var(--tx2);">PROTRACK-DEV-2025-RESET</div>
-                <div style="font-size:11px;color:var(--tx3);margin-top:5px;">Use this code on the login page if you forget the developer password</div>
-              </div>
-            </div></div>
-          </div>
-          <div class="card"><div class="ch"><span class="ct">All Users Overview</span></div>
-            <div id="pw-all-list"></div>
-          </div>
-        </div>
-
-        <!-- DEV: SYSTEM -->
-        <div class="pg" id="pg-system">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-            <div class="card"><div class="ch"><span class="ct">⚙️ Settings</span></div><div class="cb">
-              <div class="srow"><div><div class="srl-t">Default Monthly Target</div><div class="srl-d">Initial hrs for new techs</div></div><div style="display:flex;align-items:center;gap:7px;"><input type="number" id="sys-def" class="finput" style="width:90px;" value="160"><button class="btn bp bsm" onclick="saveDefTgt()">Set</button></div></div>
-              <div class="srow"><div><div class="srl-t">Default Passwords</div></div><button class="btn bo bsm" onclick="openModal('m-globalpwd')">Configure</button></div>
-              <div class="srow"><div><div class="srl-t">Export Full Backup</div></div><button class="btn bo bsm" onclick="exportBackup()">⬇ JSON</button></div>
-              <div class="srow"><div><div class="srl-t">Import Backup</div></div><label class="btn bo bsm" style="cursor:pointer;">⬆ Import<input type="file" accept=".json" style="display:none" onchange="importBackup(this)"></label></div>
-              <div class="srow"><div><div class="srl-t">Factory Reset</div><div class="srl-d">Wipe all Firestore data</div></div><button class="btn bd bsm" onclick="factoryReset()">⚠ Reset All</button></div>
-            </div></div>
-            <div class="card"><div class="ch"><span class="ct">📊 Live Stats</span></div><div class="cb" id="sys-info"></div></div>
-            <div class="card tv-board" id="dev-lb-card" style="margin-top:14px;">
-              <div class="ch">
-                <span class="ct">🏆 Leaderboard for TV</span>
-                <div class="export-group">
-                  <div class="sbx" style="max-width:200px;"><input type="text" id="dev-lb-q" placeholder="Search..." oninput="renderLB()"></div>
-                  <button class="btn bo bsm" onclick="exportLeaderboard('dev-lb-card','image')">🖼 Image</button>
-                  <button class="btn bo bsm" onclick="exportLeaderboard('dev-lb-card','pdf')">⬇ PDF</button>
-                                  </div>
-              </div>
-              <div id="dev-lb-body"></div>
-            </div>
-          </div>
-        </div>
-
-  
-      <!-- DEV/LEADER: PRODUCTION ENTRY IMPORT -->
-      <div class="pg" id="pg-productionimport">
-        <div class="al al-b"><span class="al-ico">⬆️</span><div>Import ComponentTATStatus Excel production entries. Entry date is taken from <strong>Date Completed</strong>. Entries are saved as <strong>Pending</strong>. Missing parts/employees show Add and Try Import buttons.</div></div>
-        <div class="card">
-          <div class="ch"><span class="ct">📥 Import Production Entries</span></div>
-          <div class="cb">
-            <div style="border:2px dashed var(--bdr2);border-radius:8px;padding:24px;text-align:center;cursor:pointer;" onclick="document.getElementById('imp-prod-f').click()">
-              📂 Upload ComponentTATStatus Excel
-              <input type="file" id="imp-prod-f" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleProductionImport(this)">
-            </div>
-            <div style="font-size:11.5px;color:var(--tx3);margin-top:8px;line-height:1.5;">
-              Uses: <span class="mono">WP ID</span>, <span class="mono">PART NAME</span>, <span class="mono">OEM P/N</span>, <span class="mono">Status</span>, <span class="mono">Date Completed</span>, <span class="mono">Released By</span>, <span class="mono">TECH_ID</span>, <span class="mono">UNDER_SUP</span>, <span class="mono">PRELIM_INSP</span>.<br>
-              Hours are fetched only from ProTrack Parts by <span class="mono">OEM P/N</span>. Excel <span class="mono">Est. Man Hr.</span> is ignored.
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="ch"><span class="ct">Import Preview / Actions</span><button class="btn bo bsm" onclick="clearProductionImportPreview()">Clear Preview</button></div>
-          <div class="tw"><table>
-            <thead><tr><th>Row</th><th>Date Completed</th><th>Employee</th><th>Role</th><th>Task Code</th><th>Part #</th><th>Hours</th><th>Status / Action</th></tr></thead>
-            <tbody id="prod-import-body"><tr><td colspan="8" class="empty">No import yet</td></tr></tbody>
-          </table></div>
-        </div>
-      </div>
-      <!-- PRODUCTION CONTROLLER: TECHNICIAN ENTRY -->
-        <div class="pg" id="pg-controllerentry">
-          <div class="al al-b"><span class="al-ico">⊕</span><div>Submit a production entry on behalf of a technician. Choose the technician, fill in all fields, then Review &amp; Submit as the production controller.</div></div>
-          <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:14px;align-items:start;">
-            <div>
-              <div class="card">
-                <div class="ch"><span class="ct">📋 Production Controller Entry</span></div>
-                <div class="cb">
-                  <div class="fg f2">
-                    <div class="fgroup ff"><label class="flabel">🔧 Technician *</label>
-                      <select class="fselect" id="le-tech-sel" onchange="onLeaderTechSel()"><option value="">— Select Technician —</option></select>
-                    </div>
-                    <div class="fgroup ff"><label class="flabel">Job Type *</label>
-                      <div class="cs-toggle">
-                        <button class="cs-opt sel-comp" id="le-cs-comp" onclick="setLeJobType('completed')">✅ Completed</button>
-                        <button class="cs-opt" id="le-cs-scrap" onclick="setLeJobType('scrap')">🗑 Scrap</button>
-                      </div>
-                    </div>
-                    <div class="fgroup ff"><label class="flabel">👤 Job Role *</label>
-                      <div class="jrg" id="le-jrg">
-                        <div class="jro sel0" id="le-jr0" onclick="pickLeJobRole('Technician',0)"><span class="ji">🔧</span><span class="jl">TECHNICIAN</span></div>
-                        <div class="jro" id="le-jr1" onclick="pickLeJobRole('Under Supervision',1)"><span class="ji">👁</span><span class="jl">UNDER SUPERVISION</span></div>
-                        <div class="jro" id="le-jr2" onclick="pickLeJobRole('Inspector',2)"><span class="ji">🔍</span><span class="jl">INSPECTOR</span></div>
-                        <div class="jro" id="le-jr3" onclick="pickLeJobRole('Preliminary Inspector',3)"><span class="ji">🔎</span><span class="jl">PRELIM. INSPECTOR</span></div>
-                      </div>
-                    </div>
-                    <div class="fgroup ff"><label class="flabel">🏷 Task Code (JIC) *</label>
-                      <input class="finput" id="le-taskcode" placeholder="e.g. TSFN800GRE30" style="font-family:'JetBrains Mono',monospace;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase();refreshLeAllocHrs()">
-                    </div>
-                    <div class="fgroup ff"><label class="flabel">Select Part *</label>
-                      <div class="part-search-wrap">
-                        <input class="finput" id="le-part-search" placeholder="🔍 Type part number, description, or ATA..." oninput="filterPartSearch('le')" autocomplete="off">
-                        <button type="button" class="part-search-clear" id="le-part-clear" onclick="clearPartSearch('le')">✕</button>
-                        <div class="part-search-list" id="le-part-list"></div>
-                      </div>
-                      <select class="fselect part-search-sel" id="le-part-sel" onchange="onLePartSel()"><option value="">— Choose Part —</option></select>
-                      <div class="part-search-hint">Search and click a result to confirm the part.</div>
-                    </div>
-                    <div class="fgroup"><label class="flabel">Description</label><input class="finput" id="le-desc" readonly></div>
-                    <div class="fgroup"><label class="flabel">ATA Chapter</label><input class="finput" id="le-ata" readonly></div>
-                    <div class="fgroup"><label class="flabel">Part Number</label><input class="finput" id="le-pnum" readonly></div>
-                    <div class="fgroup" id="le-hours-row"><label class="flabel" id="le-hrs-lbl">Allocated Hours</label><input class="finput" id="le-hours" readonly></div>
-                    <div class="fgroup"><label class="flabel">Date &amp; Time</label><input class="finput" id="le-time" type="date"></div>
-                    <div class="fgroup ff scrap-hrs-row" id="le-scrap-hrs-row">
-                      <label class="flabel" style="color:var(--rose);">🗑 Scrap Inspector Hours</label>
-                      <input class="finput" id="le-scrap-hrs" type="number" step="0.5" min="0" placeholder="2.0" value="2">
-                    </div>
-                  </div>
-                  <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
-                    <button type="button" class="btn bp" id="le-submit-btn" onclick="openLeReviewModal()">
-                      <span class="btn-spinner"></span>
-                      <span class="btn-label">✓ Review &amp; Submit</span>
-                    </button>
-                    <button class="btn bo" onclick="clearLeEntry()">✕ Clear</button>
-                    <button class="btn bo" onclick="location.reload()">↻ Refresh</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div class="card">
-                <div class="ch"><span class="ct">Today's Entries</span></div>
-                <div style="max-height:330px;overflow-y:auto;">
-                   <table>
-                    <thead> <tr><th>Tech</th><th>Task Code</th><th>Role</th><th>Part</th><th>Hrs</th><th>Status</th><th>Type</th><th>Action</th></tr> </thead>
-                    <tbody id="le-today-list"></tbody>
-                   </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </main>
-  </div>
-</div>
-
-<div class="toast" id="toast">
-  <span class="ti">✅</span>
-  <span class="tm" id="tm"></span>
-  <div class="tbar_ ts" id="tbar"></div>
-</div>
-
-<!-- MODALS -->
-<div class="mbg" id="m-review">
-  <div class="modal mmd">
-    <div class="mhd"><div><div class="mttl">✅ Confirm Entry</div><div class="msub">Review your data before saving</div></div><button class="mxb" onclick="closeModal('m-review')">✕</button></div>
-    <div class="mbody" id="m-review-body"></div>
-    <div class="mfoot">
-      <button class="btn bo" onclick="closeModal('m-review')">← Go Back &amp; Edit</button>
-      <button type="button" class="btn bp" id="confirm-save-btn" onclick="confirmSave()">
-        <span class="btn-spinner"></span>
-        <span class="btn-label">Confirm &amp; Save →</span>
-      </button>
-    </div>
-  </div>
-</div>
-
-<div class="mbg" id="m-password">
-  <div class="modal msm">
-    <div class="mhd"><div class="mttl">Change My Password</div><button class="mxb" onclick="closeModal('m-password')">✕</button></div>
-    <div class="mbody"><div class="fg">
-      <div class="fgroup"><label class="flabel">Current Password</label><input class="finput" id="pwd-old" type="password" placeholder="Current"></div>
-      <div class="fgroup"><label class="flabel">New Password</label><input class="finput" id="pwd-new" type="password" placeholder="New password"></div>
-      <div class="fgroup"><label class="flabel">Confirm</label><input class="finput" id="pwd-con" type="password" placeholder="Repeat new password"></div>
-    </div></div>
-    <div class="mfoot"><button class="btn bo" onclick="closeModal('m-password')">Cancel</button><button class="btn bp" onclick="changeMyPw()">Update</button></div>
-  </div>
-</div>
-
-<div class="mbg" id="m-forgot">
-  <div class="modal msm">Change My Password
-    <div class="mhd"><div class="mttl">Forgot Password</div><button class="mxb" onclick="closeModal('m-forgot')">✕</button></div>
-    <div class="mbody">
-      <div class="al al-a"><span class="al-ico">💡</span><div>Contact your Developer/Admin to reset your password. Email:natnaelni@ethiopianairlines.com</div></div>
-      <div style="margin-top:8px;">
-        <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Developer Recovery</div>
-        <div class="fg">
-          <div class="fgroup"><label class="flabel">Recovery Code (for developer only)</label><input class="finput" id="rc-code" type="text" placeholder="Enter recovery code"></div>
-          <div class="fgroup"><label class="flabel">New Developer Password</label><input class="finput" id="rc-newpw" type="password" placeholder="New password"></div>
-        </div>
-      </div>
-    </div>
-    <div class="mfoot"><button class="btn bo" onclick="closeModal('m-forgot')">Close</button><button class="btn bd" onclick="useRecoveryCode()">Use Recovery Code</button></div>
-  </div>
-</div>
-
-<div class="mbg" id="m-tech">
-  <div class="modal mmd">
-    <div class="mhd"><div><div class="mttl" id="mt-title">Add Technician</div></div><button class="mxb" onclick="closeModal('m-tech')">✕</button></div>
-    <div class="mbody"><div class="fg f2">
-      <div class="fgroup"><label class="flabel">Employee ID *</label><input class="finput" id="mt-id" placeholder="e.g. T1007"></div>
-      <div class="fgroup"><label class="flabel">Full Name *</label><input class="finput" id="mt-name" placeholder="John Smith"></div>
-      <div class="fgroup"><label class="flabel">Monthly Target (hrs)</label><input class="finput" id="mt-target" type="number" placeholder="160"></div>
-      <div class="fgroup"><label class="flabel">Status</label><select class="fselect" id="mt-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
-      <div class="fgroup"><label class="flabel">Password</label><input class="finput" id="mt-pwd" type="text" value="demo"></div>
-      <div class="fgroup"><label class="flabel">Role Access</label><select class="fselect" id="mt-role-access"><option value="tech">Technician only</option><option value="tech_sup">Under supervision only</option><option value="tech_insp">Inspector + Technician + Preliminary</option><option value="all">All 4 roles</option></select><div style="font-size:11px;color:var(--tx3);margin-top:3px;">Technicians can only use roles assigned here.</div></div>
-      <div class="fgroup ff" style="grid-column:1/-1;">
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 12px;background:var(--gdim);border:1px solid rgba(16,185,129,.2);border-radius:8px;">
-          <input type="checkbox" id="mt-unsup" style="width:16px;height:16px;accent-color:var(--green);flex-shrink:0;">
-          <div><div style="font-size:13px;font-weight:700;color:var(--green);">👁 Under Supervision</div>
-          <div style="font-size:11px;color:var(--tx3);margin-top:2px;">Allocation hours auto-set to 75% of SDT on every entry</div></div>
-        </label>
-      </div>
-      <div class="fgroup"><label class="flabel">Profile Photo</label>
-        <div class="pic-up" onclick="document.getElementById('mt-pic').click()">
-          <img id="mt-pic-prev" class="pic-prev" src="" style="display:none;width:56px;height:56px;border-radius:50%;object-fit:cover;">
-          <span id="mt-pic-ph" style="font-size:26px;">📷</span>
-          <span style="font-size:11.5px;color:var(--tx2);">Click to upload</span>
-          <input type="file" id="mt-pic" accept="image/*" onchange="previewPic(this,'mt-pic-prev','mt-pic-ph')">
-        </div>
-      </div>
-    </div></div>
-    <div class="mfoot"><button class="btn bo" onclick="closeModal('m-tech')">Cancel</button><button class="btn bp" onclick="saveTech()">Save</button></div>
-  </div>
-</div>
-
-<div class="mbg" id="m-part">
-  <div class="modal mmd">
-    <div class="mhd"><div><div class="mttl" id="mp-title">Add Part</div></div><button class="mxb" onclick="closeModal('m-part')">✕</button></div>
-    <div class="mbody"><div class="fg f2">
-      <div class="fgroup ff"><label class="flabel">Description *</label><input class="finput" id="mp-name" placeholder="e.g. SEAT BACK, 8.9&quot; SVDU"></div>
-      <div class="fgroup"><label class="flabel">ATA Chapter</label><input class="finput" id="mp-ata" placeholder="e.g. 25-60-01"></div>
-      <div class="fgroup"><label class="flabel">Part Number *</label><input class="finput" id="mp-num" placeholder="e.g. TSFN-800-01"></div>
-      <div class="fgroup"><label class="flabel">Std Hours *</label><input class="finput" id="mp-hours" type="number" step="0.1" placeholder="2.5"></div>
-    </div></div>
-    <div class="mfoot"><button class="btn bo" onclick="closeModal('m-part')">Cancel</button><button class="btn bp" onclick="savePart()">Save</button></div>
-  </div>
-</div>
-
-<div class="mbg" id="m-leader">
-  <div class="modal mmd">
-    <div class="mhd"><div><div class="mttl" id="ml-title">Add Team Leader</div></div><button class="mxb" onclick="closeModal('m-leader')">✕</button></div>
-    <div class="mbody"><div class="fg f2">
-      <div class="fgroup"><label class="flabel">Leader ID *</label><input class="finput" id="ml-id" placeholder="TL002"></div>
-      <div class="fgroup"><label class="flabel">Full Name *</label><input class="finput" id="ml-name" placeholder="Name"></div>
-      <div class="fgroup"><label class="flabel">Email</label><input class="finput" id="ml-email" type="email" placeholder="email@company.com"></div>
-      <div class="fgroup"><label class="flabel">Password</label><input class="finput" id="ml-pwd" type="text" value="demo"></div>
-      <div class="fgroup"><label class="flabel">Status</label><select class="fselect" id="ml-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
-      <div class="fgroup"><label class="flabel">Profile Photo</label>
-        <div class="pic-up" onclick="document.getElementById('ml-pic').click()">
-          <img id="ml-pic-prev" src="" style="display:none;width:56px;height:56px;border-radius:50%;object-fit:cover;">
-          <span id="ml-pic-ph" style="font-size:26px;">📷</span>
-          <span style="font-size:11.5px;color:var(--tx2);">Click to upload</span>
-          <input type="file" id="ml-pic" accept="image/*" onchange="previewPic(this,'ml-pic-prev','ml-pic-ph')">
-        </div>
-      </div>
-    </div></div>
-    <div class="mfoot"><button class="btn bo" onclick="closeModal('m-leader')">Cancel</button><button class="btn bp" onclick="saveLeader()">Save</button></div>
-  </div>
-</div>
-
-
-<div class="mbg" id="m-controller">
-  <div class="modal mmd">
-    <div class="mhd"><div><div class="mttl" id="mc-title">Add Production Controller</div></div><button class="mxb" onclick="closeModal('m-controller')">✕</button></div>
-    <div class="mbody"><div class="fg f2">
-      <div class="fgroup"><label class="flabel">Controller ID *</label><input class="finput" id="mc-id" placeholder="CP002"></div>
-      <div class="fgroup"><label class="flabel">Full Name *</label><input class="finput" id="mc-name" placeholder="Name"></div>
-      <div class="fgroup"><label class="flabel">Email</label><input class="finput" id="mc-email" type="email" placeholder="email@company.com"></div>
-      <div class="fgroup"><label class="flabel">Password</label><input class="finput" id="mc-pwd" type="text" value="demo"></div>
-      <div class="fgroup"><label class="flabel">Status</label><select class="fselect" id="mc-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
-      <div class="fgroup"><label class="flabel">Profile Photo</label>
-        <div class="pic-up" onclick="document.getElementById('mc-pic').click()">
-          <img id="mc-pic-prev" src="" style="display:none;width:56px;height:56px;border-radius:50%;object-fit:cover;">
-          <span id="mc-pic-ph" style="font-size:26px;">📷</span>
-          <span style="font-size:11.5px;color:var(--tx2);">Click to upload</span>
-          <input type="file" id="mc-pic" accept="image/*" onchange="previewPic(this,'mc-pic-prev','mc-pic-ph')">
-        </div>
-      </div>
-    </div></div>
-    <div class="mfoot"><button class="btn bo" onclick="closeModal('m-controller')">Cancel</button><button class="btn bp" onclick="saveController()">Save</button></div>
-  </div>
-</div>
-
-<div class="mbg" id="m-monthtgt">
-  <div class="modal msm">
-    <div class="mhd"><div class="mttl">Set Monthly Target</div><button class="mxb" onclick="closeModal('m-monthtgt')">✕</button></div>
-    <div class="mbody"><div class="fg">
-      <div class="fgroup"><label class="flabel">Technician</label><select class="fselect" id="tgt-sel"></select></div>
-      <div class="fgroup"><label class="flabel">Monthly Target (hours)</label><input class="finput" id="tgt-val" type="number" step="1" placeholder="160"></div>
-    </div></div>
-    <div class="mfoot"><button class="btn bo" onclick="closeModal('m-monthtgt')">Cancel</button><button class="btn bp" onclick="saveMonthTgt()">Save</button></div>
-  </div>
-</div>
-
-<div class="mbg" id="m-override">
-  <div class="modal mmd">
-    <div class="mhd"><div class="mttl">Part Number Ratio Override</div><button class="mxb" onclick="closeModal('m-override')">✕</button></div>
-    <div class="mbody"><div class="fg f2">
-      <div class="fgroup ff">
-        <label class="flabel">Search &amp; Select Part *</label>
-        <div style="position:relative;">
-          <input class="finput" id="mro-part-search" placeholder="🔍 Type part number or description..." oninput="filterOverrideParts()" autocomplete="off" style="padding-right:36px;">
-          <span id="mro-sel-clear" onclick="clearOverrideSel()" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--tx3);font-size:15px;">✕</span>
-        </div>
-        <div id="mro-part-list" style="max-height:190px;overflow-y:auto;border:1px solid var(--bdr);border-radius:7px;background:var(--inp-bg);margin-top:4px;display:none;"></div>
-        <input type="hidden" id="mro-pnum" value="">
-        <div id="mro-sel-display" style="display:none;margin-top:6px;padding:8px 11px;background:var(--gdim);border:1px solid rgba(16,185,129,.25);border-radius:7px;font-size:12.5px;">
-          <span style="color:var(--green);font-weight:700;" id="mro-sel-num"></span> — <span style="color:var(--tx2);" id="mro-sel-name"></span>
-        </div>
-      </div>
-      <div class="fgroup"><label class="flabel" style="color:var(--blue);">🔧 Tech %</label><input class="ratio-input" id="mro-tech" type="number" min="0" max="100" value="25" style="width:100%;" oninput="updOvUI()"></div>
-      <div class="fgroup"><label class="flabel" style="color:var(--green);">👁 Sup %</label><input class="ratio-input" id="mro-sup" type="number" min="0" max="100" value="75" style="width:100%;" oninput="updOvUI()"></div>
-      <div style="grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr);">
-        <span style="font-size:12px;color:var(--tx2);">Total:</span><span class="rt ok" id="rt-ov">100%</span>
-        <div class="rv" id="rv-ov" style="flex:1;"><div class="rv-s" style="background:var(--blue);flex:25;"></div><div class="rv-s" style="background:var(--green);flex:75;"></div></div>
-      </div>
-      <div class="fgroup" style="background:var(--vdim);border:1px solid rgba(139,92,246,.2);border-radius:8px;padding:11px;"><label class="flabel" style="color:var(--violet);">🔍 Inspector HRS</label><div style="display:flex;align-items:center;gap:7px;margin-top:6px;"><input class="ratio-input" id="mro-insp" type="number" min="0" step="0.1" value="1.0" style="width:80px;"><span style="color:var(--violet);font-weight:700;font-size:12px;">HRS</span></div></div>
-      <div class="fgroup" style="background:var(--cdim);border:1px solid rgba(6,182,212,.2);border-radius:8px;padding:11px;"><label class="flabel" style="color:var(--cyan);">🔎 Prelim HRS</label><div style="display:flex;align-items:center;gap:7px;margin-top:6px;"><input class="ratio-input" id="mro-prelim" type="number" min="0" step="0.1" value="1.0" style="width:80px;"><span style="color:var(--cyan);font-weight:700;font-size:12px;">HRS</span></div></div>
-      <div class="fgroup ff"><label class="flabel">Note</label><input class="finput" id="mro-note" placeholder="Optional..."></div>
-    </div></div>
-    <div class="mfoot"><button class="btn bo" onclick="closeModal('m-override')">Cancel</button><button class="btn bp" onclick="saveOverride()">Save</button></div>
-  </div>
-</div>
-
-<div class="mbg" id="m-globalpwd">
-  <div class="modal msm">
-    <div class="mhd"><div class="mttl">Default Passwords</div><button class="mxb" onclick="closeModal('m-globalpwd')">✕</button></div>
-    <div class="mbody"><div class="fg">
-      <div class="fgroup"><label class="flabel">Technician Default</label><input class="finput" id="def-tech-pwd" placeholder="New default"></div>
-      <div class="fgroup"><label class="flabel">Team Leader Default</label><input class="finput" id="def-lead-pwd" placeholder="New default"></div>
-    </div></div>
-    <div class="mfoot"><button class="btn bo" onclick="closeModal('m-globalpwd')">Cancel</button><button class="btn bp" onclick="saveDefPwds()">Save</button></div>
-  </div>
-</div>
-
-<div class="mbg" id="m-import-tech"><div class="modal msm"><div class="mhd"><div class="mttl">Import Technicians</div><button class="mxb" onclick="closeModal('m-import-tech')">✕</button></div><div class="mbody"><div style="border:2px dashed var(--bdr2);border-radius:8px;padding:24px;text-align:center;cursor:pointer;" onclick="document.getElementById('imp-tech-f').click()">📂 Upload CSV/Excel<input type="file" id="imp-tech-f" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleTechImport(this)"></div></div><div class="mfoot"><button class="btn bo" onclick="closeModal('m-import-tech')">Cancel</button></div></div></div>
-<div class="mbg" id="m-import-part"><div class="modal msm"><div class="mhd"><div class="mttl">Import Parts</div><button class="mxb" onclick="closeModal('m-import-part')">✕</button></div><div class="mbody"><div style="border:2px dashed var(--bdr2);border-radius:8px;padding:24px;text-align:center;cursor:pointer;" onclick="document.getElementById('imp-part-f').click()">📂 Upload CSV/Excel<input type="file" id="imp-part-f" accept=".csv,.xlsx,.xls" style="display:none" onchange="handlePartImport(this)"></div></div><div class="mfoot"><button class="btn bo" onclick="closeModal('m-import-part')">Cancel</button></div></div></div>
-
-<div class="mbg" id="m-import-summary">
-  <div class="modal mlg">
-    <div class="mhd">
-      <div><div class="mttl" id="imp-sum-title">Import Summary</div><div class="msub">Imported items are shown below after upload.</div></div>
-      <button class="mxb" onclick="closeModal('m-import-summary')">✕</button>
-    </div>
-    <div class="mbody"><div id="imp-sum-body"></div></div>
-    <div class="mfoot"><button class="btn bp" onclick="closeModal('m-import-summary')">Done</button></div>
-  </div>
-</div>
-
-<script>
 'use strict';
 // ════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ════════════════════════════════════════════════
-const APP_VERSION = '1.3.4';
+const APP_VERSION = '1.3.3';
 const DEV_RECOVERY_CODE = 'PROTRACK-DEV-2025-RESET';
 const EAT_TZ='Africa/Addis_Ababa';
 const ROLES=['Technician','Under Supervision','Inspector','Preliminary Inspector'];
@@ -1348,9 +65,14 @@ let lastImportedParts=[];
 // ════════════════════════════════════════════════
 //  PRODUCTION IMPORT PERSISTENCE
 // ════════════════════════════════════════════════
+
+// IMPORT: IGNORE EMPLOYEE ALWAYS (button prompts)
+const EMP_IMPORT_IGNORE_KEY='pt-import-ignore-employee-always';
+let empImportIgnoreAlways=new Set();
+try{empImportIgnoreAlways=new Set(JSON.parse(localStorage.getItem(EMP_IMPORT_IGNORE_KEY)||'[]'));}catch(e){empImportIgnoreAlways=new Set();}
 const PROD_IMPORT_STORAGE_KEY='pt-production-import-state-v1';
-function saveProductionImportState(){try{localStorage.setItem(PROD_IMPORT_STORAGE_KEY,JSON.stringify({results:productionImportResults,pendingRows:productionImportPendingRows,ignoredIds:productionImportIgnoredIds,keySeq:productionImportKeySeq}));}catch(e){}}
-function loadProductionImportState(){try{const raw=localStorage.getItem(PROD_IMPORT_STORAGE_KEY);if(!raw)return;const data=JSON.parse(raw);if(Array.isArray(data?.results))productionImportResults=data.results;productionImportPendingRows=(data?.pendingRows&&typeof data.pendingRows==='object')?data.pendingRows:{};productionImportIgnoredIds=Array.isArray(data?.ignoredIds)?data.ignoredIds.map(v=>String(v).trim().toUpperCase()).filter(Boolean):[];productionImportKeySeq=Number.isFinite(Number(data?.keySeq))?Number(data.keySeq):productionImportKeySeq;}catch(e){}}
+function saveProductionImportState(){try{localStorage.setItem(PROD_IMPORT_STORAGE_KEY,JSON.stringify({results:productionImportResults,pendingRows:productionImportPendingRows,keySeq:productionImportKeySeq}));}catch(e){}}
+function loadProductionImportState(){try{const raw=localStorage.getItem(PROD_IMPORT_STORAGE_KEY);if(!raw)return;const data=JSON.parse(raw);if(Array.isArray(data?.results))productionImportResults=data.results;productionImportPendingRows=(data?.pendingRows&&typeof data.pendingRows==='object')?data.pendingRows:{};productionImportKeySeq=Number.isFinite(Number(data?.keySeq))?Number(data.keySeq):productionImportKeySeq;}catch(e){}}
 
 // ════════════════════════════════════════════════
 //  THEME
@@ -1537,6 +259,67 @@ function toast(msg,type='success'){
   void tb.offsetWidth;tb.style.animation='none';tb.offsetWidth;tb.style.animation='';
   t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),3500);
 }
+// ════════════════════════════════════════════════
+// IMPORT BUTTON-BASED PROMPTS (replace prompt())
+// ════════════════════════════════════════════════
+function askImportChoice({title='Import Action',sub='Choose an option',msg='',buttons=[]}={}){
+  return new Promise(resolve=>{
+    const t=document.getElementById('ic-title');
+    const s=document.getElementById('ic-sub');
+    const m=document.getElementById('ic-msg');
+    const b=document.getElementById('ic-btns');
+    if(t)t.textContent=title;
+    if(s)s.textContent=sub;
+    if(m)m.textContent=msg;
+    if(!b){resolve(null);return;}
+    b.innerHTML='';
+    (buttons||[]).forEach(btn=>{
+      const el=document.createElement('button');
+      el.className='btn '+(btn.cls||'bo');
+      el.textContent=btn.label||'OK';
+      el.onclick=()=>{closeModal('m-import-choice');resolve(btn.value);};
+      b.appendChild(el);
+    });
+    const bg=document.getElementById('m-import-choice');
+    if(bg){bg.onclick=(e)=>{ if(e.target===bg){closeModal('m-import-choice');resolve(null);} };}
+    openModal('m-import-choice');
+  });
+}
+
+function askImportMultiIds({title='Select IDs',sub='Choose one or more',msg='',ids=[]}={}){
+  return new Promise(resolve=>{
+    const t=document.getElementById('im-title');
+    const s=document.getElementById('im-sub');
+    const m=document.getElementById('im-msg');
+    const list=document.getElementById('im-list');
+    if(t)t.textContent=title;
+    if(s)s.textContent=sub;
+    if(m)m.textContent=msg;
+    if(!list){resolve(null);return;}
+    list.innerHTML='';
+    (ids||[]).forEach(id=>{
+      const row=document.createElement('label');
+      row.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--bdr);border-radius:9px;background:var(--inp-bg);cursor:pointer;';
+      row.innerHTML=`<input type='checkbox' class='im-cb' value='${String(id).replace(/'/g,'')}' style='width:16px;height:16px;accent-color:var(--blue);'> <span class='mono' style='font-weight:800;color:var(--blue);'>${String(id)}</span>`;
+      list.appendChild(row);
+    });
+    const cbs=()=>Array.from(document.querySelectorAll('.im-cb'));
+    const setAll=(v)=>cbs().forEach(cb=>cb.checked=v);
+    document.getElementById('im-all').onclick=()=>setAll(true);
+    document.getElementById('im-none').onclick=()=>setAll(false);
+    document.getElementById('im-skip').onclick=()=>{closeModal('m-import-multi');resolve([]);};
+    document.getElementById('im-cancel').onclick=()=>{closeModal('m-import-multi');resolve(null);};
+    document.getElementById('im-apply').onclick=()=>{
+      const picked=cbs().filter(cb=>cb.checked).map(cb=>cb.value).filter(Boolean);
+      closeModal('m-import-multi');
+      resolve(picked.length?picked:[]);
+    };
+    const bg=document.getElementById('m-import-multi');
+    if(bg){bg.onclick=(e)=>{ if(e.target===bg){closeModal('m-import-multi');resolve(null);} };}
+    openModal('m-import-multi');
+  });
+}
+
 
 // ════════════════════════════════════════════════
 //  PROFILE PICTURES
@@ -2160,7 +943,6 @@ document.addEventListener('keydown',function(e){
 });
 
 function renderEntry(){
-  if(CR==='tech'){navTo('mystats');return;}
   if(CR==='tech'&&CU){applyRoleAccessToButtons('e',CU);ensureAllowedRole('e',CU);if(jobType==='scrap'){forcePickRole('e','Inspector',2);}}
   const today=todayEAT(),wr=getWR();
   const me=entries.filter(e=>e.techId===CU.id);
@@ -3308,7 +2090,7 @@ window.saveMonthTgt=async function(){const tid=document.getElementById('tgt-sel'
 // ════════════════════════════════════════════════
 //  IMPORT
 // ════════════════════════════════════════════════
-window.handleTechImport=function(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{lastImportedTechs=[];const wb=XLSX.read(e.target.result,{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);for(const row of rows){if(row.ID&&row.Name){const id=sanitize(row.ID.toString());if(!techs.find(t=>t.id===id)){const nt={id,name:sanitize(row.Name.toString()),monthlyTarget:parseFloat(row.MonthlyTarget)||settings.defaultMonthlyTarget||160,status:'active',password:settings.passwords?.tech||'demo',initials:row.Name.toString().slice(0,2).toUpperCase(),color:'#3b82f6'};await window.setDoc(window.doc(window.db,'technicians',id),nt);techs.push(nt);lastImportedTechs.push(nt);}}}renderTechs();toast('Import complete');closeModal('m-import-tech');renderImportSummary('tech');}catch(err){toast('Import failed','error');}};r.readAsArrayBuffer(f);};
+window.handleTechImport=function(input){const __IGN_KEY='pt-tech-import-ignore-always';let __ign=new Set();try{__ign=new Set(JSON.parse(localStorage.getItem(__IGN_KEY)||'[]'));}catch(e){__ign=new Set();}const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{lastImportedTechs=[];const wb=XLSX.read(e.target.result,{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);for(const row of rows){if(row.ID&&row.Name){const id=sanitize(row.ID.toString());if(__ign.has(id))continue;if(techs.find(t=>t.id===id)){const decision=await askImportChoice({title:'Duplicate Technician ID',sub:'Import Technicians',msg:'Duplicate Employee ID: '+id,buttons:[{label:'Skip Once',value:'skip',cls:'bo'},{label:'Ignore Always',value:'ignore',cls:'bo'},{label:'Cancel Import',value:'cancel',cls:'bd'}]});if(decision===null||decision==='cancel')break;if(decision==='ignore'){__ign.add(id);try{localStorage.setItem(__IGN_KEY,JSON.stringify(Array.from(__ign)));}catch(e){}}continue;}if(!techs.find(t=>t.id===id)){const nt={id,name:sanitize(row.Name.toString()),monthlyTarget:parseFloat(row.MonthlyTarget)||settings.defaultMonthlyTarget||160,status:'active',password:settings.passwords?.tech||'demo',initials:row.Name.toString().slice(0,2).toUpperCase(),color:'#3b82f6'};await window.setDoc(window.doc(window.db,'technicians',id),nt);techs.push(nt);lastImportedTechs.push(nt);}}}renderTechs();toast('Import complete');closeModal('m-import-tech');renderImportSummary('tech');}catch(err){toast('Import failed','error');}};r.readAsArrayBuffer(f);};
 window.handlePartImport=function(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{lastImportedParts=[];const wb=XLSX.read(e.target.result,{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);for(const row of rows){if(row.Name&&row.Number){const np={id:Date.now().toString()+Math.random(),name:sanitize(row.Name.toString()),num:sanitize(row.Number.toString()),hours:parseFloat(row.Hours)||1,ata:sanitize(row.ATA||''),desc:sanitize(row.Description||row.Name.toString())};await window.setDoc(window.doc(window.db,'parts',np.id),np);parts.push(np);lastImportedParts.push(np);}}renderParts();toast('Import complete');closeModal('m-import-part');renderImportSummary('part');}catch(err){toast('Import failed','error');}};r.readAsArrayBuffer(f);};
 
 // ════════════════════════════════════════════════
@@ -3321,177 +2103,40 @@ window.handlePartImport=function(input){const f=input.files[0];if(!f)return;cons
 // ════════════════════════════════════════════════
 let productionImportResults=[];
 let productionImportPendingRows={};
-let productionImportIgnoredIds=[];
 let productionImportKeySeq=0;
 loadProductionImportState();
 function getImportValue(row, keys){
-  if(!row||!keys)return '';
-  const lookup={};
-  Object.keys(row).forEach(k=>lookup[String(k).trim().toLowerCase()]=row[k]);
-  for(const k of keys){
-    const v=lookup[String(k).trim().toLowerCase()];
-    if(v!==undefined&&v!==null&&String(v).trim()!=='')return v;
-  }
-  return '';
-}
-function getUnderSupImportValue(row){
-  // Prefer AJ exactly, then official labels, then blank-header fallbacks.
-  const direct = getImportValue(row,['AJ','Under Supervision','UNDER_SUP','UNDER SUP','UNDER SUPERVISION','UNDER_SUPERVISION','UNDER SUPERVISION ID','UNDER_SUP_ID']);
-  if(String(direct ?? '').trim() !== '') return direct;
-
-  const keys = Object.keys(row || {});
-  for(const k of keys){
-    const kk = String(k).trim().toUpperCase();
-    if(kk !== 'AJ' && !/^__EMPTY/i.test(kk) && !/^UNNAMED:/i.test(kk)) continue;
-    const v = String(row[k] ?? '').trim();
-    if(!v) continue;
-    if(/^\d{3,8}(\s*,\s*\d{3,8})*$/.test(v)) return v;
-  }
-  return '';
+  if(!row||!keys)return'';const lookup={};Object.keys(row).forEach(k=>lookup[String(k).trim().toLowerCase()]=row[k]);
+  for(const k of keys){const v=lookup[String(k).trim().toLowerCase()];if(v!==undefined&&v!==null&&String(v).trim()!=='')return v;}return'';
 }
 function normalizeImportDate(value){
-  try{
-    if(value instanceof Date && !isNaN(value)) return value.toISOString().slice(0,10);
-    if(typeof value==='number' && isFinite(value)){
-      const d=new Date(Math.round((value-25569)*86400*1000));
-      if(!isNaN(d)) return d.toISOString().slice(0,10);
-    }
-    const s=String(value ?? '').trim();
-    if(!s) return '';
-    const d=new Date(s);
-    if(!isNaN(d)) return d.toISOString().slice(0,10);
-    const m=s.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
-    if(m) return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
-  }catch(e){}
-  return '';
+  try{if(value instanceof Date&&!isNaN(value))return value.toISOString().slice(0,10);if(typeof value==='number'&&isFinite(value)){const d=new Date(Math.round((value-25569)*86400*1000));if(!isNaN(d))return d.toISOString().slice(0,10);}const s=String(value??'').trim();if(!s)return'';const d=new Date(s);if(!isNaN(d))return d.toISOString().slice(0,10);const m=s.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);if(m)return`${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;}catch(e){}return'';
 }
-function splitImportIds(value){
-  const raw=String(value ?? '').trim();
-  if(!raw) return [];
-  return raw.split(/[;,\/\|]+/).map(s=>String(s).trim()).filter(Boolean);
-}
-function normalizeImportStatus(value){
-  const s=String(value ?? '').trim().toUpperCase();
-  if(s==='RFI') return 'completed';
-  if(s==='SCRAP') return 'scrap';
-  if(s==='CMPLT AS U/S' || s.includes('CMPLT') || s.includes('U/S')) return 'completed';
-  return 'unsupported';
-}
-function normalizePartNumberForImport(v){
-  return String(v ?? '').trim().toUpperCase().replace(/[\s\-—–_]+/g,'').replace(/[^A-Z0-9]/g,'');
-}
-function findPartByNumber(partNumber){
-  const target=normalizePartNumberForImport(partNumber);
-  if(!target) return null;
-  return parts.find(p=>normalizePartNumberForImport(p.num||p.partNumber||p.id)===target) || null;
-}
-function isFooterImportRow(row){
-  const wp=String(getImportValue(row,['WP ID','WPID','Task Code','TaskCode']) ?? '').trim();
-  if(!wp) return true;
-  const low=wp.toLowerCase();
-  return low.includes('average') || low.includes('total count') || low.includes('total est') || low.includes('total act') || low.startsWith('total ');
-}
-function normalizeIgnoredImportId(v){return String(v??'').trim().toUpperCase();}
-function isIgnoredImportId(v){const id=normalizeIgnoredImportId(v);return !!id && productionImportIgnoredIds.includes(id);}
-function addIgnoredImportId(v){const id=normalizeIgnoredImportId(v);if(!id)return false;if(!productionImportIgnoredIds.includes(id)){productionImportIgnoredIds.push(id);saveProductionImportState();return true;}return false;}
-
-function ensureImportChoiceModal(){
-  let host=document.getElementById('import-choice-overlay');
-  if(host) return host;
-  host=document.createElement('div');
-  host.id='import-choice-overlay';
-  host.style.cssText='position:fixed;inset:0;z-index:10050;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);backdrop-filter:blur(3px);padding:18px;';
-  host.innerHTML=`<div style="width:min(640px,96vw);background:var(--card);border:1px solid var(--bdr);border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.45);overflow:hidden;">
-    <div style="padding:18px 20px;border-bottom:1px solid var(--bdr);font-weight:800;font-size:16px;" id="import-choice-title"></div>
-    <div style="padding:14px 20px 8px;color:var(--tx2);font-size:14px;line-height:1.55;" id="import-choice-msg"></div>
-    <div style="padding:12px 20px 20px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;" id="import-choice-actions"></div>
-  </div>`;
-  document.body.appendChild(host);
-  host.addEventListener('click',e=>{if(e.target===host){const cancel=host._cancel; if(typeof cancel==='function') cancel();}});
-  return host;
-}
-function askImportChoice({title,message,buttons}){
-  const host=ensureImportChoiceModal();
-  const t=host.querySelector('#import-choice-title');
-  const m=host.querySelector('#import-choice-msg');
-  const a=host.querySelector('#import-choice-actions');
-  t.textContent=title||'Choose an action';
-  m.textContent=message||'';
-  a.innerHTML='';
-  host.style.display='flex';
-  return new Promise(resolve=>{
-    const done=(val)=>{host.style.display='none'; host._cancel=null; resolve(val);};
-    host._cancel=()=>done(null);
-    (buttons||[]).forEach(btn=>{
-      const b=document.createElement('button');
-      b.className='btn '+(btn.variant||'bo');
-      b.style.minWidth='120px';
-      b.style.padding='10px 14px';
-      b.style.fontSize='13px';
-      b.type='button';
-      b.textContent=btn.label;
-      b.onclick=()=>done(btn.value);
-      a.appendChild(b);
-    });
-  });
-}
+function splitImportIds(value){const raw=String(value??'').trim();if(!raw)return[];const seen=new Set();return raw.split(/[,;\/\s\n\r\t]+/).map(x=>String(x).trim()).filter(x=>x&&!['0','-','null','undefined','nan','n/a','na'].includes(x.toLowerCase())).filter(x=>{if(seen.has(x))return false;seen.add(x);return true;});}
+function normalizeImportStatus(value){const s=String(value??'').trim().toUpperCase();if(s==='RFI')return'completed';if(s==='SCRAP')return'scrap';if(s==='CMPLT AS U/S'||s.includes('CMPLT')||s.includes('U/S'))return'under_supervision_skip';return'unsupported';}
+function normalizePartNumberForImport(v){return String(v??'').trim().toUpperCase().replace(/[\s\-—–_]+/g,'').replace(/[^A-Z0-9]/g,'');}
+function findPartByNumber(partNumber){const target=normalizePartNumberForImport(partNumber);if(!target)return null;return parts.find(p=>normalizePartNumberForImport(p.num||p.partNumber||p.id)===target)||null;}
+function isFooterImportRow(row){const wp=String(getImportValue(row,['WP ID','WPID','Task Code','TaskCode'])??'').trim();if(!wp)return true;const low=wp.toLowerCase();return low.includes('average')||low.includes('total count')||low.includes('total est')||low.includes('total act')||low.startsWith('total ');}
 async function chooseImportIds(ids,role,taskCode){
   if(!ids||!ids.length) return [];
   if(ids.length===1) return ids;
-  const choice = await askImportChoice({
-    title:`Multiple ${role} IDs found`,
-    message:`WP ${taskCode} has more than one ${role} ID. Click one button to continue.`,
-    buttons:[
-      ...ids.map(id=>({label:id,value:id,variant:'bp'})),
-      {label:'All',value:'ALL',variant:'bg_'},
-      {label:'Skip',value:'SKIP',variant:'bo'},
-      {label:'Cancel import',value:'CANCEL',variant:'bd'}
-    ]
+  const picked = await askImportMultiIds({
+    title:'Multiple IDs Found',
+    sub:'Import Production Entries',
+    msg:`Multiple ${role} IDs found for WP ${taskCode}. Select one or more IDs:`,
+    ids
   });
-  if(choice===null || choice==='CANCEL') return null;
-  if(choice==='SKIP') return [];
-  if(choice==='ALL') return ids;
-  return [choice];
+  return picked; // null means cancel import, [] means skip
 }
+IDs found for WP ${taskCode}:\n${ids.join(', ')}\n\nEnter all, one ID, multiple IDs separated by comma, or skip`);if(ans===null)return null;const v=String(ans).trim();if(!v)continue;if(v.toLowerCase()==='skip')return[];if(v.toLowerCase()==='all')return ids;const selected=splitImportIds(v).filter(x=>ids.includes(x));if(selected.length)return selected;alert('Invalid selection. Use all, skip, or IDs from the list.');}}
 function importSafe(v){return String(v??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');}
 function addImportResult(r){productionImportResults.push(r);saveProductionImportState();}
 function openImportAddPart(partNumber='',partName=''){openAddPart();setTimeout(()=>{sv('mp-num',String(partNumber||''));sv('mp-name',String(partName||''));sv('mp-hours','');sv('mp-ata','');},80);}
 function openImportAddEmployee(id='',role='Technician'){openAddTech();setTimeout(()=>{sv('mt-id',String(id||''));sv('mt-name','Imported Employee '+String(id||''));sv('mt-target',settings.defaultMonthlyTarget||160);sv('mt-pwd',settings.passwords?.tech||'demo');const st=document.getElementById('mt-status');if(st)st.value='active';const ra=document.getElementById('mt-role-access');if(ra)ra.value=(role==='Technician')?'tech':'tech_insp';const us=document.getElementById('mt-unsup');if(us)us.checked=false;},80);}
 function makeImportPendingKey(row,rowIndex){const key='p'+(++productionImportKeySeq);productionImportPendingRows[key]={row,rowIndex};saveProductionImportState();return key;}
 function addImportMissingPart(partNumber,partName,rowNum,taskCode,row,rowIndex,date){const key=makeImportPendingKey(row,rowIndex);addImportResult({key,row:rowNum,date:date||'—',employee:'—',role:'—',taskCode,partNumber,hours:'—',status:'Part not found. Add part, enter correct hours, save, then click Try Import.',type:'warn',action:'part',partNumber,partName});}
-async function resolveImportEmployee(id,role,rowNum,taskCode,partNumber,row,rowIndex,date){
-  const rawId=String(id??'').trim();
-  const idKey=normalizeIgnoredImportId(rawId);
-  if(!rawId)return null;
-  if(isIgnoredImportId(idKey)) return null;
-  const tech=techs.find(t=>String(t.id).trim()===rawId);
-  if(tech)return tech;
-  const choice=await askImportChoice({
-    title:`Employee not found for ${role}`,
-    message:`Employee ID ${rawId} was not found for ${role}. Choose one action below.`,
-    buttons:[
-      {label:'Add employee now',value:'ADD',variant:'bp'},
-      {label:'Ignore this ID',value:'IGNORE_ONCE',variant:'bo'},
-      {label:'Ignore this ID always',value:'IGNORE_ALWAYS',variant:'bg_'},
-      {label:'Cancel import',value:'CANCEL',variant:'bd'}
-    ]
-  });
-  if(choice===null||choice==='CANCEL')return'CANCEL_IMPORT';
-  if(choice==='IGNORE_ALWAYS'){
-    addIgnoredImportId(idKey);
-    toast(`Ignored ${rawId} for future imports`,'warn');
-    return null;
-  }
-  if(choice==='ADD'){
-    const key=makeImportPendingKey(row,rowIndex);
-    openImportAddEmployee(rawId,role);
-    addImportResult({key,row:rowNum,date:date||'—',employee:rawId,role,taskCode,partNumber,hours:'—',status:'Employee not found. Add employee, save, then click Try Import.',type:'warn',action:'tech',employeeId:rawId,employeeRole:role});
-    return'ADD_REQUIRED';
-  }
-  return null;
-}
-
-async function buildImportEntriesForRow(row,rowIndex){
+async async function resolveImportEmployee(id,role,rowNum,taskCode,partNumber,row,rowIndex,date){const tech=techs.find(t=>String(t.id).trim()===String(id).trim());if(tech)return tech;if(empImportIgnoreAlways.has(String(id).trim()))return null;const decision=await askImportChoice({title:'Employee Not Found',sub:'Import Production Entries',msg:`Employee ID ${id} was not found for ${role}.`,buttons:[{label:'Add Employee',value:'add',cls:'bp'},{label:'Ignore Once',value:'ignore',cls:'bo'},{label:'Ignore Always',value:'ignoreAlways',cls:'bo'},{label:'Cancel Import',value:'cancel',cls:'bd'}]});if(decision===null||decision==='cancel')return'CANCEL_IMPORT';if(decision==='ignoreAlways'){empImportIgnoreAlways.add(String(id).trim());try{localStorage.setItem(EMP_IMPORT_IGNORE_KEY,JSON.stringify(Array.from(empImportIgnoreAlways)));}catch(e){}return null;}if(decision==='ignore')return null;if(decision==='add'){const key=makeImportPendingKey(row,rowIndex);openImportAddEmployee(id,role);addImportResult({key,row:rowNum,date:date||'—',employee:id,role,taskCode,partNumber,hours:'—',status:'Employee not found. Add employee, save, then click Try Import.',type:'warn',action:'tech',employeeId:id,employeeRole:role});return'ADD_REQUIRED';}return null;}
+function buildImportEntriesForRow(row,rowIndex){
   const rowNum=rowIndex+2;if(isFooterImportRow(row))return[];
   const taskCode=String(getImportValue(row,['WP ID','WPID','Task Code','TaskCode'])||'').trim().toUpperCase();
   const partName=String(getImportValue(row,['PART NAME','Part Name','Description'])||'').trim();
@@ -3500,11 +2145,11 @@ async function buildImportEntriesForRow(row,rowIndex){
   const date=normalizeImportDate(getImportValue(row,['Date Completed','DATE COMPLETED','Completed Date']));
   if(!taskCode)return[];
   if(!date){addImportResult({row:rowNum,date:'—',employee:'—',role:'—',taskCode,partNumber,hours:'—',status:'Error: Date Completed is missing/invalid',type:'error'});return[];}
-  if(jobType==='unsupported')return[]; // ignored totally: no preview row
+  if(jobType==='under_supervision_skip'||jobType==='unsupported')return[]; // ignored totally: no preview row
   const part=findPartByNumber(partNumber);if(!part){addImportMissingPart(partNumber,partName,rowNum,taskCode,row,rowIndex,date);return[];}
-  const roleFields=[{role:'Technician',keys:['TECH_ID','TECH ID','Tech ID','Technician ID']},{role:'Under Supervision',keys:['UNDER_SUP','UNDER SUP','UNDER-SUP','UNDERSUPERVISION','UNDER SUPERVISION']},{role:'Inspector',keys:['Released By','RELEASED BY','ReleasedBy']},{role:'Preliminary Inspector',keys:['PRELIM_INSP','PRELIM INSP','PRELIM-INSP','PRELIMINARY ROLE','PRELIMINARY_ROLE']}];
+  const roleFields=[{role:'Technician',keys:['TECH_ID','TECH ID','Tech ID','Technician ID']},{role:'Under Supervision',keys:['UNDER_SUP','UNDER SUP','UNDER-SUP','UNDERSUPERVISION','UNDER SUPERVISION', 'UNDER_SUPERVISION', 'UNDER SUPERVISION ID', 'UNDER SUPERVISION_ID', 'UNDER SUP ID', 'UNDER_SUP_ID', 'UNDER SUPERVISION TECH', 'UNDER_SUP_TECH']},{role:'Inspector',keys:['Released By','RELEASED BY','ReleasedBy']},{role:'Preliminary Inspector',keys:['PRELIM_INSP','PRELIM INSP','PRELIM-INSP','PRELIMINARY ROLE','PRELIMINARY_ROLE']}];
   const out=[];
-  for(const rf of roleFields){let ids=splitImportIds(rf.role==='Under Supervision'?getUnderSupImportValue(row):getImportValue(row,rf.keys));ids=await chooseImportIds(ids,rf.role,taskCode);if(ids===null)return'CANCEL_IMPORT';for(const id of ids){const tech=await resolveImportEmployee(id,rf.role,rowNum,taskCode,part.num,row,rowIndex,date);if(tech==='CANCEL_IMPORT')return'CANCEL_IMPORT';if(!tech||tech==='ADD_REQUIRED')continue;const hrs=calcPoolHrs(part,rf.role,taskCode);out.push({techId:tech.id,techName:tech.name,pname:part.name,pnum:part.num,taskCode,jobRole:rf.role,jobType,time:date,hours:hrs,stdHours:part.hours,isInspector:rf.role==='Inspector'||rf.role==='Preliminary Inspector',ata:part.ata||'',desc:part.name,scrapHrs:jobType==='scrap'&&rf.role==='Inspector'?(settings.scrapDefaultHrs||2):null,approvalStatus:'pending',submittedBy:CU?.name||'Import User',submittedByRole:CR||'import',imported:true,importedSource:'ComponentTATStatus',importedAt:new Date().toISOString(),_preview:{row:rowNum,date,employee:`${tech.name} (${tech.id})`,role:rf.role,taskCode,partNumber:part.num,hours:hrs}});}}
+  for(const rf of roleFields){let ids=splitImportIds(getImportValue(row,rf.keys));ids=chooseImportIds(ids,rf.role,taskCode);if(ids===null)return'CANCEL_IMPORT';for(const id of ids){const tech=await resolveImportEmployee(id,rf.role,rowNum,taskCode,part.num,row,rowIndex,date);if(tech==='CANCEL_IMPORT')return'CANCEL_IMPORT';if(!tech||tech==='ADD_REQUIRED')continue;const hrs=calcPoolHrs(part,rf.role,taskCode);out.push({techId:tech.id,techName:tech.name,pname:part.name,pnum:part.num,taskCode,jobRole:rf.role,jobType,time:date,hours:hrs,stdHours:part.hours,isInspector:rf.role==='Inspector'||rf.role==='Preliminary Inspector',ata:part.ata||'',desc:part.name,scrapHrs:jobType==='scrap'&&rf.role==='Inspector'?(settings.scrapDefaultHrs||2):null,approvalStatus:'pending',submittedBy:CU?.name||'Import User',submittedByRole:CR||'import',imported:true,importedSource:'ComponentTATStatus',importedAt:new Date().toISOString(),_preview:{row:rowNum,date,employee:`${tech.name} (${tech.id})`,role:rf.role,taskCode,partNumber:part.num,hours:hrs}});}}
   return out;
 }
 async function saveImportEntries(built,rowIndexForErr=0){let saved=0,errors=0;if(!built||!built.length)return{saved,errors};for(const entry of built){try{const prev=entry._preview||{};delete entry._preview;if(isDuplicateEntry(entry)){continue;}const ref=await window.addDoc(window.collection(window.db,'entries'),entry);entry.id=ref.id;entries.unshift(entry);saved++;addImportResult({...prev,status:'Saved as pending',type:'success'});}catch(err){errors++;addImportResult({row:rowIndexForErr+2,date:entry.time||'—',employee:entry.techId||'—',role:entry.jobRole||'—',taskCode:entry.taskCode||'—',partNumber:entry.pnum||'—',hours:'—',status:'Save error: '+(err.message||err),type:'error'});}}return{saved,errors};}
@@ -3512,7 +2157,7 @@ async function retryProductionImportRow(key){const p=productionImportPendingRows
 function renderProductionImportPreview(results=productionImportResults){const body=document.getElementById('prod-import-body');if(!body)return;body.dataset.hasImport='1';if(!results.length){body.innerHTML='<tr><td colspan="8" class="empty">No import results</td></tr>';return;}const cls=t=>t==='success'?'bgr':t==='error'?'bred':t==='duplicate'?'bgray':t==='info'?'bblu':'bamb';body.innerHTML=results.map(r=>{let action='';if(r.action==='part')action=` <button class="btn bp bsm" onclick="openImportAddPart('${importSafe(r.partNumber)}','${importSafe(r.partName)}')">+ Add Part</button> <button class="btn bg_ bsm" onclick="retryProductionImportRow('${r.key}')">↻ Try Import</button>`;if(r.action==='tech')action=` <button class="btn bp bsm" onclick="openImportAddEmployee('${importSafe(r.employeeId)}','${importSafe(r.employeeRole)}')">+ Add Employee</button> <button class="btn bg_ bsm" onclick="retryProductionImportRow('${r.key}')">↻ Try Import</button>`;return`<tr><td class="mono">${sanitize(String(r.row??''))}</td><td class="mono">${sanitize(String(r.date??'—'))}</td><td>${sanitize(String(r.employee??'—'))}</td><td>${sanitize(String(r.role??'—'))}</td><td class="mono" style="color:var(--blue);">${sanitize(String(r.taskCode??'—'))}</td><td class="mono" style="color:var(--amber);">${sanitize(String(r.partNumber??'—'))}</td><td class="mono">${r.hours!==undefined&&r.hours!=='—'?sanitizeNum(r.hours).toFixed(2)+'h':'—'}</td><td><span class="bdg ${cls(r.type)}">${sanitize(String(r.status??''))}</span>${action}</td></tr>`;}).join('');}
 function clearProductionImportPreview(){productionImportResults=[];productionImportPendingRows={};productionImportKeySeq=0;saveProductionImportState();const body=document.getElementById('prod-import-body');if(body){delete body.dataset.hasImport;body.innerHTML='<tr><td colspan="8" class="empty">No import yet</td></tr>';}}
 function renderProductionImportPage(){const body=document.getElementById('prod-import-body');if(!body)return;if(productionImportResults.length)renderProductionImportPreview();else if(!body.dataset.hasImport)body.innerHTML='<tr><td colspan="8" class="empty">No import yet</td></tr>';}
-async function handleProductionImport(input){const file=input?.files?.[0];if(!file)return;let saved=0,skipped=0,errors=0;showLoading('Importing production Excel...');try{const buf=await file.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});for(let i=0;i<rows.length;i++){const row=rows[i];if(isFooterImportRow(row))continue;const built=await buildImportEntriesForRow(row,i);if(built==='CANCEL_IMPORT'){break;}if(!built||!built.length){skipped++;continue;}const res=await saveImportEntries(built,i);saved+=res.saved;errors+=res.errors;}}catch(err){errors++;addImportResult({row:'—',date:'—',employee:'—',role:'—',taskCode:'—',partNumber:'—',hours:'—',status:'Import failed: '+(err.message||err),type:'error'});}finally{renderProductionImportPreview();if(typeof renderAllEntries==='function')renderAllEntries();if(typeof renderTG==='function')renderTG();if(typeof renderReports==='function')renderReports();if(typeof renderLB==='function')renderLB();toast(`Production import complete: ${saved} saved, ${skipped} ignored, ${errors} errors`);if(input)input.value='';hideLoading();}}
+async function handleProductionImport(input){const file=input?.files?.[0];if(!file)return;let saved=0,skipped=0,errors=0;showLoading('Importing production Excel...');try{const buf=await file.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});for(let i=0;i<rows.length;i++){const row=rows[i];if(isFooterImportRow(row))continue;const built=buildImportEntriesForRow(row,i);if(built==='CANCEL_IMPORT'){break;}if(!built||!built.length){skipped++;continue;}const res=await saveImportEntries(built,i);saved+=res.saved;errors+=res.errors;}}catch(err){errors++;addImportResult({row:'—',date:'—',employee:'—',role:'—',taskCode:'—',partNumber:'—',hours:'—',status:'Import failed: '+(err.message||err),type:'error'});}finally{renderProductionImportPreview();if(typeof renderAllEntries==='function')renderAllEntries();if(typeof renderTG==='function')renderTG();if(typeof renderReports==='function')renderReports();if(typeof renderLB==='function')renderLB();toast(`Production import complete: ${saved} saved, ${skipped} ignored, ${errors} errors`);if(input)input.value='';hideLoading();}}
 window.handleProductionImport=handleProductionImport;window.renderProductionImportPage=renderProductionImportPage;window.renderProductionImportPreview=renderProductionImportPreview;window.clearProductionImportPreview=clearProductionImportPreview;window.openImportAddPart=openImportAddPart;window.openImportAddEmployee=openImportAddEmployee;window.retryProductionImportRow=retryProductionImportRow;
 
 function dlFile(c,fn,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=fn;a.click();URL.revokeObjectURL(a.href);}
@@ -3753,7 +2398,9 @@ function buildNav(){
   nav.innerHTML='<div class="sb-sec">Menu</div>'+(NAV[CR]||[]).map(p=>`<div class="nl" data-page="${p}" onclick="navTo('${p}');closeSidebar();"><span class="ni">${ICONS[p]||'•'}</span>${META[p]?.t||p}</div>`).join('');
 }
 window.navTo=function(page){
-  if(page==='entry' && CR==='tech'){page='mystats';}
+  // TECHNICIAN MUST NOT ACCESS PRODUCTION ENTRY
+  if(CR==='tech' && page==='entry'){toast('Access denied','error');page='mystats';}
+
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.nl').forEach(l=>l.classList.remove('on'));
   const pg=document.getElementById('pg-'+page);if(pg)pg.classList.add('on');
@@ -3843,10 +2490,7 @@ async function doLogin(){
   document.getElementById('login').classList.remove('on');
   document.getElementById('app').classList.add('on');
   hideLoading();
-  if(CR==='tech'){navTo('mystats');}
-  else if(CR==='lead')navTo('dashboard');
-  else if(CR==='ctrl')navTo('controllerentry');
-  else navTo('techs');
+  if(CR==='tech'){navTo('mystats');}else if(CR==='lead'){navTo('dashboard');}else if(CR==='ctrl'){navTo('controllerentry');}else{navTo('techs');}
   toast('Welcome, '+user.name.split(' ')[0]+'!');
 }
 window.doLogin=doLogin;
@@ -3875,6 +2519,3 @@ document.addEventListener('DOMContentLoaded',()=>{
   const mf=document.getElementById('ms-month-filter');if(mf&&!mf.value)mf.value=todayEAT().slice(0,7);
   stxt('ver-current','v'+APP_VERSION);
 });
-</script>
-</body>
-</html>
